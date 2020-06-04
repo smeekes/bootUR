@@ -1,14 +1,14 @@
 Package: bootUR
 Type: Package
 Title: Bootstrap Unit Root Tests
-Version: 0.1.0
+Version: 0.2.0
 Author@R: c(
    person("Stephan", "Smeekes", email = "s.smeekes@maastrichtuniversity.nl", role=c("cre","aut")),
    person("Ines", "Wilms", email = "i.wilms@maastrichtuniversity.nl", role="aut"))
 Author: Stephan Smeekes [cre, aut],
   Ines Wilms [aut]
 Maintainer: Stephan Smeekes <s.smeekes@maastrichtuniversity.nl>
-Description: Bootstrap Unit Root Tests. Add some references here to each of the test statistics.
+Description: This package performs various bootstrap unit root tests for both individual time series (including augmented Dickey-Fuller test and union tests), multiple time series and panel data; see Palm, Smeekes and Urbain (2008) <doi:10.1111/j.1467-9892.2007.00565.x>, Palm, Smeekes and Urbain (2011) <doi:10.1016/j.jeconom.2010.11.010>, Moon and Perron (2012) <doi:10.1016/j.jeconom.2012.01.008>, Smeekes and Taylor (2012), <doi:10.1017/S0266466611000387> , Smeekes (2015) <doi:10.1111/jtsa.12110> for key references. 
 License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
