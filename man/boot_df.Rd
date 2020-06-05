@@ -4,21 +4,9 @@
 \alias{boot_df}
 \title{Bootstrap Dickey-Fuller Unit Root Test}
 \usage{
-boot_df(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  B = 9999,
-  l = NULL,
-  ar_AWB = NULL,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  dc = 1,
-  detr = "OLS",
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+boot_df(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+  ar_AWB = NULL, p.min = 0, p.max = NULL, ic = "MAIC", dc = 1,
+  detr = "OLS", ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{Vector with time series data to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}
@@ -52,6 +40,13 @@ For boostrap union test (union=TRUE): a matrix with test statistic and p-value (
 }
 \description{
 Bootstrap Dickey-Fuller Unit Root Test
+}
+\examples{
+# boot_df on GDPC1 (Real Gross Domestic Product)
+GDP_df <- boot_df(FREDQD[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
+
+# boot_df on T5YFFM (5-year Treasury constant maturity minus federal funds rate)
+T5YFFM_df <- boot_df(FREDQD[, 202], B = 399, dc = 1, detr = "OLS", verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.

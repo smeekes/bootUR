@@ -4,22 +4,9 @@
 \alias{iADFtest}
 \title{Individual Unit Root Tests without multiple testing control}
 \usage{
-iADFtest(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  B = 9999,
-  l = NULL,
-  ar_AWB = NULL,
-  union = TRUE,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  dc = NULL,
-  detr = NULL,
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+  ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC",
+  dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{A T-dimensional vector or a (TxN)-matrix of N time series with T observations to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}
@@ -55,6 +42,10 @@ For boostrap union test (union=TRUE): a matrix with test statistic and p-value (
 }
 \description{
 Individual Unit Root Tests without multiple testing control
+}
+\examples{
+# iADFtest on GDPC1 and T5YFFM
+two_series_iADFtest <- iADFtest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.

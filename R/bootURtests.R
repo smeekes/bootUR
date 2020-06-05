@@ -28,6 +28,9 @@
 #' @references Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
 #' @references Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+#' @examples
+#' # iADFtest on GDPC1 and T5YFFM
+#' two_series_iADFtest <- iADFtest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE){
 
@@ -140,6 +143,12 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB =
 #' @references Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
 #' @references Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+#' @examples
+#' # boot_df on GDPC1 (Real Gross Domestic Product)
+#' GDP_df <- boot_df(FREDQD[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
+#'
+#' # boot_df on T5YFFM (5-year Treasury constant maturity minus federal funds rate)
+#' T5YFFM_df <- boot_df(FREDQD[, 202], B = 399, dc = 1, detr = "OLS", verbose = TRUE)
 boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, p.min = 0, p.max = NULL,
                      ic = "MAIC", dc = 1, detr = "OLS", ic.scale = TRUE, verbose = FALSE){
 
@@ -178,6 +187,12 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' @references Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
 #' @references Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+#' @examples
+#' # boot_union on GDPC1 
+#' GDP_df <- boot_union(FREDQD[, 1], B = 399, verbose = TRUE)
+#'
+#' # boot_union on T5YFFM
+#' T5YFFM_df <- boot_union(FREDQD[, 202], B = 399, verbose = TRUE)
 boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, p.min = 0, p.max = NULL,
                     ic = "MAIC", ic.scale = TRUE, verbose = FALSE){
 
@@ -223,6 +238,9 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
 #' @references Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
 #' @references Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+#' @examples
+#' # bFDRtest on GDPC1 and T5YFFM 
+#' two_series_bFDRtest <- bFDRtest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 bFDRtest <- function(y, level = 0.05,  boot = "MBB", l = NULL, ar_AWB = NULL, B = 9999, union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE){
 
   inputs <- generate_inputs(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level, boot = boot, B = B, union = union,
@@ -331,6 +349,9 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", l = NULL, ar_AWB = NULL, B 
 #' @references Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
 #' @references Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+#' @examples
+#' # BSQTtest on GDPC1 and T5YFFM 
+#' two_series_BSQTtest <- BSQTtest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 BSQTtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, q = 0:NCOL(y), ic.scale = TRUE, verbose = FALSE){
 
@@ -441,6 +462,9 @@ BSQTtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 #' @references Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
 #' @references Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+#' @examples
+#' # paneltest on GDPC1 and T5YFFM 
+#' two_series_paneltest <- paneltest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 paneltest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
                       ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE){
 

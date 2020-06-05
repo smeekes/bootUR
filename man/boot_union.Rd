@@ -4,19 +4,9 @@
 \alias{boot_union}
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
-boot_union(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  B = 9999,
-  l = NULL,
-  ar_AWB = NULL,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+  ar_AWB = NULL, p.min = 0, p.max = NULL, ic = "MAIC",
+  ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{Vector with time series data to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}
@@ -46,6 +36,13 @@ For boostrap union test (union=TRUE): a matrix with test statistic and p-value (
 }
 \description{
 Bootstrap Union Test for Unit Roots
+}
+\examples{
+# boot_union on GDPC1 
+GDP_df <- boot_union(FREDQD[, 1], B = 399, verbose = TRUE)
+
+# boot_union on T5YFFM
+T5YFFM_df <- boot_union(FREDQD[, 202], B = 399, verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.

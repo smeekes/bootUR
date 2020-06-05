@@ -4,26 +4,8 @@
 \alias{generate_inputs}
 \title{Auxiliary Function (not accessible to users) to create all inputs for the unit root test functions.}
 \usage{
-generate_inputs(
-  y,
-  BSQT_test,
-  iADF_test,
-  level,
-  boot,
-  B,
-  union,
-  p.min,
-  p.max,
-  ic,
-  dc,
-  detr,
-  q,
-  l,
-  ic.scale,
-  h.rs,
-  k_DWB,
-  ar_AWB
-)
+generate_inputs(y, BSQT_test, iADF_test, level, boot, B, union, p.min, p.max,
+  ic, dc, detr, q, l, ic.scale, h.rs, k_DWB, ar_AWB)
 }
 \arguments{
 \item{y}{A T-dimensional vector or (TxN)-matrix with data to be tested for unit roots}

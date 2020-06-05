@@ -4,22 +4,9 @@
 \alias{paneltest}
 \title{Panel Unit Root Test}
 \usage{
-paneltest(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  B = 9999,
-  l = NULL,
-  ar_AWB = NULL,
-  union = TRUE,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  dc = NULL,
-  detr = NULL,
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+  ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC",
+  dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{A (TxN)-matrix of N time series with T observations to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}
@@ -51,10 +38,14 @@ paneltest(
 \item{verbose}{Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.}
 }
 \value{
-xxxxx
+Still to be added
 }
 \description{
 Panel Unit Root Test
+}
+\examples{
+# paneltest on GDPC1 and T5YFFM 
+two_series_paneltest <- paneltest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
