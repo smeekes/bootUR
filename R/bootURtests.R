@@ -14,7 +14,14 @@
 #' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (TRUE) or not (FALSE). Default is TRUE.
 #' @param verbose Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.
 #' @export
-#' @return For boostrap union test (union=TRUE): a matrix with test statistic and p-value (columns) for each of the time series (rows). Otherwise, an array with for each time series test statistic and p-value for each of the deterministic component specifications7
+#' @return A list with the following components:
+#' 
+#' rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+#'
+#' ADF_tests: Details on the unit root tests: value of the test statistics and p-values.
+#' 
+#' If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
+#' 
 #' @references Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
 #' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 #' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
@@ -129,8 +136,14 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB =
 #' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (TRUE) or not (FALSE). Default is TRUE.
 #' @param verbose Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.
 #' @export
-#' @return For boostrap union test (union=TRUE): a matrix with test statistic and p-value (columns) for each of the time series (rows). Otherwise, an array with for each time series test statistic and p-value for each of the deterministic component specifications7
-#' @references Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
+#' @return A list with the following components:
+#' 
+#' rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+#'
+#' ADF_tests: Details on the unit root tests: value of the test statistics and p-values.
+#' 
+#' The output components are arranged per time series, type of deterministic component and detrending method.
+#' #' @references Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
 #' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 #' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
 #' @references Harvey, D. I., Leybourne, S. J., and Taylor, A. M. R. (2012), Testing for unit roots in the presence of uncertainty over both the trend and initial condition, Journal of Econometrics, 169(2), 188-195.
@@ -173,7 +186,13 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (TRUE) or not (FALSE). Default is TRUE.
 #' @param verbose Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.
 #' @export
-#' @return For boostrap union test (union=TRUE): a matrix with test statistic and p-value (columns) for each of the time series (rows). Otherwise, an array with for each time series test statistic and p-value for each of the deterministic component specifications7
+#' @return A list with the following components:
+#' 
+#' rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+#'
+#' ADF_tests: Details on the unit root tests: value of the test statistics and p-values.
+#' 
+#' The output components are arranged per time series
 #' @references Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
 #' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 #' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
@@ -224,6 +243,13 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
 #' @param verbose Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.
 #' @export
 #' @return A list with the following components:
+#' 
+#' rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+#'
+#' FDR_sequence: Details on the unit root tests: value of the test statistics and critical values.
+#' 
+#' If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
+#' 
 #' @references Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
 #' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 #' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
@@ -335,7 +361,14 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", l = NULL, ar_AWB = NULL, B 
 #' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (TRUE) or not (FALSE). Default is TRUE.
 #' @param verbose Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.
 #' @export
-#' @return To be added
+#' @return A list with the following components:
+#' 
+#' rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+#'
+#' BSQT_sequence: Details on the unit root tests: outcome of the sequential steps, value of the test statistics and p-values.
+#' 
+#' If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
+#' 
 #' @references Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
 #' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 #' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
@@ -447,7 +480,14 @@ BSQTtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 #' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (TRUE) or not (FALSE). Default is TRUE.
 #' @param verbose Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.
 #' @export
-#' @return Still to be added
+#' @return A list with the following components:
+#' 
+#' rej_H0: Logical indicator of whether the null hypothesis that all series have a unit root is rejected (TRUE) or not (FALSE). 
+#'
+#' panel_tests: Details on the panel unit root test: value of the test statistics and p-values.
+#' 
+#' If no union test is used, the output components are arranged per type of deterministic component and detrending method.
+#'
 #' @references Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
 #' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 #' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)

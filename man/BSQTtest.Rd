@@ -41,7 +41,13 @@ BSQTtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{verbose}{Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.}
 }
 \value{
-To be added
+A list with the following components:
+
+rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+
+BSQT_sequence: Details on the unit root tests: outcome of the sequential steps, value of the test statistics and p-values.
+
+If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
 }
 \description{
 Bootstrap Sequential Panel Test

@@ -39,6 +39,12 @@ bFDRtest(y, level = 0.05, boot = "MBB", l = NULL, ar_AWB = NULL,
 }
 \value{
 A list with the following components:
+
+rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+
+FDR_sequence: Details on the unit root tests: value of the test statistics and critical values.
+
+If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
 }
 \description{
 False Discovery Rate controlled Unit Root Tests

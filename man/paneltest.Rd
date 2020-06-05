@@ -38,7 +38,13 @@ paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{verbose}{Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.}
 }
 \value{
-Still to be added
+A list with the following components:
+
+rej_H0: Logical indicator of whether the null hypothesis that all series have a unit root is rejected (TRUE) or not (FALSE). 
+
+panel_tests: Details on the panel unit root test: value of the test statistics and p-values.
+
+If no union test is used, the output components are arranged per type of deterministic component and detrending method.
 }
 \description{
 Panel Unit Root Test
