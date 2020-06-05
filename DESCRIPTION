@@ -1,7 +1,7 @@
 Package: bootUR
 Type: Package
 Title: Bootstrap Unit Root Tests
-Version: 0.2.0
+Version: 0.1.0
 Author@R: c(
    person("Stephan", "Smeekes", email = "s.smeekes@maastrichtuniversity.nl", role=c("cre","aut")),
    person("Ines", "Wilms", email = "i.wilms@maastrichtuniversity.nl", role="aut"))

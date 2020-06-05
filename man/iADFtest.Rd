@@ -15,7 +15,7 @@ iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \item{boot}{String for bootstrap method to be used. Options are
 \describe{
-\item{"MBB"}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011), this is the default;}
+\item{\verb{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011), this is the default;}
 \item{\verb{"BWB"}}{Block wild bootstrap (Shao, 2011);}
 \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
@@ -49,8 +49,13 @@ Default is TRUE.}
 the unit root test needs to be printed to the console. Default is FALSE.}
 }
 \value{
-For boostrap union test (union=TRUE): a matrix with test statistic
-and p-value (columns) for each of the time series (rows). Otherwise, an array with for each time series test statistic and p-value for each of the deterministic component specifications7
+A list with the following components:
+
+rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE).
+
+ADF_tests: Details on the unit root tests: value of the test statistics and p-values.
+
+If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
 }
 \description{
 This function performs bootstrap unit root tests on each time series individually.
@@ -58,36 +63,44 @@ This function performs bootstrap unit root tests on each time series individuall
 \details{
 Lag selection (rescaling and Perron-Qu correction). Residual bootstrap.
 }
+\examples{
+# iADFtest on GDPC1 and T5YFFM
+two_series_iADFtest <- iADFtest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
+}
 \references{
-Chang, Y. and Park, J. (2003).
+Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 
 Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time
 series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
-(2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
+(2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.
 
-Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
+Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient tests for an autoregressive unit root. \emph{Econometrica}, 64(4), 813-836.
 
-Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
+Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
 
-Harvey, D.I., Leybourne, S.J., and Taylor, A.M.R. (2012), Testing for unit roots in the presence of uncertainty over both the trend and initial condition, Journal of Econometrics, 169(2), 188-195.
+Harvey, D.I., Leybourne, S.J., and Taylor, A.M.R. (2012). Testing for unit roots in the presence of uncertainty over both the trend and initial condition. \emph{Journal of Econometrics}, 169(2), 188-195.
 
-Moon, H.R. and Perron, B. (2012), Beyond panel unit root tests: Using multiple testing to determine the non stationarity properties of individual series in a panel. Journal of Econometrics, 169(1), 29-33.
+Moon, H.R. and Perron, B. (2012). Beyond panel unit root tests: Using multiple testing to determine the non stationarity properties of individual series in a panel. Journal of Econometrics, 169(1), 29-33.
 
-Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008), Bootstrap unit root tests: Comparison and extensions, Journal of Time Series Analysis, 29(1), 371-401.
+Ng, S. and Perron, P. (2001). Lag Length Selection and the Construction of Unit Root Tests with Good Size and Power. \emph{Econometrica}, 69(6), 1519-1554,
 
-Rho, Y. and Shao, X. (2019), Bootstrap-assisted unit root testing with piecewise locally stationary errors, Econometric Theory, 35(1), 142-166.
+Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008). Bootstrap unit root tests: Comparison and extensions. \emph{Journal of Time Series Analysis}, 29(1), 371-401.
 
-Shao, X. (2010), The dependent wild bootstrap, Journal of the American Statistical Association, 105(489), 218-235.
+Perron, P. and Qu, Z. (2008). A simple modification to improve the finite sample properties of Ng and Perron's unit root tests. \emph{Economic Letters}, 94(1), 12-19.
 
-Shao, X. (2011), A bootstrap-assisted spectral test of white noise under unknown dependence, Journal of Econometrics, 162, 213-224.
+Rho, Y. and Shao, X. (2019). Bootstrap-assisted unit root testing with piecewise locally stationary errors. \emph{Econometric Theory}, 35(1), 142-166.
 
-Smeekes, S. (2015), Bootstrap sequential tests to determine the order of integration of individual units in a time series panel, Journal of Time Series Analysis, 36(3), 398-415.
+Shao, X. (2010). The dependent wild bootstrap. \emph{Journal of the American Statistical Association}, 105(489), 218-235.
 
-Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
+Shao, X. (2011). A bootstrap-assisted spectral test of white noise under unknown dependence. \emph{Journal of Econometrics}, 162, 213-224.
 
-Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
+Smeekes, S. (2015). Bootstrap sequential tests to determine the order of integration of individual units in a time series panel. \emph{Journal of Time Series Analysis}, 36(3), 398-415.
 
-Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit roots in the presence of nonstationary volatility. \emph{Econometric Theory}, 28(2), 422-456.
+
+Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
+
+Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 }

@@ -38,17 +38,21 @@ paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{verbose}{Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.}
 }
 \value{
-Still to be added
+If a union test is used, the test statistic and p-value are returned. If no union test is used, the test statistics and p-values are reported per type of deterministic component and detrending method.
 }
 \description{
 Panel Unit Root Test
+}
+\examples{
+# paneltest on GDPC1 and T5YFFM
+two_series_paneltest <- paneltest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
 
 Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 
-Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
+Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
 
 Harvey, D. I., Leybourne, S. J., and Taylor, A. M. R. (2012), Testing for unit roots in the presence of uncertainty over both the trend and initial condition, Journal of Econometrics, 169(2), 188-195.
 
