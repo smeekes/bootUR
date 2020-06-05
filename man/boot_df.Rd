@@ -38,7 +38,7 @@ boot_df(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \value{
 A list with the following components:
 
-rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE).
 
 ADF_tests: Details on the unit root tests: value of the test statistics and p-values.
 
@@ -58,7 +58,7 @@ T5YFFM_df <- boot_df(FREDQD[, 202], B = 399, dc = 1, detr = "OLS", verbose = TRU
 \references{
 Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 
-Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
+Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
 
 Harvey, D. I., Leybourne, S. J., and Taylor, A. M. R. (2012), Testing for unit roots in the presence of uncertainty over both the trend and initial condition, Journal of Econometrics, 169(2), 188-195.
 

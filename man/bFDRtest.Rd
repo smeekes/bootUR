@@ -40,7 +40,7 @@ bFDRtest(y, level = 0.05, boot = "MBB", l = NULL, ar_AWB = NULL,
 \value{
 A list with the following components:
 
-rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE). 
+rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE).
 
 FDR_sequence: Details on the unit root tests: value of the test statistics and critical values.
 
@@ -50,7 +50,7 @@ If a union test is used, the output components are arranged per time series. If 
 False Discovery Rate controlled Unit Root Tests
 }
 \examples{
-# bFDRtest on GDPC1 and T5YFFM 
+# bFDRtest on GDPC1 and T5YFFM
 two_series_bFDRtest <- bFDRtest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
@@ -58,7 +58,7 @@ Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag
 
 Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
 
-Friedrich, M., Smeekes, S. and Urbain, J.-P. (2018), Autoregressive wild bootstrap inference for nonparametric trends (arXiv No 1807.02357)
+Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
 
 Harvey, D. I., Leybourne, S. J., and Taylor, A. M. R. (2012), Testing for unit roots in the presence of uncertainty over both the trend and initial condition, Journal of Econometrics, 169(2), 188-195.
 
