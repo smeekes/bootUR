@@ -4,19 +4,9 @@
 \alias{boot_union}
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
-boot_union(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  B = 9999,
-  l = NULL,
-  ar_AWB = NULL,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+  ar_AWB = NULL, p.min = 0, p.max = NULL, ic = "MAIC",
+  ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{Vector with time series data to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}

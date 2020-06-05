@@ -4,22 +4,9 @@
 \alias{paneltest}
 \title{Panel Unit Root Test}
 \usage{
-paneltest(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  B = 9999,
-  l = NULL,
-  ar_AWB = NULL,
-  union = TRUE,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  dc = NULL,
-  detr = NULL,
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+  ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC",
+  dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{A (TxN)-matrix of N time series with T observations to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}
@@ -51,7 +38,7 @@ paneltest(
 \item{verbose}{Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.}
 }
 \value{
-xxxxx
+Still to be added
 }
 \description{
 Panel Unit Root Test

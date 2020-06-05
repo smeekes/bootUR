@@ -4,22 +4,9 @@
 \alias{bFDRtest}
 \title{False Discovery Rate controlled Unit Root Tests}
 \usage{
-bFDRtest(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  l = NULL,
-  ar_AWB = NULL,
-  B = 9999,
-  union = TRUE,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  dc = NULL,
-  detr = NULL,
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+bFDRtest(y, level = 0.05, boot = "MBB", l = NULL, ar_AWB = NULL,
+  B = 9999, union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC",
+  dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{A (TxN)-matrix of N time series with T observations to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}

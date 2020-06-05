@@ -155,26 +155,26 @@ arma::vec rescale_cpp(const arma::vec& y, const double& h = 0.1, const int& p = 
   return(yscaled);
 }
 
-double aic_cpp (const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
+double aic_cpp(const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
   const double s2 = dot(e, e)/n;
   const double icvalue = log(s2) + k * 2. / n;
   return icvalue;
 }
 
-double bic_cpp (const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
+double bic_cpp(const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
   const double s2 = dot(e, e)/n;
   const double icvalue = log(s2) + k * log(n) / n;
   return icvalue;
 }
 
-double maic_cpp (const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
+double maic_cpp(const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
   const double s2 = dot(e, e)/n;
   const double tk = dot(ylag, ylag) * pow(b0, 2) / s2;
   const double icvalue = log(s2) + (k + tk) * 2. / n;
   return icvalue;
 }
 
-double mbic_cpp (const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
+double mbic_cpp(const arma::vec& e, const int& k, const double& n, const double& b0, arma::mat& ylag){
   const double s2 = dot(e, e)/n;
   const double tk = dot(ylag, ylag) * pow(b0, 2) / s2;
   const double icvalue = log(s2) + (k + tk) * log(n) / n;

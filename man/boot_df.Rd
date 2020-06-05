@@ -4,21 +4,9 @@
 \alias{boot_df}
 \title{Bootstrap Dickey-Fuller Unit Root Test}
 \usage{
-boot_df(
-  y,
-  level = 0.05,
-  boot = "MBB",
-  B = 9999,
-  l = NULL,
-  ar_AWB = NULL,
-  p.min = 0,
-  p.max = NULL,
-  ic = "MAIC",
-  dc = 1,
-  detr = "OLS",
-  ic.scale = TRUE,
-  verbose = FALSE
-)
+boot_df(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+  ar_AWB = NULL, p.min = 0, p.max = NULL, ic = "MAIC", dc = 1,
+  detr = "OLS", ic.scale = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{y}{Vector with time series data to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}
