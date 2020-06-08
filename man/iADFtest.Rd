@@ -37,7 +37,7 @@ iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}. Default is \verb{"MAIC"} (Ng and Perron, 2001).}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are: 0: no deterministics, 1: intercept only, 2: intercept and trend. 
+\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are
 \describe{
 \item{\emph{0}}{no deterministics;}
 \item{\emph{1}}{intercept only;}
@@ -45,7 +45,7 @@ iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}), in which case this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
 }}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.}
+\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.}
 
 \item{ic.scale}{Logical indicator whether or not to use the rescaled
 information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}).
