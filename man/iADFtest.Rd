@@ -25,37 +25,42 @@ iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \item{B}{Number of bootstrap replications. Default is 9999.}
 
-\item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB, this is a genuine block length. For AWB, the blcok length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014); this can be overwritten by setting \verb{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.}
+\item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014); this can be overwritten by setting \verb{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.}
 
 \item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\verb{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
 
 \item{union}{Logical indicator whether or not to use bootstrap union tests (\verb{TRUE}) or not (\verb{FALSE}), see Harvey, Leybourne and Taylor (2012) and Smeekes and Taylor (2012). Default is \verb{TRUE}.}
 
-\item{p.min}{Minimum lag length in augmented Dickey-Fuller regression. Default is 0.}
+\item{p.min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{p.max}{Maximum lag length in ADF regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+\item{p.max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
-\item{ic}{String for information criterion used to select the lag length in the ADF regression. Options are: AIC, BIC, MAIC, MBIC. Default is MAIC (Ng and Perron, 2001).}
+\item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}. Default is \verb{"MAIC"} (Ng and Perron, 2001).}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if union = FALSE. Options are: 0: no deterministics, 1: intercept only, 2: intercept and trend. Combinations thereof are allowed. Default is the union test, in which case this is not relevant.If union is FALSE, the default is adding an intercept (a warning is given).}
+\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are: 0: no deterministics, 1: intercept only, 2: intercept and trend. 
+\describe{
+\item{\emph{0}}{no deterministics;}
+\item{\emph{1}}{intercept only;}
+\item{\emph{2}}{intercept and trend.}
+Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}), in which case this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
+}}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if union = FALSE. Options are OLS and/or QD (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is OLS.}
+\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.}
 
 \item{ic.scale}{Logical indicator whether or not to use the rescaled
-information criteria of Cavaliere et al. (2015) (TRUE) or not (FALSE).
-Default is TRUE.}
+information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}).
+Default is \verb{TRUE}.}
 
-\item{verbose}{Logical indictator wheter or not information on the outcome of
-the unit root test needs to be printed to the console. Default is FALSE.}
+\item{verbose}{Logical indicator whether or not information on the outcome of
+the unit root test needs to be printed to the console. Default is \verb{FALSE}.}
 }
 \value{
 A list with the following components:
-
-rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE).
-
-ADF_tests: Details on the unit root tests: value of the test statistics and p-values.
-
-If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
+\describe{
+\item{\verb{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\verb{TRUE}) or not (\verb{FALSE});}
+\item{\verb{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
+For the union test (\verb{union = TRUE}), the output is arranged per time series. If \verb{union = FALSE}, the output is arranged per time series, type of deterministic component (verb{dc}) and detrending method (verb{detr}).
+}
 }
 \description{
 This function performs bootstrap unit root tests on each time series individually.
