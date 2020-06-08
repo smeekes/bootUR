@@ -44,11 +44,8 @@ The output components are arranged per time series
 Bootstrap Union Test for Unit Roots
 }
 \examples{
-# boot_union on GDPC1
-GDP_df <- boot_union(FREDQD[, 1], B = 399, verbose = TRUE)
-
-# boot_union on T5YFFM
-T5YFFM_df <- boot_union(FREDQD[, 202], B = 399, verbose = TRUE)
+# boot_union on GDP_BE
+GDP_BE_df <- boot_union(eurostat[, 1], B = 399, verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.

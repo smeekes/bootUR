@@ -228,8 +228,8 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' @examples
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(eurostat[, 1], B = 399, verbose = TRUE)
-boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, p.min = 0, p.max = NULL,
-                    ic = "MAIC", ic.scale = TRUE, verbose = FALSE){
+boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, p.min = 0,
+                       p.max = NULL, ic = "MAIC", ic.scale = TRUE, verbose = FALSE){
 
   if (verbose) {
     cat("Bootstrap Test with", boot, "bootstrap method.\n")
@@ -298,8 +298,8 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", l = NULL, ar_AWB = NULL, B 
   if (union) { # Union Tests
     bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
     rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(y))
-    FDR_seq <- bFDRout$FDR_Tests[, -1]
-    
+    FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
+
     rownames(rej_H0) <- var_names
     rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1]]
 
@@ -315,7 +315,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", l = NULL, ar_AWB = NULL, B 
       } else {
           cat(paste("There are ", p_hat, " stationary time series", "\n", sep = ""))
       }
-      cat("Details of the FDR ssquential tests:\n")
+      cat("Details of the FDR sequential tests:\n")
       print(FDR_seq)
     }
   } else { # No Union Tests

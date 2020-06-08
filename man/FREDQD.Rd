@@ -4,11 +4,13 @@
 \name{FREDQD}
 \alias{FREDQD}
 \title{FRED-QD Data Set}
-\format{A time series object containing 247 macro-economic time series, quarterly observed over 243 time points (from 1959-2019). In the examples, the following two time series will be used
+\format{
+A time series object containing 247 macro-economic time series, quarterly observed over 243 time points (from 1959-2019). In the examples, the following two time series will be used
 
 GDPC1: Real Gross Domestic Product (column 1)
 
-T5YFFM:  5-year Treasury constant maturity minus federal funds rate (column 202)}
+T5YFFM:  5-year Treasury constant maturity minus federal funds rate (column 202)
+}
 \usage{
 FREDQD
 }

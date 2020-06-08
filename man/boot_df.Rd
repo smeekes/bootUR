@@ -49,11 +49,8 @@ The output components are arranged per time series, type of deterministic compon
 Bootstrap Dickey-Fuller Unit Root Test
 }
 \examples{
-# boot_df on GDPC1 (Real Gross Domestic Product)
-GDP_df <- boot_df(FREDQD[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
-
-# boot_df on T5YFFM (5-year Treasury constant maturity minus federal funds rate)
-T5YFFM_df <- boot_df(FREDQD[, 202], B = 399, dc = 1, detr = "OLS", verbose = TRUE)
+# boot_df on GDP_BE
+GDP_BE_df <- boot_df(eurostat[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
 }
 \references{
 Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.

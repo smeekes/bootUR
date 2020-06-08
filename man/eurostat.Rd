@@ -5,47 +5,49 @@
 \alias{eurostat}
 \title{Eurostat Data}
 \format{
-A time series object containing 20 macro-economic time series, quarterly observed from 1959-2019 for Belgium (BE), Germany (DE), France (FR), the Netherlands (NL) and the United Kingdom (UK).
+A time series object containing 20 macroeconomic seasonally adjusted time series, quarterly observed from 1992-2019 for Belgium (BE), Germany (DE), France (FR), the Netherlands (NL) and the United Kingdom (UK).
 
-GDP_BE: Gross domestic product at market prices (index, 2015=100) for Belgium. The data are seasonally and calendar adjusted.
+\describe{
+\item{\verb{GDP_BE}}{Gross domestic product at market prices (index, 2015=100) for Belgium.}
 
-GDP_DE: Gross domestic product at market prices (index, 2015=100) for Germany. The data are seasonally and calendar adjusted.
+\item{\verb{GDP_DE}}{Gross domestic product at market prices (index, 2015=100) for Germany.}
 
-GDP_FR: Gross domestic product at market prices (index, 2015=100) for France. The data are seasonally and calendar adjusted.
+\item{\verb{GDP_FR}}{Gross domestic product at market prices (index, 2015=100) for France.}
 
-GDP_NL: Gross domestic product at market prices (index, 2015=100) for the Netherlands. The data are seasonally and calendar adjusted.
+\item{\verb{GDP_NL}}{Gross domestic product at market prices (index, 2015=100) for the Netherlands.}
 
-GDP_UK: Gross domestic product at market prices (index, 2015=100) for the United Kingdom. The data are seasonally and calendar adjusted.
+\item{\verb{GDP_UK}}{Gross domestic product at market prices (index, 2015=100) for the United Kingdom.}
 
-CONS_BE: Final consumption expenditure (index, 2015=100) for Belgium. The data are seasonally and calendar adjusted.
+\item{\verb{CONS_BE}}{Final consumption expenditure (index, 2015=100) for Belgium.}
 
-CONS_DE: Final consumption expenditure (index, 2015=100) for Germany. The data are seasonally and calendar adjusted.
+\item{\verb{CONS_DE}}{Final consumption expenditure (index, 2015=100) for Germany.}
 
-CONS_FR: Final consumption expenditure (index, 2015=100) for France. The data are seasonally and calendar adjusted.
+\item{\verb{CONS_FR}}{Final consumption expenditure (index, 2015=100) for France.}
 
-CONS_NL: Final consumption expenditure (index, 2015=100) for the Netherlands. The data are seasonally and calendar adjusted.
+\item{\verb{CONS_NL}}{Final consumption expenditure (index, 2015=100) for the Netherlands.}
 
-CONS_UK: Final consumption expenditure (index, 2015=100) for the United Kingdom. The data are seasonally and calendar adjusted.
+\item{\verb{CONS_UK}}{Final consumption expenditure (index, 2015=100) for the United Kingdom.}
 
-HICP_BE: Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for Belgium. 
+\item{\verb{HICP_BE}}{Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for Belgium.}
 
-HICP_DE: Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for Germany. 
+\item{\verb{HICP_DE}}{Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for Germany.}
 
-HICP_FR: Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for France. 
+\item{\verb{HICP_FR}}{Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for France.}
 
-HICP_NL: Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for the Netherlands. 
+\item{\verb{HICP_N}}{Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for the Netherlands.}
 
-HICP_UK: Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for the United Kingdom. 
+\item{\verb{HICP_UK}}{Harmonised Indices of Consumer Prices (annual rate of change, 2015=100) for the United Kingdom.}
 
-UR_BE: Unemployment rate (percentage of the active population) for Belgium. The data are seasonally adjusted.
+\item{\verb{UR_BE}}{Unemployment rate (percentage of the active population) for Belgium.}
 
-UR_DE: Unemployment rate (percentage of the active population) for Germany The data are seasonally adjusted.
+\item{\verb{UR_DE}}{Unemployment rate (percentage of the active population) for Germany.}
 
-UR_FR: Unemployment rate (percentage of the active population) for France The data are seasonally adjusted.
+\item{\verb{UR_FR}}{Unemployment rate (percentage of the active population) for France.}
 
-UR_NL: Unemployment rate (percentage of the active population) for the Netherlands The data are seasonally adjusted.
+\item{\verb{UR_NL}}{Unemployment rate (percentage of the active population) for the Netherlands.}
 
-UR_UK: Unemployment rate (percentage of the active population) for the United Kingdom The data are seasonally adjusted.
+\item{\verb{UR_UK}}{Unemployment rate (percentage of the active population) for the United Kingdom.}
+}
 }
 \source{
 https://ec.europa.eu/eurostat/data/database
@@ -54,6 +56,12 @@ https://ec.europa.eu/eurostat/data/database
 eurostat
 }
 \description{
-Eurostat macro-economic data on output, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
+Eurostat macroeconomic data on output, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
+}
+\note{
+\itemize{
+\item Unemployment rates are seasonally but not calendar adjusted, all other series are both seasonally and calendar adjusted.
+\item Quarterly inflation rates are sampled from Eurostat's monthly series with annual rates of change as the final month of the respective quarter.
+\item The unemployment rate for France excludes overseas territories ('France continental' in the Eurostat database).}
 }
 \keyword{datasets}

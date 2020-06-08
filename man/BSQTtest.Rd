@@ -53,8 +53,8 @@ If a union test is used, the output components are arranged per time series. If 
 Bootstrap Sequential Panel Test
 }
 \examples{
-# BSQTtest on GDPC1 and T5YFFM
-two_series_BSQTtest <- BSQTtest(FREDQD[, c(1, 202)], boot = "MBB", B = 399,  verbose = TRUE)
+# BSQTtest on GDP_BE and GDP_DE
+two_series_BSQTtest <- BSQTtest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
