@@ -48,6 +48,8 @@ Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}
 
 \item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.}
 
+\item{q}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
+
 \item{ic.scale}{Logical indicator whether or not to use the rescaled
 information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}).
 Default is \verb{TRUE}.}

@@ -41,8 +41,6 @@ Default is \verb{TRUE}.}
 
 \item{verbose}{Logical indicator whether or not information on the outcome of
 the unit root test needs to be printed to the console. Default is \verb{FALSE}.}
-
-\item{union}{Logical indicator whether or not to use bootstrap union tests (\verb{TRUE}) or not (\verb{FALSE}), see Harvey, Leybourne and Taylor (2012) and Smeekes and Taylor (2012). Default is \verb{TRUE}.}
 }
 \value{
 A list with the following components:
