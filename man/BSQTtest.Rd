@@ -10,44 +10,58 @@ BSQTtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
   verbose = FALSE)
 }
 \arguments{
-\item{y}{A (TxN)-matrix of N time series with T observations to be tested for unit roots. Data may also be in a time series format (e.g. ts, zoo or xts).}
+\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}).}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
-\item{boot}{String for bootstrap method to be used. Options are MBB - moving blocks bootstrap (Moon and Perron, 2012; Smeekes, 2015), BWB - block wild bootstrap (Shao, 2011), DWB - dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019), AWB - autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2018), SB - sieve bootstrap (Palm, Smeekes and Urbain, 2008; Smeekes and Urbain, 2014a), SWB - sieve wild boostrap (Smeekes and Taylor, 2014b). Default is MBB.}
+\item{boot}{String for bootstrap method to be used. Options are
+\describe{
+\item{\verb{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011), this is the default;}
+\item{\verb{"BWB"}}{Block wild bootstrap (Shao, 2011);}
+\item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
+\item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
+\item{\verb{"SB"}}{Sieve bootstrap (Palm, Smeekes and Urbain,2008; Smeekes and Urbain, 2014a);}
+\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2014b).}
+}}
 
 \item{B}{Number of bootstrap replications. Default is 9999.}
 
-\item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB, this is a genuine block length. For AWB, the blcok length is transformed into an autoregressive parameter via the formula 0.01^(1/l) as in Smeekes and Urbain (2014); this can be overwritten by setting ar_AWB directly. Default sets the block length as a function of the time series length n, via the rule l = 1.75*n^(1/3).}
+\item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014); this can be overwritten by setting \verb{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.}
 
-\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (boot = "AWB"). Can be used to set the parameter directly rather than via the default link to the block length l.}
+\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\verb{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
 
-\item{union}{Logical indicator whether or not to use bootstrap union tests (TRUE) or not (FALSE), see Harvey et al. (2012), Smeekes and Taylor (2012). Default is TRUE.}
+\item{union}{Logical indicator whether or not to use bootstrap union tests (\verb{TRUE}) or not (\verb{FALSE}), see Harvey, Leybourne and Taylor (2012) and Smeekes and Taylor (2012). Default is \verb{TRUE}.}
 
-\item{p.min}{Minimum lag length in augmented Dickey-Fuller (ADF) regression. Default is 0.}
+\item{p.min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{p.max}{Maximum lag length in ADF regression. Default NULL uses the sample size-based rule 12*(T/100)^(1/4).}
+\item{p.max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
-\item{ic}{String for information criterion used to select the lag length in the ADF regression. Options are: AIC, BIC, MAIC, MBIC. Default is MAIC.}
+\item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}. Default is \verb{"MAIC"} (Ng and Perron, 2001).}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if union=FALSE. Options are: 0: no deterministics, 1: intercept only, 2: intercept and trend. Combinations thereof are allowed. Default is 1.}
+\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are
+\describe{
+\item{\emph{0}}{no deterministics;}
+\item{\emph{1}}{intercept only;}
+\item{\emph{2}}{intercept and trend.}
+Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}), in which case this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
+}}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if union=FALSE. Options are OLS and/or QD (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is OLS.}
+\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.}
 
-\item{q}{Numeric vector quantiles to be tested Default is to test each unit sequentially.}
+\item{ic.scale}{Logical indicator whether or not to use the rescaled
+information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}).
+Default is \verb{TRUE}.}
 
-\item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (TRUE) or not (FALSE). Default is TRUE.}
-
-\item{verbose}{Logical indictator wheter or not information on the outcome of the unit root test needs to be printed to the console. Default is FALSE.}
+\item{verbose}{Logical indicator whether or not information on the outcome of
+the unit root test needs to be printed to the console. Default is \verb{FALSE}.}
 }
 \value{
 A list with the following components:
-
-rej_H0: Logical indicator of whether the null hypothesis of a unit root is rejected (TRUE) or not (FALSE).
-
-BSQT_sequence: Details on the unit root tests: outcome of the sequential steps, value of the test statistics and p-values.
-
-If a union test is used, the output components are arranged per time series. If no union test is used, the output components are arranged per time series, type of deterministic component and detrending method.
+\describe{
+\item{\verb{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\verb{TRUE}) or not (\verb{FALSE});}
+\item{\verb{BSQT_sequence}}{Details on the unit root tests: outcome of the sequential steps, value of the test statistics and p-values.}
+For the union test (\verb{union = TRUE}), the output is arranged per time series. If \verb{union = FALSE}, the output is arranged per time series, type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
+}
 }
 \description{
 Bootstrap Sequential Panel Test
@@ -57,29 +71,34 @@ Bootstrap Sequential Panel Test
 two_series_BSQTtest <- BSQTtest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
-Cavaliere, G., Phillips, P. C. B., Smeekes, S., and Taylor, A. M. R. (2015), Lag length selection for unit root tests in the presence of nonstationary volatility, Econometric Reviews, 34(4), 512-536.
+Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
+(2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.
 
-Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996), Efficient tests for an autoregressive unit root, Econometrica, 64(4), 813-836.
+Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient tests for an autoregressive unit root. \emph{Econometrica}, 64(4), 813-836.
 
 Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
 
-Harvey, D. I., Leybourne, S. J., and Taylor, A. M. R. (2012), Testing for unit roots in the presence of uncertainty over both the trend and initial condition, Journal of Econometrics, 169(2), 188-195.
+Harvey, D.I., Leybourne, S.J., and Taylor, A.M.R. (2012). Testing for unit roots in the presence of uncertainty over both the trend and initial condition. \emph{Journal of Econometrics}, 169(2), 188-195.
 
-Moon, H. R. and Perron, B. (2012), Beyond panel unit root tests: Using multiple testing to determine the non stationarity properties of individual series in a panel. Journal of Econometrics, 169(1), 29-33.
+Moon, H.R. and Perron, B. (2012). Beyond panel unit root tests: Using multiple testing to determine the non stationarity properties of individual series in a panel. Journal of Econometrics, 169(1), 29-33.
 
-Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008), Bootstrap unit root tests: Comparison and extensions, Journal of Time Series Analysis, 29(1), 371-401.
+Ng, S. and Perron, P. (2001). Lag Length Selection and the Construction of Unit Root Tests with Good Size and Power. \emph{Econometrica}, 69(6), 1519-1554,
 
-Rho, Y. and Shao, X. (2019), Bootstrap-assisted unit root testing with piecewise locally stationary errors, Econometric Theory, 35(1), 142-166.
+Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008). Bootstrap unit root tests: Comparison and extensions. \emph{Journal of Time Series Analysis}, 29(1), 371-401.
 
-Shao, X. (2010), The dependent wild bootstrap, Journal of the American Statistical Association, 105(489), 218-235.
+Perron, P. and Qu, Z. (2008). A simple modification to improve the finite sample properties of Ng and Perron's unit root tests. \emph{Economic Letters}, 94(1), 12-19.
 
-Shao, X. (2011), A bootstrap-assisted spectral test of white noise under unknown dependence, Journal of Econometrics, 162, 213-224.
+Rho, Y. and Shao, X. (2019). Bootstrap-assisted unit root testing with piecewise locally stationary errors. \emph{Econometric Theory}, 35(1), 142-166.
 
-Smeekes, S. (2015), Bootstrap sequential tests to determine the order of integration of individual units in a time series panel, Journal of Time Series Analysis, 36(3), 398-415.
+Shao, X. (2010). The dependent wild bootstrap. \emph{Journal of the American Statistical Association}, 105(489), 218-235.
 
-Smeekes, S. and Taylor, A.M.R. (2012), Bootstrap union tests for unit roots in the presence of nonstationary volatility, Econometric Theory, 28(2), 422-456.
+Shao, X. (2011). A bootstrap-assisted spectral test of white noise under unknown dependence. \emph{Journal of Econometrics}, 162, 213-224.
 
-Smeekes, S. and Urbain, J.-P. (2014a), A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing (GSBE Research Memorandum No. RM/14/008), Maastricht University
+Smeekes, S. (2015). Bootstrap sequential tests to determine the order of integration of individual units in a time series panel. \emph{Journal of Time Series Analysis}, 36(3), 398-415.
 
-Smeekes, S. and Urbain, J.-P. (2014b), On the applicability of the sieve bootstrap in time series panels, Oxford Bulletin of Economics and Statistics, 76(1), 139-151.
+Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit roots in the presence of nonstationary volatility. \emph{Econometric Theory}, 28(2), 422-456.
+
+Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
+
+Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 }
