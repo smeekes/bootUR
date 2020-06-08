@@ -18,7 +18,7 @@
 #' @param p.min Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
 #' @param p.max Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
 #' @param ic String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}. Default is \verb{"MAIC"} (Ng and Perron, 2001).
-#' @param dc Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are: 0: no deterministics, 1: intercept only, 2: intercept and trend. 
+#' @param dc Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are:
 #' \describe{
 #' \item{\emph{0}}{no deterministics;}
 #' \item{\emph{1}}{intercept only;}
@@ -37,7 +37,7 @@
 #' \describe{
 #' \item{\verb{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\verb{TRUE}) or not (\verb{FALSE});}
 #' \item{\verb{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-#' For the union test (\verb{union = TRUE}), the output is arranged per time series. If \verb{union = FALSE}, the output is arranged per time series, type of deterministic component (verb{dc}) and detrending method (verb{detr}).
+#' For the union test (\verb{union = TRUE}), the output is arranged per time series. If \verb{union = FALSE}, the output is arranged per time series, type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
 #' }
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time
