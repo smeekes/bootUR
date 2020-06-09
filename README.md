@@ -1,4 +1,6 @@
 # bootUR
 Bootstrap Unit Root Tests R package
 
-TBA
+Install package using
+
+devtools::install_github("smeekes/bootUR")
