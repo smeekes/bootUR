@@ -68,7 +68,7 @@ generate_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, 
     if (boot %in% c("MBB", "SB")) {
       if (!iADF_test) {
         stop("Resampling-based bootstraps MBB and SB cannot handle missing values.")
-      } else {
+      } else if (N > 1) {
         warning("Missing values cause resampling bootstrap to be executed for each time series individually.")
       }
     }

@@ -70,7 +70,7 @@ Bootstrap Sequential Panel Test
 }
 \examples{
 # BSQTtest on GDP_BE and GDP_DE
-two_series_BSQTtest <- BSQTtest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.

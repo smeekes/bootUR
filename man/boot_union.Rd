@@ -56,7 +56,7 @@ Bootstrap Union Test for Unit Roots
 }
 \examples{
 # boot_union on GDP_BE
-GDP_BE_df <- boot_union(eurostat[, 1], B = 399, verbose = TRUE)
+GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.

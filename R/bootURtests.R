@@ -31,7 +31,7 @@
 #' Default is \verb{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of
 #'  the unit root test needs to be printed to the console. Default is \verb{FALSE}.
-#' @details Lag selection (rescaling and Perron-Qu correction). Residual bootstrap.
+#' @details The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). Lag selection (rescaling and Perron-Qu correction). Residual bootstrap.
 #' @export
 #' @return A list with the following components:
 #' \describe{
@@ -60,7 +60,7 @@
 #' @references Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 #' @examples
 #' # iADFtest on GDP_BE and GDP_DE
-#' two_series_iADFtest <- iADFtest(eurostat[, 1:2], boot = "MBB", B=399, verbose = TRUE)
+#' two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B=399, verbose = TRUE)
 iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE,
@@ -179,7 +179,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #'  the unit root test needs to be printed to the console. Default is \verb{FALSE}.
 #' @export
 #' @return A list with the following components:
-#' 
+#'
 #' \describe{
 #' \item{\verb{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\verb{TRUE}) or not (\verb{FALSE});}
 #' \item{\verb{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
@@ -203,7 +203,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' @references Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 #' @examples
 #' # boot_df on GDP_BE
-#' GDP_BE_df <- boot_df(eurostat[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
+#' GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
 boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, p.min = 0,
                     p.max = NULL, ic = "MAIC", dc = 1, detr = "OLS", ic.scale = TRUE, verbose = FALSE){
 
@@ -216,6 +216,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 }
 
 #' Bootstrap Union Test for Unit Roots
+#' @description Performs bootstrap unit root test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012).
 #' @param y Vector with time series data to be tested for unit roots. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}).
 #' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param boot String for bootstrap method to be used. Options are
@@ -240,12 +241,13 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #'  the unit root test needs to be printed to the console. Default is \verb{FALSE}.
 #' @export
 #' @return A list with the following components:
-#' 
+#'
 #' \describe{
 #' \item{\verb{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\verb{TRUE}) or not (\verb{FALSE});}
 #' \item{\verb{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
 #' The output is arranged per time series.
 #' }
+#' @details The union is taken over the combination of tests with intercept only and intercept plus trend, coupled with OLS detrending and QD detrending.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
 #' (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.
 #' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient tests for an autoregressive unit root. \emph{Econometrica}, 64(4), 813-836.
@@ -264,7 +266,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' @references Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 #' @examples
 #' # boot_union on GDP_BE
-#' GDP_BE_df <- boot_union(eurostat[, 1], B = 399, verbose = TRUE)
+#' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
 boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, p.min = 0,
                        p.max = NULL, ic = "MAIC", ic.scale = TRUE, verbose = FALSE){
 
@@ -336,7 +338,7 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
 #' @references Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 #' @examples
 #' # bFDRtest on GDP_BE and GDP_DE
-#' two_series_bFDRtest <- bFDRtest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+#' two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL , union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE){
 
   inputs <- generate_inputs(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level, boot = boot, B = B, union = union,
@@ -473,7 +475,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 #' @references Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 #' @examples
 #' # BSQTtest on GDP_BE and GDP_DE
-#' two_series_BSQTtest <- BSQTtest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+#' two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 BSQTtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, q = 0:NCOL(y), ic.scale = TRUE, verbose = FALSE){
 
@@ -554,6 +556,7 @@ BSQTtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 }
 
 #' Panel Unit Root Test
+#' @description Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root.The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 #' @param y A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}).
 #' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param boot String for bootstrap method to be used. Options are
@@ -606,7 +609,7 @@ BSQTtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 #' @references Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 #' @examples
 #' # paneltest on GDP_BE and GDP_DE
-#' two_series_paneltest <- paneltest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+#' two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 paneltest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
                       ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE){
 
@@ -677,15 +680,23 @@ check_missing_insample_values <- function(X) {
 }
 
 #' Find Non-Missing Subsamples
-#' @param X A (TxN)-matrix of N time series with T observations. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}). Assumes a prior check on missing vaues in-sample has been done.
+#' @param X A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}). Assumes a prior check on missing vaues in-sample has been done.
 #' @export
-#' @return A list with the following components: range: (2xN)-dimensional matrix containing the first and last non-missing observation in each column of X; all_equal logical value indicating whether all series have the same non-missing indices.
+#' @return A list with the following components:
+#' \describe{
+#' \item{\verb{range}}{(2xN)-dimensional matrix containing the first and last non-missing observation in each column of X.}
+#' \item{\verb{all_equal}}{Logical value indicating whether all series have the same non-missing indices.}
+#' }
 find_nonmissing_subsample <- function(X) {
+  names <- colnames(X)
+  X <- as.matrix(X)
   n <- NROW(X)
   N <- NCOL(X)
   ind <- matrix(1:n, nrow = n, ncol = N)
   ind[is.na(X)] <- NA
   range_nonmiss <- matrix(apply(ind, 2, function(x){c(min(stats::na.omit(x)), max(stats::na.omit(x)))}), ncol = N)
+  colnames(range_nonmiss) <- names
+  rownames(range_nonmiss) <- c("first", "last")
   all_equal <- (max(range_nonmiss[1, ]) - min(range_nonmiss[1, ]) == 0) & (max(range_nonmiss[2, ]) - min(range_nonmiss[2, ]) > 0)
   return(list(range = range_nonmiss, all_equal = all_equal))
 }

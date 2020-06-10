@@ -64,7 +64,7 @@ Bootstrap Dickey-Fuller Unit Root Test
 }
 \examples{
 # boot_df on GDP_BE
-GDP_BE_df <- boot_df(eurostat[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
+GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.

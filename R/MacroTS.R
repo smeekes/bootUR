@@ -1,6 +1,6 @@
-#' Eurostat Data
+#' Macroeconomic Time Series
 #'
-#' Eurostat macroeconomic data on output, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
+#' Macroeconomic data from urostat on GDP, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
 #'
 #' @format A time series object containing 20 macroeconomic seasonally adjusted time series, quarterly observed from 1992-2019 for Belgium (BE), Germany (DE), France (FR), the Netherlands (NL) and the United Kingdom (UK).
 #'
@@ -52,4 +52,4 @@
 #' \item Unemployment rates are seasonally but not calendar adjusted, all other series are both seasonally and calendar adjusted.
 #' \item Quarterly inflation rates are sampled from Eurostat's monthly series with annual rates of change as the final month of the respective quarter.
 #' \item The unemployment rate for France excludes overseas territories ('France continental' in the Eurostat database).}
-"eurostat"
+"MacroTS"

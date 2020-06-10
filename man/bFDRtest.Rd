@@ -67,7 +67,7 @@ False Discovery Rate controlled Unit Root Tests
 }
 \examples{
 # bFDRtest on GDP_BE and GDP_DE
-two_series_bFDRtest <- bFDRtest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.

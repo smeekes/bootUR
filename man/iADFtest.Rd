@@ -70,7 +70,7 @@ Lag selection (rescaling and Perron-Qu correction). Residual bootstrap.
 }
 \examples{
 # iADFtest on GDP_BE and GDP_DE
-two_series_iADFtest <- iADFtest(eurostat[, 1:2], boot = "MBB", B=399, verbose = TRUE)
+two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B=399, verbose = TRUE)
 }
 \references{
 Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.

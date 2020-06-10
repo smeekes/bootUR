@@ -58,11 +58,11 @@ the unit root test needs to be printed to the console. Default is \verb{FALSE}.}
 For the union test (\verb{union = TRUE}), the test statistic and p-value are returned. If \verb{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
 }
 \description{
-Panel Unit Root Test
+Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root.The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 }
 \examples{
 # paneltest on GDP_BE and GDP_DE
-two_series_paneltest <- paneltest(eurostat[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
