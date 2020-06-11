@@ -66,7 +66,7 @@ For the union test (\verb{union = TRUE}), the output is arranged per time series
 This function performs bootstrap unit root tests on each time series individually.
 }
 \details{
-Lag selection (rescaling and Perron-Qu correction). Residual bootstrap.
+The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). Lag selection (rescaling and Perron-Qu correction). Residual bootstrap.
 }
 \examples{
 # iADFtest on GDP_BE and GDP_DE

@@ -4,13 +4,15 @@
 \alias{BSQTtest}
 \title{Bootstrap Sequential Panel Test}
 \usage{
-BSQTtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
-  ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC",
-  dc = NULL, detr = NULL, q = 0:NCOL(y), ic.scale = TRUE,
+BSQTtest(y, q = 0:NCOL(y), level = 0.05, boot = "MBB", B = 9999,
+  l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
+  ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE,
   verbose = FALSE)
 }
 \arguments{
 \item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}).}
+
+\item{q}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
@@ -47,8 +49,6 @@ Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}
 }}
 
 \item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.}
-
-\item{q}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
 
 \item{ic.scale}{Logical indicator whether or not to use the rescaled
 information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}).

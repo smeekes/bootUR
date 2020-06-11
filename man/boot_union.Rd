@@ -52,7 +52,10 @@ The output is arranged per time series.
 }
 }
 \description{
-Bootstrap Union Test for Unit Roots
+Performs bootstrap unit root test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012).
+}
+\details{
+The union is taken over the combination of tests with intercept only and intercept plus trend, coupled with OLS detrending and QD detrending.
 }
 \examples{
 # boot_union on GDP_BE
