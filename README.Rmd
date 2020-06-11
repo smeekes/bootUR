@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 ```
 
 # bootUR
-`bootUR` implements several bootstrap tests for unit, both for single time series and for (potentially) large systems of time series.
+`bootUR` implements several bootstrap tests for unit roots, both for single time series and for (potentially) large systems of time series.
 
 ## Installation
 `bootUR` can be installed using
@@ -42,7 +42,11 @@ sample_check$all_equal  # Gives TRUE if the time series all start and end at the
 ## Univariate Dickey-Fuller unit root test
 To perform a standard augmented Dickey-Fuller (ADF) bootstrap unit root test on a single time series, use the `boot_df()` function. The function allows to set many options, including the bootstrap method used (option `boot`), the deterministic components included (option `dc`) and the type of detrending used. While `dc = "OLS"` gives the standard ADF test, `dc = "QD"` provides the powerful DF-GLS test of Elliott, Rothenberg and Stock (1996). Here we use the terminology Quasi-Differencing (QD) rather than GLS as this conveys the meaning less ambiguously and is the same terminology used by Smeekes and Taylor (2012) and Smeekes (2013).
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) to as the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD(GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
+### Lag selection
+Lag length selection is done automatically in the ADF regression; the default is by the modified Akaike information criterion (MAIC) proposed by Ng and Perron (2001) with the correction of Perron and Qu (2008). Other options include the regular Akaike information criterion (AIC), as well as the Bayesian information criterion and its modified variant. In addition, the rescaling suggested by Calaiere et al. (2015) is implemented to improve the power of the test under hetereskedasticity; this can be turned off by setting `rescale = FALSE`. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+
+### Implementation
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) to as the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
 ```{r adf}
 set.seed(155776)
@@ -50,6 +54,7 @@ GDP_NL <- MacroTS[, 4]
 adf_out <- boot_df(GDP_NL, B = 399, boot = "SB", dc = 2, detr = c("OLS", "QD"), verbose = TRUE)
 ```
 
+## Union of Rejections Test
 Use `boot_union()` for a test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012). The advantage of the union test is that you don't have to specify these (rather influential) specification tests. This makes the union test a safe option for quick or automatic unit root testing where careful manual specification setup is not viable. Here we illustrate it with the sieve wild bootstrap as proposed by Smeekes and Taylor (2012).
 
 ```{r union}
@@ -59,11 +64,11 @@ union_out <- boot_union(GDP_NL, B = 399, boot = "SWB", verbose = TRUE)
 ## Panel Unit Root Test
 The function `panel_test` performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. A rejection is typically interpreted as evidence that a 'significant proportion' of the series is stationary, although how large that proportion is - or which series are stationary - is not given by the test. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 
-Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`boot = "MBB"`), which is the standard option. However, this resampling-based method cannot handle unbalancedness, and will therefore gives an error when applied to `MacroTS`. Therefore, you should switch to one of the wild bootstrap methods. Here we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010).
+Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`boot = "MBB"`), which is the standard option. However, this resampling-based method cannot handle unbalancedness, and will therefore gives an error when applied to `MacroTS`. Therefore, you should switch to one of the wild bootstrap methods. Here we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao (2019).
 
 By default the union test is used for each series (`union = TRUE`), if this is set to `FALSE` the deterministic components and detrending methods can be specified as in the univariate Dickey-Fuller test.
 
-Although the sieve bootstrap method `"SB"` and `"SWB"` can be used (historically they have been popular among practitioners), Smeekes and Urbain (2014a) show that these are not suited to capture general forms of dependence across units. The code will give a warning to recommend using a different bootstrap method.
+Although the sieve bootstrap method `"SB"` and `"SWB"` can be used (historically they have been popular among practitioners), Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units. The code will give a warning to recommend using a different bootstrap method.
 
 ```{r panel}
 # This will give an error!
@@ -86,7 +91,7 @@ The function `BSQTtest()` performs the Bootstrap Sequential Quantile Test (BSQT)
 
 Most options are the same as for `paneltest`. The most important new parameter to set here is the group sizes. These can either be set in units, or in fractions of the total number of series (i.e. quantiles, hence the name) via the parameter `q`. If we have `N` time series, setting `q = 0:N` means each unit should be tested sequentially. To split the series in four equally sized groups (regardless of many series there are), use `q = 0:4 / 4`. By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the start of the second group, and so on. However, if the initial zero is accidentally omitted, it is automatically added by the function. Similarly, if the final value is not equal to `1` (in case of quantiles) or `N` to end the last group, this is added by the function.
 
-Testing individual series consecutively is easiest for interpretation, but is only meaningful if `N` is small. In this case the method is equivalent to the bootstrap StepM method of Romano and Wolf (2005), which controls the familywise error rate, that is the probability of making at least one false rejection. This can get very conservative if `N` is large, and you would typically end up not rejecting any null hypothesis. The method is illustrated with the autoregressive wild bootstrap of Smeekes and Urbain (2014b) and Friedrich, Smeekes and Urbain (2020).
+Testing individual series consecutively is easiest for interpretation, but is only meaningful if `N` is small. In this case the method is equivalent to the bootstrap StepM method of Romano and Wolf (2005), which controls the familywise error rate, that is the probability of making at least one false rejection. This can get very conservative if `N` is large, and you would typically end up not rejecting any null hypothesis. The method is illustrated with the autoregressive wild bootstrap of Smeekes and Urbain (2014a) and Friedrich, Smeekes and Urbain (2020).
 ```{r BSQT}
 N <- ncol(MacroTS)
 # Test each unit sequentially
@@ -98,10 +103,12 @@ BSQT_out2 <- BSQTtest(MacroTS, q = 0:4 / 4, boot = "AWB", B = 399, verbose = TRU
 ## Bootstrap FDR controlling tests
 The function `bFDRtest()` controls for multiple testing by controlling the false discovery rate (FDR), which is defined as the expected proportion of false rejections relative to the total number of rejections. This scales with the total number of tests, making it more suitable for large `N` than the familywise error rate.
 
-The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wolf (2008), who showed that, unlike the classical way to control FDR, the bootstrap is appropriate under general forms of dependence between series. Moon and Perron (2012) applied this method to unit root testing; it is essentially their method which is implemented in `bFDRtest()` though again with the option to change the bootstrap used (their suggestion was MBB). The arguments to be set are the same as for the other multivariate unit root tests, though the meaning of `level` changes from regular significance level to FDR level. As BSQT, the method only report those tests until no rejection occurs.
+The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wolf (2008), who showed that, unlike the classical way to control FDR, the bootstrap is appropriate under general forms of dependence between series. Moon and Perron (2012) applied this method to unit root testing; it is essentially their method which is implemented in `bFDRtest()` though again with the option to change the bootstrap used (their suggestion was MBB). The arguments to be set are the same as for the other multivariate unit root tests, though the meaning of `level` changes from regular significance level to FDR level. As BSQT, the method only report those tests until no rejection occurs. 
+
+We illustrate it here with the final available bootstrap method, the block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 ```{r bFDR}
 N <- ncol(MacroTS)
-bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "AWB", B = 399, verbose = TRUE)
+bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "BWB", B = 399, verbose = TRUE)
 ```
 
 
@@ -109,15 +116,15 @@ bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "AWB", B = 399, verbos
 * Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R. (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. *Econometric Reviews*, 34(4), 512-536.
 * Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient tests for an autoregressive unit root. *Econometrica*, 64(4), 813-836.
 * Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. *Journal of Econometrics*, 214(1), 81-109.
-* Harvey, D.I., Leybourne, S.J., and Taylor, A.M.R. (2012). Testing for unit roots in the presence of uncertainty over both the trend and initial condition. *Journal of Econometrics*, 169(2), 188-195.
 * Moon, H.R. and Perron, B. (2012). Beyond panel unit root tests: Using multiple testing to determine the non stationarity properties of individual series in a panel. *Journal of Econometrics*, 169(1), 29-33.
 * Ng, S. and Perron, P. (2001). Lag Length Selection and the Construction of Unit Root Tests with Good Size and Power. *Econometrica*, 69(6), 1519-1554,
 * Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008). Bootstrap unit root tests: Comparison and extensions. *Journal of Time Series Analysis*, 29(1), 371-401.
-* Palm, Smeekes and Urbain (2011)
+* Palm, F. C., Smeekes, S., and Urbain, J.-.P. (2011). Cross-sectional dependence robust block bootstrap panel unit root tests. *Journal of Econometrics*, 163(1), 85-104.
+* Paparoditis, E. and Politis, D.N. (2003). Residual‐based block bootstrap for unit root testing. *Econometrica*, 71(3), 813-855.
 * Perron, P. and Qu, Z. (2008). A simple modification to improve the finite sample properties of Ng and Perron's unit root tests. *Economic Letters*, 94(1), 12-19.
 * Rho, Y. and Shao, X. (2019). Bootstrap-assisted unit root testing with piecewise locally stationary errors. *Econometric Theory*, 35(1), 142-166.
-* Romano, Shaikh and Wolf (2008)
-* Romano and Wolf (2005)
+* Romano, J.P., Shaikh, A.M., and Wolf, M. (2008). Control of the false discovery rate under dependence using the bootstrap and subsampling. *Test*, 17(3), 417.
+* Romano, J. P. and Wolf, M. (2005). Stepwise multiple testing as formalized data snooping. *Econometrica*, 73(4), 1237-1282.
 * Shao, X. (2010). The dependent wild bootstrap. *Journal of the American Statistical Association*, 105(489), 218-235.
 * Shao, X. (2011). A bootstrap-assisted spectral test of white noise under unknown dependence. *Journal of Econometrics*, 162, 213-224.
 * Smeekes (2013)
