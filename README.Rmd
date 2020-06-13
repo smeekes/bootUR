@@ -127,7 +127,7 @@ bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "BWB", B = 399, verbos
 * Romano, J. P. and Wolf, M. (2005). Stepwise multiple testing as formalized data snooping. *Econometrica*, 73(4), 1237-1282.
 * Shao, X. (2010). The dependent wild bootstrap. *Journal of the American Statistical Association*, 105(489), 218-235.
 * Shao, X. (2011). A bootstrap-assisted spectral test of white noise under unknown dependence. *Journal of Econometrics*, 162, 213-224.
-* Smeekes (2013)
+* Smeekes (2013). Detrending bootstrap unit root tests. *Econometric Reviews*, 32(8), 869-891.
 * Smeekes, S. (2015). Bootstrap sequential tests to determine the order of integration of individual units in a time series panel. *Journal of Time Series Analysis*, 36(3), 398-415.
 * Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit roots in the presence of nonstationary volatility. *Econometric Theory*, 28(2), 422-456.
 * Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University.
