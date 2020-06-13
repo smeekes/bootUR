@@ -59,7 +59,7 @@ The output is  arranged per time series, type of deterministic component (\verb{
 }
 }
 \description{
-This function performs a standard augmented Dickey-Fuller bootstrap unit root tests on a single time series.
+This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series.
 }
 \details{
 The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).

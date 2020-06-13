@@ -159,7 +159,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 }
 
 #' Bootstrap augmented Dickey-Fuller Unit Root Test
-#' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root tests on a single time series.
+#' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series.
 #' @inheritParams iADFtest
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
@@ -233,7 +233,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' }
 #' @details The union is taken over the combination of tests with intercept only and intercept plus trend, coupled with OLS detrending and QD detrending.
 #'
-#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+#' Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
@@ -280,7 +280,7 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
 #' \item{\verb{FDR_sequence}}{Details on the unit root tests: value of the test statistics and critical values.}
 #' For the union test (\verb{union = TRUE}), the output is arranged per time series. If \verb{union = FALSE}, the output is arranged per time series, type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
 #' }
-#' @details The false discovery rate (FDR) is defined as the expected proportion of false rejections relative to the total number of rejections.
+#' @details The false discovery rate FDR is defined as the expected proportion of false rejections relative to the total number of rejections.
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
