@@ -19,4 +19,7 @@ Imports:
     Rcpp, stats
 LinkingTo: Rcpp,  RcppArmadillo
 URL: https://github.com/smeekes/bootUR
-
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

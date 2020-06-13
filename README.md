@@ -3,14 +3,17 @@
 
 # bootUR
 
-`bootUR` implements several bootstrap tests for unit roots, both for
-single time series and for (potentially) large systems of time series.
+The R package `bootUR` implements several bootstrap tests for unit
+roots, both for single time series and for (potentially) large systems
+of time series.
 
 ## Installation
 
-`bootUR` can be installed using
+The development version of the `bootUR` package can be installed from
+GitHub using
 
 ``` r
+# install.packages("devtools")
 devtools::install_github("smeekes/bootUR")
 ```
 
@@ -63,11 +66,13 @@ To perform a standard augmented Dickey-Fuller (ADF) bootstrap unit root
 test on a single time series, use the `boot_df()` function. The function
 allows to set many options, including the bootstrap method used (option
 `boot`), the deterministic components included (option `dc`) and the
-type of detrending used. While `dc = "OLS"` gives the standard ADF test,
-`dc = "QD"` provides the powerful DF-GLS test of Elliott, Rothenberg and
-Stock (1996). Here we use the terminology Quasi-Differencing (QD) rather
-than GLS as this conveys the meaning less ambiguously and is the same
-terminology used by Smeekes and Taylor (2012) and Smeekes (2013).
+type of detrending used. Setting `boot = "MBB"` gives the test proposed
+by Paparoditis and Politis (2003). While `dc = "OLS"` gives the standard
+ADF test, `dc = "QD"` provides the powerful DF-GLS test of Elliott,
+Rothenberg and Stock (1996). Here we use the terminology
+Quasi-Differencing (QD) rather than GLS as this conveys the meaning less
+ambiguously and is the same terminology used by Smeekes and Taylor
+(2012) and Smeekes (2013).
 
 ### Lag selection
 
@@ -76,8 +81,8 @@ default is by the modified Akaike information criterion (MAIC) proposed
 by Ng and Perron (2001) with the correction of Perron and Qu (2008).
 Other options include the regular Akaike information criterion (AIC), as
 well as the Bayesian information criterion and its modified variant. In
-addition, the rescaling suggested by Calaiere et al. (2015) is
-implemented to improve the power of the test under hetereskedasticity;
+addition, the rescaling suggested by Cavaliere et al. (2015) is
+implemented to improve the power of the test under heteroskedasticity;
 this can be turned off by setting `rescale = FALSE`. To overwrite
 data-driven lag length selection with a pre-specified lag length, simply
 set both the minimum `p.min` and maximum lag length `p.max` for the
@@ -86,7 +91,7 @@ selection algorithm equal to the desired lag length.
 ### Implementation
 
 We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve
-bootstrap (`boot = SB`) to as the specification used by Palm, Smeekes
+bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes
 and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap
 replications (`B = 399`) to prevent the code from running too long. We
 add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS)
@@ -125,7 +130,8 @@ proposed by Smeekes and Taylor (2012).
 union_out <- boot_union(GDP_NL, B = 399, boot = "SWB", verbose = TRUE)
 #> Bootstrap Test with SWB bootstrap method.
 #> Bootstrap Union Test:
-#> The null hypothesis of a unit root is not rejected at a significance level of 0.05.
+#> The null hypothesis of a unit root is not rejected at a significance
+#>                     level of 0.05.
 #> test statistic        p-value 
 #>     -0.6722611      0.6090226
 ```
@@ -143,10 +149,10 @@ also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 Palm, Smeekes and Urbain (2011) introduced this test with the moving
 block bootstrap (`boot = "MBB"`), which is the standard option. However,
 this resampling-based method cannot handle unbalancedness, and will
-therefore gives an error when applied to `MacroTS`. Therefore, you
-should switch to one of the wild bootstrap methods. Here we illustrate
-it with the dependent wild bootstrap (DWB) of Shao (2010) and Rho and
-Shao (2019).
+therefore give an error when applied to `MacroTS`. Therefore, you should
+switch to one of the wild bootstrap methods. Here we illustrate it with
+the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao
+(2019).
 
 By default the union test is used for each series (`union = TRUE`), if
 this is set to `FALSE` the deterministic components and detrending
@@ -164,7 +170,8 @@ using a different bootstrap method.
 # This works!
 panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 #> Panel Bootstrap Group-Mean Union Test
-#> The null hypothesis that all series have a unit root, is rejected at a significance level of 0.05.
+#> The null hypothesis that all series have a unit root, is
+#>                   rejected at a significance level of 0.05.
 #>      test statistic    p-value
 #> [1,]     -0.8537718 0.03508772
 ```
@@ -176,8 +183,8 @@ the function `iADFtest()` can be used. As the bootstrap is performed for
 all series simultaneously, resampling-based bootstrap methods `"MBB"`
 and `"SB"` cannot be used directly in case of unbalanced panels. If they
 are used anyway, the function will revert to splitting the bootstrap up
-and perfoming it individually per time series. In this case a warning is
-given to alert the user. The other options are the same as for
+and performing it individually per time series. In this case a warning
+is given to alert the user. The other options are the same as for
 `paneltest`.
 
 ``` r
@@ -197,12 +204,12 @@ iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, unio
 ```
 
 Note that `iADFtest` (intentionally) does not provide a correction for
-multiple testing; of course, if we perform each test with a signifiance
+multiple testing; of course, if we perform each test with a significance
 level of 5%, the probability of making a mistake in all these tests
 becomes (much, if `N` is large) more than 5%. To explicitly account for
 multiple testing, use the functions `BSQTtest()` or `bFDRtest()`.
 
-## Sequential Tests for Multiple Time Series
+## Bootstrap Sequential Tests for Multiple Time Series
 
 The function `BSQTtest()` performs the Bootstrap Sequential Quantile
 Test (BSQT) proposed by Smeekes (2015). Here we split the series in
@@ -220,7 +227,7 @@ setting `q = 0:N` means each unit should be tested sequentially. To
 split the series in four equally sized groups (regardless of many series
 there are), use `q = 0:4 / 4`. By convention and in accordance with
 notation in Smeekes (2015), the first entry of the vector should be
-equal to zero, while the second entry indicates the start of the second
+equal to zero, while the second entry indicates the end of the first
 group, and so on. However, if the initial zero is accidentally omitted,
 it is automatically added by the function. Similarly, if the final value
 is not equal to `1` (in case of quantiles) or `N` to end the last group,
@@ -326,7 +333,8 @@ bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "BWB", B = 399, verbos
     American Statistical Association*, 105(489), 218-235.
   - Shao, X. (2011). A bootstrap-assisted spectral test of white noise
     under unknown dependence. *Journal of Econometrics*, 162, 213-224.
-  - Smeekes (2013)
+  - Smeekes (2013). Detrending bootstrap unit root tests. *Econometric
+    Reviews*, 32(8), 869-891.
   - Smeekes, S. (2015). Bootstrap sequential tests to determine the
     order of integration of individual units in a time series panel.
     *Journal of Time Series Analysis*, 36(3), 398-415.

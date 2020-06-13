@@ -66,3 +66,4 @@ Auxiliary Function (not accessible to users) to create all inputs for the unit r
 \seealso{
 \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 }
+\keyword{internal}

@@ -1,14 +1,18 @@
 ---
-output: github_document
+title: "Introduction to bootUR"
+author: "Stephan Smeekes and Ines Wilms"
+date: "June 13, 2020"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bootUR-intro}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
-```{r, echo = FALSE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
+  comment = "#>"
 )
 ```
 
@@ -36,8 +40,10 @@ If your time series have different starting and end points (and thus some series
 
 ```{r start_end}
 sample_check <- find_nonmissing_subsample(MacroTS)
-sample_check$range  # Provides the number of the first and last non-missing observation for each series
-sample_check$all_equal  # Gives TRUE if the time series all start and end at the same observation
+# Provides the number of the first and last non-missing observation for each series
+sample_check$range
+# Gives TRUE if the time series all start and end at the same observation
+sample_check$all_equal
 ```
 
 ## Univariate Dickey-Fuller unit root test
@@ -82,7 +88,8 @@ panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 To perform individual ADF tests on multiple time series simultaneously, the function `iADFtest()` can be used. As the bootstrap is performed for all series simultaneously, resampling-based bootstrap methods `"MBB"` and `"SB"` cannot be used directly in case of unbalanced panels. If they are used anyway, the function will revert to splitting the bootstrap up and performing it individually per time series. In this case a warning is given to alert the user. The other options are the same as for `paneltest`.
 
 ```{r iADF}
-iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, union = FALSE, dc = 2, detr = "OLS")
+iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, union = FALSE, 
+                     dc = 2, detr = "OLS")
 ```
 
 Note that `iADFtest` (intentionally) does not provide a correction for multiple testing; of course, if we perform each test with a significance level of 5%, the probability of making a mistake in all these tests becomes (much, if `N` is large) more than 5%. To explicitly account for multiple testing, use the functions `BSQTtest()` or `bFDRtest()`.
@@ -111,7 +118,6 @@ We illustrate it here with the final available bootstrap method, the block wild 
 N <- ncol(MacroTS)
 bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "BWB", B = 399, verbose = TRUE)
 ```
-
 
 ## References
 * Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R. (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. *Econometric Reviews*, 34(4), 512-536.
