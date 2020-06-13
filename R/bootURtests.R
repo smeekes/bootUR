@@ -158,7 +158,8 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
   return(list(rej_H0 = rej_H0, ADF_tests = iADFout))
 }
 
-#' Bootstrap Dickey-Fuller Unit Root Test
+#' Bootstrap augmented Dickey-Fuller Unit Root Test
+#' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root tests on a single time series.
 #' @inheritParams iADFtest
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
@@ -166,9 +167,12 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' \item{\verb{"BWB"}}{Block wild bootstrap (Shao, 2011);}
 #' \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Rho and Shao, 2019);}
 #' \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
-#' \item{\verb{"SB"}}{Sieve bootstrap (Palm, Smeekes and Urbain, 2008);}
+#' \item{\verb{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
 #' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
+#' @details The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
+#'
+#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 #' @export
 #' @return A list with the following components:
 #'
