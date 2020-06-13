@@ -319,7 +319,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
     FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
 
     rownames(rej_H0) <- var_names
-    rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1]]
+    rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
 
     colnames(rej_H0) <- "Reject H0"
     colnames(FDR_seq) <- c("test statistic", "critical value")
@@ -359,8 +359,8 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
       bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[i, ], nrow = 1),
                          t_star = inputs$t_star[ , i,], level = inputs$level)
       rej_H0[, i] <- bFDRout$rej_H0 == 1
-      FDR_seq[[i]] <- bFDRout$FDR_Tests[, -1]
-      rownames(FDR_seq[[i]]) <- var_names[bFDRout$FDR_Tests[, 1]]
+      FDR_seq[[i]] <- bFDRout$FDR_Tests[, -1, drop = FALSE]
+      rownames(FDR_seq[[i]]) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
       colnames(FDR_seq[[i]]) <- c("test statistic", "critical value")
 
       if (verbose) {
