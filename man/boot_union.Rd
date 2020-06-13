@@ -52,6 +52,8 @@ Performs bootstrap unit root test based on the union of rejections of 4 tests wi
 }
 \details{
 The union is taken over the combination of tests with intercept only and intercept plus trend, coupled with OLS detrending and QD detrending.
+
+Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 }
 \examples{
 # boot_union on GDP_BE

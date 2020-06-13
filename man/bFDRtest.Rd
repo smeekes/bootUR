@@ -60,7 +60,12 @@ For the union test (\verb{union = TRUE}), the output is arranged per time series
 }
 }
 \description{
-Bootstrap Unit Root Tests with False Discovery Rate control
+Controls for multiple testing by controlling the false discovery rate (FDR), see Moon and Perron (2012) and Romano, Shaikh and Wolf (2008).
+}
+\details{
+The false discovery rate (FDR) is defined as the expected proportion of false rejections relative to the total number of rejections.
+
+Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 }
 \examples{
 # bFDRtest on GDP_BE and GDP_DE
