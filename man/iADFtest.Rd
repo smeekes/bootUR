@@ -20,7 +20,7 @@ iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 \item{\verb{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
-\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2012).}
+\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
 \item{B}{Number of bootstrap replications. Default is 9999.}
@@ -45,7 +45,7 @@ iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 For the default union test (\verb{union = TRUE}) this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
 }}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.}
+\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.}
 
 \item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.}
 
@@ -63,7 +63,7 @@ For the union test (\verb{union = TRUE}), the output is arranged per time series
 This function performs bootstrap unit root tests on each time series individually.
 }
 \details{
-The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
+The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 
 Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 }

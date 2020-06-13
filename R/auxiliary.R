@@ -10,7 +10,7 @@
 #' \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 #' \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 #' \item{\verb{"SB"}}{Sieve bootstrap (Palm, Smeekes and Urbain,2008; Smeekes and Urbain, 2014a);}
-#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2014b).}
+#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
 #' @param B Number of bootstrap replications. Default is 9999.
 #' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014); this can be overwritten by setting \verb{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.
@@ -27,7 +27,7 @@
 #' Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}), in which case this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
 #' }
 #' @param detr String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.
-#' @param ic.scale Logical indicator whether or not to use the rescaled
+#' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.
 #' @param q Numeric vector of quantiles to be tested. Default is to test each unit sequentially.
 #' @param h.rs Bandwidth used in rescaled information criteria.
 #' @param k_DWB Kernel used in DWB bootstrap method.

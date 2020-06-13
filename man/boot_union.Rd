@@ -20,7 +20,7 @@ boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Rho and Shao, 2019);}
 \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 \item{\verb{"SB"}}{Sieve bootstrap (Palm, Smeekes and Urbain, 2008);}
-\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2012).}
+\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
 \item{B}{Number of bootstrap replications. Default is 9999.}
@@ -64,8 +64,6 @@ Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit 
 
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
 (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.
-
-Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient tests for an autoregressive unit root. \emph{Econometrica}, 64(4), 813-836.
 
 Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
 

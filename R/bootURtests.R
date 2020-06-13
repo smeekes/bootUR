@@ -9,7 +9,7 @@
 #' \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 #' \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 #' \item{\verb{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
-#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2012).}
+#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
 #' @param B Number of bootstrap replications. Default is 9999.
 #' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \verb{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).
@@ -25,10 +25,10 @@
 #' \item{\emph{2}}{intercept and trend.}
 #' For the default union test (\verb{union = TRUE}) this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
 #' }
-#' @param detr String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.
+#' @param detr String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.
 #' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \verb{FALSE}.
-#' @details The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
+#' @details The options encompass many test proposed in the literature. \verb{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \verb{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 #' @export
@@ -167,7 +167,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Rho and Shao, 2019);}
 #' \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 #' \item{\verb{"SB"}}{Sieve bootstrap (Palm, Smeekes and Urbain, 2008);}
-#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2012).}
+#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
 #' @export
 #' @return A list with the following components:
@@ -218,7 +218,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Rho and Shao, 2019);}
 #' \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 #' \item{\verb{"SB"}}{Sieve bootstrap (Palm, Smeekes and Urbain, 2008);}
-#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2012).}
+#' \item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
 #' @export
 #' @return A list with the following components:
@@ -232,7 +232,6 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
 #' (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.
-#' @references Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient tests for an autoregressive unit root. \emph{Econometrica}, 64(4), 813-836.
 #' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
 #' @references Harvey, D.I., Leybourne, S.J., and Taylor, A.M.R. (2012). Testing for unit roots in the presence of uncertainty over both the trend and initial condition. \emph{Journal of Econometrics}, 169(2), 188-195.
 #' @references Ng, S. and Perron, P. (2001). Lag Length Selection and the Construction of Unit Root Tests with Good Size and Power. \emph{Econometrica}, 69(6), 1519-1554,
@@ -512,6 +511,7 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 9999,
 #' @inheritParams iADFtest
 #' @export
 #' @return For the union test (\verb{union = TRUE}), the test statistic and p-value are returned. If \verb{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
+#' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
 #' (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.

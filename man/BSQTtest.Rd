@@ -23,7 +23,7 @@ BSQTtest(y, q = 0:NCOL(y), level = 0.05, boot = "MBB", B = 9999,
 \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 \item{\verb{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
-\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2012).}
+\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
 \item{B}{Number of bootstrap replications. Default is 9999.}
@@ -48,7 +48,7 @@ BSQTtest(y, q = 0:NCOL(y), level = 0.05, boot = "MBB", B = 9999,
 For the default union test (\verb{union = TRUE}) this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
 }}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.}
+\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.}
 
 \item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.}
 

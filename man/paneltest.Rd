@@ -20,7 +20,7 @@ paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 \item{\verb{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
-\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2012).}
+\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
 \item{B}{Number of bootstrap replications. Default is 9999.}
@@ -45,7 +45,7 @@ paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 For the default union test (\verb{union = TRUE}) this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
 }}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.}
+\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \verb{"OLS"}.}
 
 \item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.}
 
@@ -62,6 +62,8 @@ Performs a test on a multivariate (panel) time series by testing the null hypoth
 two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 }
 \references{
+Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
+
 Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 
 Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.

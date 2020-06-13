@@ -23,7 +23,7 @@ generate_inputs(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
 \item{\verb{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 \item{\verb{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
 \item{\verb{"SB"}}{Sieve bootstrap (Palm, Smeekes and Urbain,2008; Smeekes and Urbain, 2014a);}
-\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2008; Smeekes and Taylor, 2014b).}
+\item{\verb{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
 \item{B}{Number of bootstrap replications. Default is 9999.}
@@ -50,7 +50,7 @@ Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}
 
 \item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{unionunion = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). Default is \verb{"OLS"}.}
 
-\item{ic.scale}{Logical indicator whether or not to use the rescaled}
+\item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.}
 
 \item{q}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
 
