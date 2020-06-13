@@ -358,7 +358,8 @@ arma::vec gen_AR_cpp(const arma::vec& x, const arma::vec& ar, const arma::vec& i
   const int p = ar.size();
   const arma::vec ar_rev = reverse(ar);
   arma::vec y = zeros(T + p);
-  if (init.n_elem == p) {
+  const int init_elem = init.n_elem;
+  if (init_elem == p) {
     y.subvec(0, p-1) = init;
   } else {
     y.subvec(0, p-1).fill(init[0]);
@@ -513,7 +514,7 @@ arma::mat Quantile(const arma::mat& x, const arma::vec& prob, const bool& interp
     q = x_sort.rows(ceil_index);
   } else {
     const arma::vec g = ceil_index - index;
-    for (int i = 0; i < prob.n_elem; i++) {
+    for (unsigned int i = 0; i < prob.n_elem; i++) {
       q.row(i) = g(i) * x_sort.row(ceil_index(i) - 1) + (1. - g(i)) * x_sort.row(ceil_index(i));
     }
   }
