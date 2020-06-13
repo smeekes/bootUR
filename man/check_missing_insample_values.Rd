@@ -7,10 +7,10 @@
 check_missing_insample_values(X)
 }
 \arguments{
-\item{X}{A (TxN)-matrix of N time series with T observations. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}).}
+\item{X}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}).}
 }
 \value{
-N-dimensional vector, for each series whether missing values are present (\verb{TRUE}) or not (\verb{FALSE})
+\eqn{N}-dimensional vector, for each series whether missing values are present (\code{TRUE}) or not (\code{FALSE})
 }
 \description{
 Check Missing Values in Sample

@@ -8,7 +8,7 @@ generate_inputs(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
   p.min, p.max, ic, dc, detr, ic.scale, q, h.rs, k_DWB)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}).}
+\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}).}
 
 \item{BSQT_test}{Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).}
 
@@ -40,13 +40,15 @@ generate_inputs(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}. Default is \verb{"MAIC"}.}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are
-\describe{
-\item{\emph{0}}{no deterministics;}
-\item{\emph{1}}{intercept only;}
-\item{\emph{2}}{intercept and trend.}
-Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}), in which case this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
-}}
+\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
+
+\verb{0 } no deterministics;
+
+\verb{1 } intercept only;
+
+\verb{2 } intercept and trend.
+
+For the default union test (\code{union = TRUE}) this is not relevant. If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
 \item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS). Default is \verb{"OLS"}.}
 
@@ -60,4 +62,7 @@ Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}
 }
 \description{
 Auxiliary Function (not accessible to users) to create all inputs for the unit root test functions.
+}
+\seealso{
+\code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 }

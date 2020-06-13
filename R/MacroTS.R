@@ -1,6 +1,6 @@
 #' Macroeconomic Time Series
 #'
-#' Macroeconomic data from urostat on GDP, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
+#' Macroeconomic data from Eurostat on GDP, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
 #'
 #' @format A time series object containing 20 macroeconomic seasonally adjusted time series, quarterly observed from 1992-2019 for Belgium (BE), Germany (DE), France (FR), the Netherlands (NL) and the United Kingdom (UK).
 #'

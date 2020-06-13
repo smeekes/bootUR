@@ -18,3 +18,5 @@ RoxygenNote: 7.1.0
 Imports: 
     Rcpp, stats
 LinkingTo: Rcpp,  RcppArmadillo
+URL: https://github.com/smeekes/bootUR
+

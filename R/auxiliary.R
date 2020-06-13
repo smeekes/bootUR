@@ -1,5 +1,5 @@
 #' Auxiliary Function (not accessible to users) to create all inputs for the unit root test functions.
-#' @param y A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}).
+#' @inheritParams iADFtest
 #' @param BSQT_test Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param iADF_test Logical indicator whether or not to perform the individual ADF Tests (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param level Desired significance level of the unit root test. Default is 0.05.
@@ -12,25 +12,16 @@
 #' \item{\verb{"SB"}}{Sieve bootstrap;}
 #' \item{\verb{"SWB"}}{Sieve wild boostrap.}
 #' }
-#' @param B Number of bootstrap replications. Default is 9999.
 #' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)}; this can be overwritten by setting \verb{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.
 #' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\verb{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.
 #' @param union Logical indicator whether or not to use bootstrap union tests (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.
-#' @param p.min Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
-#' @param p.max Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
 #' @param ic String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}. Default is \verb{"MAIC"}.
-#' @param dc Numeric vector indicating the deterministic specification. Only relevant if \verb{union = FALSE}. Options are
-#' \describe{
-#' \item{\emph{0}}{no deterministics;}
-#' \item{\emph{1}}{intercept only;}
-#' \item{\emph{2}}{intercept and trend.}
-#' Combinations thereof are allowed. Default is the union test (\verb{union = TRUE}), in which case this is not relevant. If \verb{union = FALSE}, the default is adding an intercept (a warning is given).
-#' }
 #' @param detr String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS). Default is \verb{"OLS"}.
 #' @param ic.scale Logical indicator whether or not to use the rescaled information criteria (\verb{TRUE}) or not (\verb{FALSE}). Default is \verb{TRUE}.
 #' @param q Numeric vector of quantiles to be tested. Default is to test each unit sequentially.
 #' @param h.rs Bandwidth used in rescaled information criteria.
 #' @param k_DWB Kernel used in DWB bootstrap method.
+#' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 generate_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p.min, p.max, ic, dc, detr, ic.scale, q, h.rs, k_DWB){
   if (level * (B + 1) < 1) {
     stop("Bootstrap iterations B too low to perform test at desired significance level.")
@@ -65,7 +56,7 @@ generate_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, 
   if (!(boot %in% c("MBB", "BWB", "DWB", "AWB", "SB", "SWB")) | length(boot) > 1) {
     stop("The argument boot should be equal to either MBB, BWB, DWB, AWB, SB or SWB")
   } else if (boot %in% c("SB", "SWB") & !iADF_test) {
-    warning("SB and SWB bootstrap only recommended for iADF_test; see help for details.")
+    warning("SB and SWB bootstrap only recommended for iADFtest; see help for details.")
   }
   boot <- 1*(boot=="MBB") + 2*(boot=="BWB") + 3*(boot=="DWB") + 4*(boot=="AWB") + 5*(boot=="SB") + 6*(boot=="SWB")
 

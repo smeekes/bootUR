@@ -56,7 +56,7 @@ https://ec.europa.eu/eurostat/data/database
 MacroTS
 }
 \description{
-Macroeconomic data from urostat on GDP, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
+Macroeconomic data from Eurostat on GDP, consumption, inflation and unemployment for Belgium, Germany, France, the Netherlands and the United Kingdom.
 }
 \note{
 \itemize{

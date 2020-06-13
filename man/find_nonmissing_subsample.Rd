@@ -7,14 +7,12 @@
 find_nonmissing_subsample(X)
 }
 \arguments{
-\item{X}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \verb{ts}, \verb{zoo} or \verb{xts}). Assumes a prior check on missing vaues in-sample has been done.}
+\item{X}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}). Assumes a prior check on missing vaues in-sample has been done.}
 }
 \value{
-A list with the following components:
-\describe{
-\item{\verb{range}}{(2xN)-dimensional matrix containing the first and last non-missing observation in each column of X.}
-\item{\verb{all_equal}}{Logical value indicating whether all series have the same non-missing indices.}
-}
+A list with the following components
+\item{\code{range}}{(2x\eqn{N})-dimensional matrix containing the first and last non-missing observation in each column of X.}
+\item{\code{all_equal}}{Logical value indicating whether all series have the same non-missing indices.}
 }
 \description{
 Find Non-Missing Subsamples
