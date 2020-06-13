@@ -2,7 +2,7 @@
 % Please edit documentation in R/bootURtests.R
 \name{BSQTtest}
 \alias{BSQTtest}
-\title{Bootstrap Sequential Panel Test}
+\title{Bootstrap Sequential Quantile Test}
 \usage{
 BSQTtest(y, q = 0:NCOL(y), level = 0.05, boot = "MBB", B = 9999,
   l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
@@ -63,10 +63,12 @@ For the union test (\verb{union = TRUE}), the output is arranged per time series
 }
 }
 \description{
-Bootstrap Sequential Panel Test
+Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).
 }
 \details{
 If each series is tested individually, the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate.
+
+Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 }
 \examples{
 # BSQTtest on GDP_BE and GDP_DE

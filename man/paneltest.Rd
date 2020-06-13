@@ -55,7 +55,10 @@ For the default union test (\verb{union = TRUE}) this is not relevant. If \verb{
 For the union test (\verb{union = TRUE}), the test statistic and p-value are returned. If \verb{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
 }
 \description{
-Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root.The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
+Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
+}
+\details{
+Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 }
 \examples{
 # paneltest on GDP_BE and GDP_DE

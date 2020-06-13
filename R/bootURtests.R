@@ -394,7 +394,8 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 }
 
 
-#' Bootstrap Sequential Panel Test
+#' Bootstrap Sequential Quantile Test
+#' @description Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).
 #' @inheritParams iADFtest
 #' @param q Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.
 #' @export
@@ -405,6 +406,8 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 #' For the union test (\verb{union = TRUE}), the output is arranged per time series. If \verb{union = FALSE}, the output is arranged per time series, type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
 #' }
 #' @details If each series is tested individually, the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate.
+#'
+#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
@@ -517,9 +520,10 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 9999,
 }
 
 #' Panel Unit Root Test
-#' @description Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root.The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
+#' @description Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 #' @inheritParams iADFtest
 #' @export
+#' @details Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 #' @return For the union test (\verb{union = TRUE}), the test statistic and p-value are returned. If \verb{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\verb{dc}) and detrending method (\verb{detr}).
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
