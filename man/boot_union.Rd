@@ -5,11 +5,11 @@
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
 boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
-  ar_AWB = NULL, p.min = 0, p.max = NULL, ic = "MAIC",
-  ic.scale = TRUE, verbose = FALSE)
+  ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC",
+  ic_scale = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}).}
+\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
@@ -29,13 +29,13 @@ boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
 
-\item{p.min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+\item{p_min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{p.max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+\item{p_max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+\item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 }
@@ -51,7 +51,7 @@ Performs bootstrap unit root test based on the union of rejections of 4 tests wi
 \details{
 The union is taken over the combination of tests with intercept only and intercept plus trend, coupled with OLS detrending and QD detrending, as in Harvey, Leybourne and Taylor (2012) and Smeekes an Taylor (2012). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 
-Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 }
 \examples{
 # boot_union on GDP_BE

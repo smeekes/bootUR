@@ -5,11 +5,11 @@
 \title{Panel Unit Root Test}
 \usage{
 paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
-  ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC",
-  dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE)
+  ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
+  dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}).}
+\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
@@ -31,9 +31,9 @@ paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \item{union}{Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.}
 
-\item{p.min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+\item{p_min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{p.max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+\item{p_max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
@@ -45,11 +45,11 @@ paneltest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \verb{2 } intercept and trend.
 
-For the default union test (\code{union = TRUE}) this is not relevant. If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
+If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
 \item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
-\item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+\item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 }

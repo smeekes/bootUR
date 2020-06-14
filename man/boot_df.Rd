@@ -5,11 +5,11 @@
 \title{Bootstrap augmented Dickey-Fuller Unit Root Test}
 \usage{
 boot_df(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
-  ar_AWB = NULL, p.min = 0, p.max = NULL, ic = "MAIC", dc = 1,
-  detr = "OLS", ic.scale = TRUE, verbose = FALSE)
+  ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC", dc = 1,
+  detr = "OLS", ic_scale = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}).}
+\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
@@ -29,9 +29,9 @@ boot_df(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
 
-\item{p.min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+\item{p_min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{p.max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+\item{p_max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
@@ -43,11 +43,11 @@ boot_df(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \verb{2 } intercept and trend.
 
-For the default union test (\code{union = TRUE}) this is not relevant. If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
+If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
 \item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
-\item{ic.scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+\item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 }
@@ -63,7 +63,7 @@ This function performs a standard augmented Dickey-Fuller bootstrap unit root te
 \details{
 The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 
-Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 }
 \examples{
 # boot_df on GDP_BE

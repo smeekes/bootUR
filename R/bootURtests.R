@@ -15,8 +15,8 @@
 #' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).
 #' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.
 #' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
-#' @param p.min Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
-#' @param p.max Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
+#' @param p_min Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
+#' @param p_max Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
 #' @param ic String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).
 #' @param dc Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
 #'
@@ -26,13 +26,13 @@
 #'
 #' \verb{2 } intercept and trend.
 #'
-#' For the default union test (\code{union = TRUE}) this is not relevant. If \code{union = FALSE}, the default is adding an intercept (a warning is given).
+#' If \code{union = FALSE}, the default is adding an intercept (a warning is given).
 #' @param detr String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
-#' @param ic.scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
+#' @param ic_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
 #' @details The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
-#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #'
 #' @export
 #' @return A list with the following components
@@ -67,15 +67,14 @@
 #' # iADFtest on GDP_BE and GDP_DE
 #' two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B=399, verbose = TRUE)
 iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
-                     ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
-                     ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE,
+                     ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
+                     ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
                      verbose = FALSE){
 
-  inputs <- generate_inputs(y = y, BSQT_test = FALSE, iADF_test = TRUE,
-                            level = level, boot = boot, B = B, union = union,
-                            p.min = p.min, p.max = p.max, ic = ic, dc = dc,
-                            detr = detr, q = NULL, l = l, ic.scale = ic.scale,
-                            h.rs = 0.1, k_DWB = "k.TBB", ar_AWB = ar_AWB)
+  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
+                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
+                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1)
 
   if (!is.null(colnames(y))) {
     var_names <- colnames(y)
@@ -179,7 +178,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' }
 #' @details The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
-#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #' @export
 #' @return A list with the following components
 #' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
@@ -204,15 +203,15 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' # boot_df on GDP_BE
 #' GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
 boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
-                    p.min = 0, p.max = NULL, ic = "MAIC", dc = 1, detr = "OLS",
-                    ic.scale = TRUE, verbose = FALSE){
+                    p_min = 0, p_max = NULL, ic = "MAIC", dc = 1, detr = "OLS",
+                    ic_scale = TRUE, verbose = FALSE){
 
   if (verbose) {
     cat("Bootstrap DF Test with", boot, "bootstrap method.\n")
   }
   out <- iADFtest(y, level = level, boot = boot, B = B, l = l, ar_AWB = ar_AWB,
-                  union = FALSE, p.min = p.min, p.max = p.max, ic = ic, dc = dc,
-                  detr = detr, ic.scale = ic.scale, verbose = verbose)
+                  union = FALSE, p_min = p_min, p_max = p_max, ic = ic, dc = dc,
+                  detr = detr, ic_scale = ic_scale, verbose = verbose)
   return(out)
 }
 
@@ -230,7 +229,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' }
 #' @details The union is taken over the combination of tests with intercept only and intercept plus trend, coupled with OLS detrending and QD detrending, as in Harvey, Leybourne and Taylor (2012) and Smeekes an Taylor (2012). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
-#' Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+#' Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #' @export
 #' @return A list with the following components
 #' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
@@ -256,7 +255,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
 boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
-                       p.min = 0, p.max = NULL, ic = "MAIC", ic.scale = TRUE, verbose = FALSE){
+                       p_min = 0, p_max = NULL, ic = "MAIC", ic_scale = TRUE, verbose = FALSE){
 
   if (verbose) {
     cat("Bootstrap Test with", boot, "bootstrap method.\n")
@@ -265,8 +264,8 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
     stop("Function takes single time series only. Use one of the functions suited for multivariate time series.")
   }
   out <- iADFtest(y, level = level, boot = boot, B = B, l = l, ar_AWB = ar_AWB,
-                  union = TRUE, p.min = p.min, p.max = p.max,
-                  ic = ic, ic.scale = ic.scale, verbose = verbose)
+                  union = TRUE, p_min = p_min, p_max = p_max,
+                  ic = ic, ic_scale = ic_scale, verbose = verbose)
   return(out)
 }
 
@@ -314,13 +313,13 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
 #' # bFDRtest on GDP_BE and GDP_DE
 #' two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
-                     union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC", dc = NULL,
-                     detr = NULL, ic.scale = TRUE, verbose = FALSE){
+                     union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
+                     detr = NULL, ic_scale = TRUE, verbose = FALSE){
 
-  inputs <- generate_inputs(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
-                            boot = boot, B = B, union = union, p.min = p.min, p.max = p.max,
-                            ic = ic, dc = dc, detr = detr, q = NULL, l = l, ic.scale = ic.scale,
-                            h.rs = 0.1, k_DWB = "k.TBB", ar_AWB = ar_AWB)
+  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
+                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
+                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1)
 
   if (!is.null(colnames(y))) {
     var_names <- colnames(y)
@@ -448,13 +447,13 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 #' # BSQTtest on GDP_BE and GDP_DE
 #' two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 9999,
-                     l = NULL, ar_AWB = NULL, union = TRUE, p.min = 0, p.max = NULL,
-                     ic = "MAIC", dc = NULL, detr = NULL, ic.scale = TRUE, verbose = FALSE){
+                     l = NULL, ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
+                     ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE){
 
-  inputs <- generate_inputs(y = y, BSQT_test = TRUE, iADF_test = FALSE, level = level,
-                            boot = boot, B = B, union = union, p.min = p.min, p.max = p.max,
-                            ic = ic, dc = dc, detr = detr, q = q, l = l, ic.scale = ic.scale,
-                            h.rs = 0.1, k_DWB = "k.TBB", ar_AWB = ar_AWB)
+  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = TRUE, iADF_test = FALSE, level = level,
+                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
+                                   ic_scale = ic_scale, q = q, h_rs = 0.1)
 
   if (!is.null(colnames(y))) {
     var_names <- colnames(y)
@@ -572,13 +571,13 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 9999,
 #' # paneltest on GDP_BE and GDP_DE
 #' two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 paneltest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
-                      union = TRUE, p.min = 0, p.max = NULL, ic = "MAIC", dc = NULL, detr = NULL,
-                      ic.scale = TRUE, verbose = FALSE){
+                      union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL,
+                      ic_scale = TRUE, verbose = FALSE){
 
-  inputs <- generate_inputs(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
-                            boot = boot, B = B, union = union, p.min = p.min, p.max = p.max,
-                            ic = ic, dc = dc, detr = detr, q = NULL, l = l, ic.scale = ic.scale,
-                            h.rs = 0.1, k_DWB = "k.TBB", ar_AWB = ar_AWB)
+  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
+                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
+                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1)
 
   if (union) { # Union Tests
     GM_test <- mean(inputs$test_stats)
