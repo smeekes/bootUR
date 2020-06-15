@@ -1,13 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# bootUR
+# bootUR: Bootstrap Unit Root Tests
 
 The R package `bootUR` implements several bootstrap tests for unit
 roots, both for single time series and for (potentially) large systems
 of time series.
 
-## Installation
+## Installation and Loading
+
+### Installation
 
 The development version of the `bootUR` package can be installed from
 GitHub using
@@ -17,7 +19,30 @@ GitHub using
 devtools::install_github("smeekes/bootUR")
 ```
 
-## Inspect data for missing values
+If you want this document to appear as vignette in your package, use
+
+``` r
+# install.packages("devtools")
+devtools::install_github("smeekes/bootUR", build_vignettes = TRUE, dependencies = TRUE)
+```
+
+instead. As building the vignette may take a bit of time (all bootstrap
+code below is run), package installation will be slower this way.
+
+### Load Package
+
+After installation, the package can be loaded in the standard way:
+
+``` r
+library(bootUR)
+```
+
+## Preliminary Analysis: Missing Values
+
+`bootUR` provides a few simple tools to check if your data are suitable
+to be bootstrapped.
+
+### Inspect Data for Missing Values
 
 The bootstrap tests in `bootUR` do not work with missing data, although
 multivariate time series with different start and end dates (unbalanced
@@ -27,7 +52,6 @@ your data contain missing values. We will illustrate this on the
 package.
 
 ``` r
-library(bootUR)
 data("MacroTS")
 check_missing_insample_values(MacroTS)
 #>  GDP_BE  GDP_DE  GDP_FR  GDP_NL  GDP_UK CONS_BE CONS_DE CONS_FR CONS_NL CONS_UK 
@@ -36,7 +60,7 @@ check_missing_insample_values(MacroTS)
 #>   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE   FALSE
 ```
 
-## Checking start and end points of time series
+### Checking Start and End Points of Time Series
 
 If your time series have different starting and end points (and thus
 some series contain `NA`s at the beginning and/or end of your sample,
@@ -46,7 +70,8 @@ follows:
 
 ``` r
 sample_check <- find_nonmissing_subsample(MacroTS)
-sample_check$range  # Provides the number of the first and last non-missing observation for each series
+# Provides the number of the first and last non-missing observation for each series:
+sample_check$range 
 #>       GDP_BE GDP_DE GDP_FR GDP_NL GDP_UK CONS_BE CONS_DE CONS_FR CONS_NL
 #> first      1      1      1      5      1       1       1       1       5
 #> last     100    100    100    100    100     100     100     100     100
@@ -56,11 +81,14 @@ sample_check$range  # Provides the number of the first and last non-missing obse
 #>       UR_UK
 #> first     1
 #> last    100
-sample_check$all_equal  # Gives TRUE if the time series all start and end at the same observation
+# Gives TRUE if the time series all start and end at the same observation:
+sample_check$all_equal
 #> [1] FALSE
 ```
 
-## Univariate Dickey-Fuller unit root test
+## Univariate Bootstrap Unit Root Tests
+
+### Augmented Dickey-Fuller Test
 
 To perform a standard augmented Dickey-Fuller (ADF) bootstrap unit root
 test on a single time series, use the `boot_df()` function. The function
@@ -74,7 +102,7 @@ Quasi-Differencing (QD) rather than GLS as this conveys the meaning less
 ambiguously and is the same terminology used by Smeekes and Taylor
 (2012) and Smeekes (2013).
 
-### Lag selection
+**Lag selection**
 
 Lag length selection is done automatically in the ADF regression; the
 default is by the modified Akaike information criterion (MAIC) proposed
@@ -88,7 +116,7 @@ data-driven lag length selection with a pre-specified lag length, simply
 set both the minimum `p.min` and maximum lag length `p.max` for the
 selection algorithm equal to the desired lag length.
 
-### Implementation
+**Implementation**
 
 We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve
 bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes
@@ -115,7 +143,7 @@ adf_out <- boot_df(GDP_NL, B = 399, boot = "SB", dc = 2, detr = c("OLS", "QD"), 
 #>     -1.5965001      0.4185464
 ```
 
-## Union of Rejections Test
+### Union of Rejections Test
 
 Use `boot_union()` for a test based on the union of rejections of 4
 tests with different number of deterministic components and different
@@ -176,7 +204,9 @@ panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 #> [1,]     -0.8537718 0.03508772
 ```
 
-## Individual ADF Tests for Multiple Time Series
+## Tests for Multiple Time Series
+
+### Individual ADF Tests
 
 To perform individual ADF tests on multiple time series simultaneously,
 the function `iADFtest()` can be used. As the bootstrap is performed for
@@ -188,10 +218,10 @@ is given to alert the user. The other options are the same as for
 `paneltest`.
 
 ``` r
-iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, union = FALSE, dc = 2, detr = "OLS")
-#> Warning in generate_inputs(y = y, BSQT_test = FALSE, iADF_test = TRUE, level =
-#> level, : Missing values cause resampling bootstrap to be executed for each time
-#> series individually.
+iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, union = FALSE, 
+                     dc = 2, detr = "OLS")
+#> Warning in check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, : Missing values cause resampling bootstrap to be executed
+#>                 for each time series individually.
 #> ----------------------------------------
 #> Type of unit root test performed: detr = OLS, dc = intercept and trend
 #> There are 0 stationary time series
@@ -209,7 +239,7 @@ level of 5%, the probability of making a mistake in all these tests
 becomes (much, if `N` is large) more than 5%. To explicitly account for
 multiple testing, use the functions `BSQTtest()` or `bFDRtest()`.
 
-## Bootstrap Sequential Tests for Multiple Time Series
+### Bootstrap Sequential Tests
 
 The function `BSQTtest()` performs the Bootstrap Sequential Quantile
 Test (BSQT) proposed by Smeekes (2015). Here we split the series in
@@ -261,7 +291,7 @@ BSQT_out2 <- BSQTtest(MacroTS, q = 0:4 / 4, boot = "AWB", B = 399, verbose = TRU
 #> Step 1       0       5       -1.00877 0.05513784
 ```
 
-## Bootstrap FDR controlling tests
+### Bootstrap FDR Controlling Tests
 
 The function `bFDRtest()` controls for multiple testing by controlling
 the false discovery rate (FDR), which is defined as the expected

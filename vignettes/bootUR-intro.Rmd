@@ -1,7 +1,7 @@
 ---
 title: "Introduction to bootUR"
 author: "Stephan Smeekes and Ines Wilms"
-date: "June 13, 2020"
+date: "June 15, 2020"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{bootUR-intro}
@@ -16,43 +16,60 @@ knitr::opts_chunk$set(
 )
 ```
 
-# bootUR
 The R package `bootUR` implements several bootstrap tests for unit roots, both for single time series and for (potentially) large systems of time series.
 
-## Installation
+## Installation and Loading
+### Installation
 The development version of the `bootUR` package can be installed from GitHub using
 ```{r install, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("smeekes/bootUR")
 ```
+If you want this document to appear as vignette in your package, use
+```{r install-vign, eval = FALSE}
+# install.packages("devtools")
+devtools::install_github("smeekes/bootUR", build_vignettes = TRUE, dependencies = TRUE)
+```
+instead. As building the vignette may take a bit of time (all bootstrap code below is run), package installation will be slower this way.
 
-## Inspect data for missing values
+### Load Package
+After installation, the package can be loaded in the standard way:
+```{r load}
+library(bootUR)
+```
+
+## Preliminary Analysis: Missing Values
+`bootUR` provides a few simple tools to check if your data are suitable to be bootstrapped.
+
+### Inspect Data for Missing Values
 The bootstrap tests in `bootUR` do not work with missing data, although multivariate time series with different start and end dates (unbalanced panels) are allowed. `bootUR` provides a simple function to check if your data contain missing values. We will illustrate this on the `MacroTS` dataset of macreconomic time series that comes with the package.
 
 ```{r missing}
-library(bootUR)
 data("MacroTS")
 check_missing_insample_values(MacroTS)
 ```
 
-## Checking start and end points of time series
+### Checking Start and End Points of Time Series
 If your time series have different starting and end points (and thus some series contain `NA`s at the beginning and/or end of your sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used. `bootUR` lets you check the start and end points as follows:
 
 ```{r start_end}
 sample_check <- find_nonmissing_subsample(MacroTS)
-# Provides the number of the first and last non-missing observation for each series
-sample_check$range
-# Gives TRUE if the time series all start and end at the same observation
+# Provides the number of the first and last non-missing observation for each series:
+sample_check$range 
+# Gives TRUE if the time series all start and end at the same observation:
 sample_check$all_equal
 ```
 
-## Univariate Dickey-Fuller unit root test
+## Univariate Bootstrap Unit Root Tests
+### Augmented Dickey-Fuller Test
 To perform a standard augmented Dickey-Fuller (ADF) bootstrap unit root test on a single time series, use the `boot_df()` function. The function allows to set many options, including the bootstrap method used (option `boot`), the deterministic components included (option `dc`) and the type of detrending used. Setting `boot = "MBB"` gives the test proposed by Paparoditis and Politis (2003). While `dc = "OLS"` gives the standard ADF test, `dc = "QD"` provides the powerful DF-GLS test of Elliott, Rothenberg and Stock (1996). Here we use the terminology Quasi-Differencing (QD) rather than GLS as this conveys the meaning less ambiguously and is the same terminology used by Smeekes and Taylor (2012) and Smeekes (2013).
 
-### Lag selection
+**Lag selection**
+
 Lag length selection is done automatically in the ADF regression; the default is by the modified Akaike information criterion (MAIC) proposed by Ng and Perron (2001) with the correction of Perron and Qu (2008). Other options include the regular Akaike information criterion (AIC), as well as the Bayesian information criterion and its modified variant. In addition, the rescaling suggested by Cavaliere et al. (2015) is implemented to improve the power of the test under heteroskedasticity; this can be turned off by setting `rescale = FALSE`. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
 
-### Implementation
+**Implementation**
+
 We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
 ```{r adf}
@@ -61,7 +78,7 @@ GDP_NL <- MacroTS[, 4]
 adf_out <- boot_df(GDP_NL, B = 399, boot = "SB", dc = 2, detr = c("OLS", "QD"), verbose = TRUE)
 ```
 
-## Union of Rejections Test
+### Union of Rejections Test
 Use `boot_union()` for a test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012). The advantage of the union test is that you don't have to specify these (rather influential) specification tests. This makes the union test a safe option for quick or automatic unit root testing where careful manual specification setup is not viable. Here we illustrate it with the sieve wild bootstrap as proposed by Smeekes and Taylor (2012).
 
 ```{r union}
@@ -84,7 +101,8 @@ Although the sieve bootstrap method `"SB"` and `"SWB"` can be used (historically
 panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 ```
 
-## Individual ADF Tests for Multiple Time Series
+## Tests for Multiple Time Series
+### Individual ADF Tests
 To perform individual ADF tests on multiple time series simultaneously, the function `iADFtest()` can be used. As the bootstrap is performed for all series simultaneously, resampling-based bootstrap methods `"MBB"` and `"SB"` cannot be used directly in case of unbalanced panels. If they are used anyway, the function will revert to splitting the bootstrap up and performing it individually per time series. In this case a warning is given to alert the user. The other options are the same as for `paneltest`.
 
 ```{r iADF}
@@ -94,7 +112,7 @@ iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, unio
 
 Note that `iADFtest` (intentionally) does not provide a correction for multiple testing; of course, if we perform each test with a significance level of 5%, the probability of making a mistake in all these tests becomes (much, if `N` is large) more than 5%. To explicitly account for multiple testing, use the functions `BSQTtest()` or `bFDRtest()`.
 
-## Bootstrap Sequential Tests for Multiple Time Series
+### Bootstrap Sequential Tests
 The function `BSQTtest()` performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015). Here we split the series in groups which are consecutively tested for unit roots, starting with the group most likely to be stationary (having the smallest ADF statistics). If the unit root hypothesis cannot be rejected for the first group, the algorithm stops; if there is a rejection, the second group is tested, and so on.
 
 Most options are the same as for `paneltest`. The most important new parameter to set here is the group sizes. These can either be set in units, or in fractions of the total number of series (i.e. quantiles, hence the name) via the parameter `q`. If we have `N` time series, setting `q = 0:N` means each unit should be tested sequentially. To split the series in four equally sized groups (regardless of many series there are), use `q = 0:4 / 4`. By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. However, if the initial zero is accidentally omitted, it is automatically added by the function. Similarly, if the final value is not equal to `1` (in case of quantiles) or `N` to end the last group, this is added by the function.
@@ -108,7 +126,7 @@ BSQT_out1 <- BSQTtest(MacroTS, q = 0:N, boot = "AWB", B = 399, verbose = TRUE)
 BSQT_out2 <- BSQTtest(MacroTS, q = 0:4 / 4, boot = "AWB", B = 399, verbose = TRUE)
 ```
 
-## Bootstrap FDR controlling tests
+### Bootstrap FDR Controlling Tests
 The function `bFDRtest()` controls for multiple testing by controlling the false discovery rate (FDR), which is defined as the expected proportion of false rejections relative to the total number of rejections. This scales with the total number of tests, making it more suitable for large `N` than the familywise error rate.
 
 The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wolf (2008), who showed that, unlike the classical way to control FDR, the bootstrap is appropriate under general forms of dependence between series. Moon and Perron (2012) applied this method to unit root testing; it is essentially their method which is implemented in `bFDRtest()` though again with the option to change the bootstrap used (their suggestion was MBB). The arguments to be set are the same as for the other multivariate unit root tests, though the meaning of `level` changes from regular significance level to FDR level. As BSQT, the method only report those tests until no rejection occurs. 
@@ -118,6 +136,7 @@ We illustrate it here with the final available bootstrap method, the block wild 
 N <- ncol(MacroTS)
 bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "BWB", B = 399, verbose = TRUE)
 ```
+
 
 ## References
 * Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R. (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. *Econometric Reviews*, 34(4), 512-536.
