@@ -25,7 +25,7 @@ The development version of the `bootUR` package can be installed from GitHub usi
 # install.packages("devtools")
 devtools::install_github("smeekes/bootUR")
 ```
-If you want this document to appear as vignette in your package, use
+If you want the vignette to appear in your package, use
 ```{r install-vign, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("smeekes/bootUR", build_vignettes = TRUE, dependencies = TRUE)

@@ -19,7 +19,7 @@ GitHub using
 devtools::install_github("smeekes/bootUR")
 ```
 
-If you want this document to appear as vignette in your package, use
+If you want the vignette to appear in your package, use
 
 ``` r
 # install.packages("devtools")
