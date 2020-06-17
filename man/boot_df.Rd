@@ -9,7 +9,7 @@ boot_df(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
   detr = "OLS", ic_scale = TRUE, verbose = FALSE)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
+\item{y}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 

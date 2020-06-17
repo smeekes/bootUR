@@ -167,6 +167,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' Bootstrap augmented Dickey-Fuller Unit Root Test
 #' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series.
 #' @inheritParams iADFtest
+#' @param y A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
 #' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003), this is the default;}
@@ -224,6 +225,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' Bootstrap Union Test for Unit Roots
 #' @description Performs bootstrap unit root test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Harvey, Leybourne and Taylor, 2012; Smeekes and Taylor, 2012).
 #' @inheritParams iADFtest
+#' @param y A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
 #' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003), this is the default;}
