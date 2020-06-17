@@ -184,6 +184,10 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
 #' The output is  arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
+#' @section Errors and warnings:
+#' \describe{
+#' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for thay.}
+#' }
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R. (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.
@@ -199,12 +203,17 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' @references Shao, X. (2011). A bootstrap-assisted spectral test of white noise under unknown dependence. \emph{Journal of Econometrics}, 162, 213-224.
 #' @references Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit roots in the presence of nonstationary volatility. \emph{Econometric Theory}, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
+#' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # boot_df on GDP_BE
 #' GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
 boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
                     p_min = 0, p_max = NULL, ic = "MAIC", dc = 1, detr = "OLS",
                     ic_scale = TRUE, verbose = FALSE){
+  if (NCOL(y) > 1) {
+    stop("Multiple time series not allowed. Switch to a multivariate method such as iADFtest,
+         or change argument y to a univariate time series.")
+  }
 
   if (verbose) {
     cat("Bootstrap DF Test with", boot, "bootstrap method.\n")
@@ -235,6 +244,10 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
 #' The output is arranged per time series.
+#' @section Errors and warnings:
+#' \describe{
+#' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for thay.}
+#' }
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
@@ -251,6 +264,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' @references Smeekes, S. (2013). Detrending bootstrap unit root tests. \emph{Econometric Reviews}, 32(8), 869-891.
 #' @references Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit roots in the presence of nonstationary volatility. \emph{Econometric Theory}, 28(2), 422-456.
 #' @references Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
+#' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
@@ -261,7 +275,8 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
     cat("Bootstrap Test with", boot, "bootstrap method.\n")
   }
   if (NCOL(y) > 1) {
-    stop("Function takes single time series only. Use one of the functions suited for multivariate time series.")
+    stop("Multiple time series not allowed. Switch to a multivariate method such as iADFtest,
+         or change argument y to a univariate time series.")
   }
   out <- iADFtest(y, level = level, boot = boot, B = B, l = l, ar_AWB = ar_AWB,
                   union = TRUE, p_min = p_min, p_max = p_max,

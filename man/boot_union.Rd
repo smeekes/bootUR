@@ -53,6 +53,13 @@ The union is taken over the combination of tests with intercept only and interce
 
 Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 }
+\section{Errors and warnings}{
+
+\describe{
+\item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for thay.}
+}
+}
+
 \examples{
 # boot_union on GDP_BE
 GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
@@ -88,4 +95,7 @@ Smeekes, S. (2013). Detrending bootstrap unit root tests. \emph{Econometric Revi
 Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit roots in the presence of nonstationary volatility. \emph{Econometric Theory}, 28(2), 422-456.
 
 Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
+}
+\seealso{
+\code{\link{iADFtest}}
 }
