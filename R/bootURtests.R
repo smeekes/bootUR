@@ -180,13 +180,10 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #' @export
-#' @return A list with the following components
-#' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-#' The output is  arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
+#' @return Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.
 #' @section Errors and warnings:
 #' \describe{
-#' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for thay.}
+#' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for that.}
 #' }
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
@@ -221,7 +218,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
   out <- iADFtest(y, level = level, boot = boot, B = B, l = l, ar_AWB = ar_AWB,
                   union = FALSE, p_min = p_min, p_max = p_max, ic = ic, dc = dc,
                   detr = detr, ic_scale = ic_scale, verbose = verbose)
-  return(out)
+  return(aperm(out$ADF_tests, 3:1)[, , 1])
 }
 
 #' Bootstrap Union Test for Unit Roots
@@ -240,13 +237,10 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #'
 #' Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #' @export
-#' @return A list with the following components
-#' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-#' The output is arranged per time series.
+#' @return Value of the union test statistic and the bootstrap p-values.
 #' @section Errors and warnings:
 #' \describe{
-#' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for thay.}
+#' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for that.}
 #' }
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
@@ -281,7 +275,7 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
   out <- iADFtest(y, level = level, boot = boot, B = B, l = l, ar_AWB = ar_AWB,
                   union = TRUE, p_min = p_min, p_max = p_max,
                   ic = ic, ic_scale = ic_scale, verbose = verbose)
-  return(out)
+  return(out$ADF_tests[1, ])
 }
 
 #' Bootstrap Unit Root Tests with False Discovery Rate control

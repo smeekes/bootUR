@@ -40,10 +40,7 @@ boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 }
 \value{
-A list with the following components
-\item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-\item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-The output is arranged per time series.
+Value of the union test statistic and the bootstrap p-values.
 }
 \description{
 Performs bootstrap unit root test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Harvey, Leybourne and Taylor, 2012; Smeekes and Taylor, 2012).
@@ -56,7 +53,7 @@ Lag length selection is done automatically in the ADF regressions with the speci
 \section{Errors and warnings}{
 
 \describe{
-\item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for thay.}
+\item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for that.}
 }
 }
 

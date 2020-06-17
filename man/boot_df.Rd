@@ -52,10 +52,7 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 }
 \value{
-A list with the following components
-\item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-\item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-The output is  arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
+Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.
 }
 \description{
 This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series.
@@ -68,7 +65,7 @@ Lag length selection is done automatically in the ADF regression with the specif
 \section{Errors and warnings}{
 
 \describe{
-\item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for thay.}
+\item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as iADFtest, or change argument y to a univariate time series.}}{The function is a simple wrapper around \code{\link{iADFtest}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{iADFtest}} is specifically suited for that.}
 }
 }
 
