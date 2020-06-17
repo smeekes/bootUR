@@ -493,12 +493,14 @@ arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e
   arma::cube output = zeros(B, dclength*detrlength, N);
   if (joint) {
     for (int iB = 0; iB < B; iB++) {
+      Rcpp::checkUserInterrupt();
       output.subcube(iB, 0, 0,iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
     }
   } else {
-    for (int iN = 0; iN < N; iN++) {
-      for (int iB = 0; iB < B; iB++) {
-        output.subcube(iB, 0, iN,iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
+    for (int iB = 0; iB < B; iB++) {
+      Rcpp::checkUserInterrupt();
+      for (int iN = 0; iN < N; iN++) {
+        output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
       }
     }
   }
