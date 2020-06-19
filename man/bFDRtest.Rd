@@ -6,7 +6,8 @@
 \usage{
 bFDRtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
   ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
-  dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE)
+  dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
+  show_progress = FALSE)
 }
 \arguments{
 \item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -52,6 +53,8 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
+
+\item{show_progress}{Logical indicator whether a bootstrap progress indicator should be printed to the console. Default is FALSE. The indicator is only activated for B larger than 99.}
 }
 \value{
 A list with the following components

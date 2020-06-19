@@ -25,8 +25,8 @@
 #' @param h_rs Bandwidth used in rescaled information criteria.
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
-do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB,
-                                   union, p_min, p_max, ic, dc, detr, ic_scale, q, h_rs){
+do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
+                                   p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress){
   y <- as.matrix(y)
 
   # Check correctness arguments and perform initial calculations and transformations
@@ -63,7 +63,7 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
   t_star <- bootstrap_cpp(B = B, boot = boot, u = u_boot, e = res, l = l, s = s_DWB, ar = ar_AWB,
                           ar_est = ar_est, y0 = matrix(0, ncol = N), pmin = p_min, pmax = p_max,
                           ic = ic, dc = dc, detr = detr_int, ic_scale = ic_scale, h_rs = h_rs,
-                          range = range_nonmiss, joint = joint)
+                          range = range_nonmiss, joint = joint, show_progress = show_progress)
   tests_i <- adf_tests_panel_cpp(y, pmin = p_min, pmax = p_max, ic = ic, dc = dc, detr = detr_int,
                                   ic_scale = ic_scale, h_rs = h_rs, range = range_nonmiss)
 
@@ -134,7 +134,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   } else if (anyNA(y)) {
     if (boot %in% c("MBB", "SB")) {
       if (!iADF_test) {
-        stop("Resampling-based bootstraps MBB and SB cannot handle missing values.")
+        stop("Resampling-based bootstraps MBB and SB cannot handle unbalanced series.")
       } else if (N > 1) {
         warning("Missing values cause resampling bootstrap to be executed
                 for each time series individually.")
@@ -215,7 +215,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
     }
   }
   if(is.null(p_max)){
-    p_max = round(12*(n/100)^(1/4))
+    p_max = round(12*(n/100)^(1/4)) #- 5*max(1 - n/30, 0)^(1/2)
   }
   s_DWB <- matrix(0, n, n)
   if (boot == 3) {

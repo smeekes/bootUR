@@ -46,8 +46,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // bootstrap_cpp
-arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e, const int& boot, const double& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint);
-RcppExport SEXP _bootUR_bootstrap_cpp(SEXP BSEXP, SEXP uSEXP, SEXP eSEXP, SEXP bootSEXP, SEXP lSEXP, SEXP sSEXP, SEXP arSEXP, SEXP ar_estSEXP, SEXP y0SEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP detrSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP, SEXP jointSEXP) {
+arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e, const int& boot, const double& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint, const bool& show_progress);
+RcppExport SEXP _bootUR_bootstrap_cpp(SEXP BSEXP, SEXP uSEXP, SEXP eSEXP, SEXP bootSEXP, SEXP lSEXP, SEXP sSEXP, SEXP arSEXP, SEXP ar_estSEXP, SEXP y0SEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP detrSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP, SEXP jointSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -69,7 +69,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const double& >::type h_rs(h_rsSEXP);
     Rcpp::traits::input_parameter< const arma::umat& >::type range(rangeSEXP);
     Rcpp::traits::input_parameter< const bool& >::type joint(jointSEXP);
-    rcpp_result_gen = Rcpp::wrap(bootstrap_cpp(B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range, joint));
+    Rcpp::traits::input_parameter< const bool& >::type show_progress(show_progressSEXP);
+    rcpp_result_gen = Rcpp::wrap(bootstrap_cpp(B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range, joint, show_progress));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -153,7 +154,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_bootUR_adf_tests_panel_cpp", (DL_FUNC) &_bootUR_adf_tests_panel_cpp, 9},
     {"_bootUR_adf_panel_bootstrap_dgp_cpp", (DL_FUNC) &_bootUR_adf_panel_bootstrap_dgp_cpp, 10},
-    {"_bootUR_bootstrap_cpp", (DL_FUNC) &_bootUR_bootstrap_cpp, 18},
+    {"_bootUR_bootstrap_cpp", (DL_FUNC) &_bootUR_bootstrap_cpp, 19},
     {"_bootUR_scaling_factors_cpp", (DL_FUNC) &_bootUR_scaling_factors_cpp, 2},
     {"_bootUR_union_tests_cpp", (DL_FUNC) &_bootUR_union_tests_cpp, 2},
     {"_bootUR_union_test_cpp", (DL_FUNC) &_bootUR_union_test_cpp, 2},

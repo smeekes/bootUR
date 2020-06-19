@@ -205,7 +205,7 @@ adfvout adf_selectlags_cpp(const arma::vec& y, const int& pmin, const int& pmax,
   if (ic_scale) {
     ys = rescale_cpp(y, h_rs, p_rs, dc, false, false, 0);
   }
-   arma::vec ylag = de_trend(ys, dc, false).subvec(pmax + 1, n - 2);
+  arma::vec ylag = de_trend(ys, dc, false).subvec(pmax + 1, n - 2);
 
   arma::vec icvalue = zeros(pmax - pmin + 1);
   adfvout adfp;
@@ -479,7 +479,7 @@ arma::mat bootstrap_tests_cpp(const arma::mat& u, const arma::mat& e, bFun boot_
 // [[Rcpp::export]]
 arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e, const int& boot, const double& l, const arma::mat& s,
                          const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc,
-                         const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint = true){
+                         const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint = true, const bool& show_progress = false){
 
   const int detrlength = detr.size();
   const int dclength = dc.size();
@@ -493,12 +493,22 @@ arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e
   arma::cube output = zeros(B, dclength*detrlength, N);
   if (joint) {
     for (int iB = 0; iB < B; iB++) {
-      Rcpp::checkUserInterrupt();
+      if ((iB + 1) % 100 == 0) {
+        Rcpp::checkUserInterrupt();
+        if (show_progress) {
+          Rcpp::Rcout << "Bootstrap progress: " << round(100 * (iB + 1) / B) << "%" << std::endl;
+        }
+      }
       output.subcube(iB, 0, 0,iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
     }
   } else {
     for (int iB = 0; iB < B; iB++) {
-      Rcpp::checkUserInterrupt();
+      if ((iB + 1) % 100 == 0) {
+        Rcpp::checkUserInterrupt();
+        if (show_progress) {
+          Rcpp::Rcout << "Bootstrap progress: " << round(100 * (iB + 1) / B) << "%" << std::endl;
+        }
+      }
       for (int iN = 0; iN < N; iN++) {
         output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
       }
@@ -669,34 +679,36 @@ Rcpp:: List FDR_cpp(const arma::mat& test_i, const arma::mat& t_star, const doub
   const int B = t_star.n_rows;
   const arma::uvec ranks = sort_index(test_i);
 
-  arma::mat t_star_sub, sorted_t_star, noreject, noreject_jplus;
+  arma::mat t_star_sub, sorted_t_star, noreject, noreject_jplus, cv_star;
   arma::mat cv_fdr = zeros(1, N);
   arma::vec noreject_prod, FDR_est;
+  arma::uvec ranks_c1;
   double pseudo_inf = std::numeric_limits<double>::max();
 
   for (int j = 0; j < N; j++) {
-    // Extract the j "least" significant statistics
-    t_star_sub = t_star.cols(ranks.subvec(N - 1 - j, N-1));
+    // Extract the j+1 "least" significant statistics
+    t_star_sub = t_star.cols(ranks.subvec(N - 1 - j, N - 1));
     // Sort them within each bootstrap replication
     sorted_t_star = sort(t_star_sub, "ascend", 1);
     // Sort them along the first column
-    arma::uvec ranks_c1 = sort_index(sorted_t_star.col(0));
-    arma::mat cv_star = join_cols(sorted_t_star.rows(ranks_c1), pseudo_inf * ones(1, j + 1));
+    ranks_c1 = sort_index(sorted_t_star.col(0));
+    cv_star = join_cols(sorted_t_star.rows(ranks_c1), pseudo_inf * ones(1, j + 1));
 
     if (j == 0) {
       cv_fdr(0, N-1) = cv_star(std::min(B, int(N * level * B)) - (N * level <= 1), 0);
     } else if ((j > 0) & (j < (N-1))) {
-       // Count number of non-rejections in the (j-1) "least-significant" statistics, add one supperflous column for easier coding
-      noreject_jplus = ones(B + 1, j + 1);
-      noreject_jplus.elem( find(cv_star <= repelem(cv_fdr(0, span(N - j - 1, N - 1) ), B + 1, 1)) ).zeros();
-      // First case: no rejection for the 1st among (j-1) statistics (set everything else to 1 as it doesn't count)
-      noreject = ones(B+1, j+1);
+       // Count number of non-rejections in the j "least-significant" statistics, add one supperflous column for easier coding
+      noreject_jplus = ones(B + 1, j);
+      noreject_jplus.elem( find(cv_star.cols(1, j) <= repelem(cv_fdr(0, span(N - j, N - 1) ), B + 1, 1)) ).zeros();
+      noreject_jplus = join_rows(noreject_jplus, ones(B + 1));
+      // First case: no rejection for the 1st among j statistics (set everything else to 1 as it doesn't count)
+      noreject = ones(B + 1, j + 1);
       noreject.col(0) = noreject_jplus.col(0);
       // FDR estimate based on first case
       noreject_prod = prod(noreject, 1);
-      FDR_est = noreject_prod/(N - (j+1) + 1);
+      FDR_est = noreject_prod/(N - (j + 1) + 1);
       // Loop over the cases of the first non-rejection in the last (j-1) statistics. The last case means all (j-1) rejections.
-      for (int no_r = 1; no_r < (j+1); no_r ++){
+      for (int no_r = 1; no_r < (j + 1); no_r ++){
         // Set the (no.r-1)-th statistic to rejection
         noreject.col(no_r - 1) = 1 - noreject.col(no_r - 1);
         // Add the (r+1)-th non-rejection

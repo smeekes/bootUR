@@ -70,7 +70,7 @@ Lag length selection is done automatically in the ADF regression; the default is
 
 **Implementation**
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. To see live progress updates on the bootstrap, set `show_progress = TRUE`. This is particularly useful for large `B`, so we leave it out here. As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
 ```{r adf}
 set.seed(155776)

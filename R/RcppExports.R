@@ -9,8 +9,8 @@ adf_panel_bootstrap_dgp_cpp <- function(y, pmin, pmax, ic, dc, QD, trim, ic_scal
     .Call(`_bootUR_adf_panel_bootstrap_dgp_cpp`, y, pmin, pmax, ic, dc, QD, trim, ic_scale, h_rs, range)
 }
 
-bootstrap_cpp <- function(B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range, joint = TRUE) {
-    .Call(`_bootUR_bootstrap_cpp`, B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range, joint)
+bootstrap_cpp <- function(B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range, joint = TRUE, show_progress = FALSE) {
+    .Call(`_bootUR_bootstrap_cpp`, B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range, joint, show_progress)
 }
 
 scaling_factors_cpp <- function(u, prob) {
