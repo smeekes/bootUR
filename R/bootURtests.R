@@ -675,6 +675,6 @@ find_nonmissing_subsample <- function(X) {
   colnames(range_nonmiss) <- names
   rownames(range_nonmiss) <- c("first", "last")
   all_equal <- (max(range_nonmiss[1, ]) - min(range_nonmiss[1, ]) == 0) &
-    (max(range_nonmiss[2, ]) - min(range_nonmiss[2, ]) > 0)
+    (max(range_nonmiss[2, ]) - min(range_nonmiss[2, ]) == 0)
   return(list(range = range_nonmiss, all_equal = all_equal))
 }

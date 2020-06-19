@@ -66,7 +66,7 @@ To perform a standard augmented Dickey-Fuller (ADF) bootstrap unit root test on 
 
 **Lag selection**
 
-Lag length selection is done automatically in the ADF regression; the default is by the modified Akaike information criterion (MAIC) proposed by Ng and Perron (2001) with the correction of Perron and Qu (2008). Other options include the regular Akaike information criterion (AIC), as well as the Bayesian information criterion and its modified variant. In addition, the rescaling suggested by Cavaliere et al. (2015) is implemented to improve the power of the test under heteroskedasticity; this can be turned off by setting `rescale = FALSE`. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p.min` and maximum lag length `p.max` for the selection algorithm equal to the desired lag length.
+Lag length selection is done automatically in the ADF regression; the default is by the modified Akaike information criterion (MAIC) proposed by Ng and Perron (2001) with the correction of Perron and Qu (2008). Other options include the regular Akaike information criterion (AIC), as well as the Bayesian information criterion and its modified variant. In addition, the rescaling suggested by Cavaliere et al. (2015) is implemented to improve the power of the test under heteroskedasticity; this can be turned off by setting `ic_scale = FALSE`. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 
 **Implementation**
 

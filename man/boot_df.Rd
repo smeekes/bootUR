@@ -88,7 +88,7 @@ Ng, S. and Perron, P. (2001). Lag Length Selection and the Construction of Unit 
 
 Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008). Bootstrap unit root tests: Comparison and extensions. \emph{Journal of Time Series Analysis}, 29(1), 371-401.
 
-Paparoditis, E. and Politis, D.N. (2003). Residual‐based block bootstrap for unit root testing. \emph{Econometrica}, 71(3), 813-855.
+Paparoditis, E. and Politis, D.N. (2003). Residual-based block bootstrap for unit root testing. \emph{Econometrica}, 71(3), 813-855.
 
 Perron, P. and Qu, Z. (2008). A simple modification to improve the finite sample properties of Ng and Perron's unit root tests. \emph{Economic Letters}, 94(1), 12-19.
 

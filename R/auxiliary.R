@@ -130,8 +130,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   # Check for missing values or unbalanced panels (MBB, SB)
   check_missing <- check_missing_insample_values(y)
   if (any(check_missing)) {
-    stop("Missing values detected inside samples.
-         Series may only contain missing values at the beginning or end for wild bootstrap methods.")
+    stop("Missing values detected inside sample.")
   } else if (anyNA(y)) {
     if (boot %in% c("MBB", "SB")) {
       if (!iADF_test) {
