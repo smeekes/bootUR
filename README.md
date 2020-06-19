@@ -111,9 +111,9 @@ Other options include the regular Akaike information criterion (AIC), as
 well as the Bayesian information criterion and its modified variant. In
 addition, the rescaling suggested by Cavaliere et al. (2015) is
 implemented to improve the power of the test under heteroskedasticity;
-this can be turned off by setting `rescale = FALSE`. To overwrite
+this can be turned off by setting `ic_scale = FALSE`. To overwrite
 data-driven lag length selection with a pre-specified lag length, simply
-set both the minimum `p.min` and maximum lag length `p.max` for the
+set both the minimum `p_min` and maximum lag length `p_max` for the
 selection algorithm equal to the desired lag length.
 
 **Implementation**
@@ -124,9 +124,11 @@ and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap
 replications (`B = 399`) to prevent the code from running too long. We
 add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS)
 detrending. The option `verbose = TRUE` prints easy to read output on
-the console. As random number generation is required to draw bootstrap
-samples, we first set the seed of the random number generator to obtain
-replicable results.
+the console. To see live progress updates on the bootstrap, set
+`show_progress = TRUE`. This is particularly useful for large `B`, so we
+leave it out here. As random number generation is required to draw
+bootstrap samples, we first set the seed of the random number generator
+to obtain replicable results.
 
 ``` r
 set.seed(155776)
@@ -177,10 +179,16 @@ also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 Palm, Smeekes and Urbain (2011) introduced this test with the moving
 block bootstrap (`boot = "MBB"`), which is the standard option. However,
 this resampling-based method cannot handle unbalancedness, and will
-therefore give an error when applied to `MacroTS`. Therefore, you should
-switch to one of the wild bootstrap methods. Here we illustrate it with
-the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao
-(2019).
+therefore give an error when applied to `MacroTS`:
+
+``` r
+panel_out <- paneltest(MacroTS, boot = "MBB", B = 399, verbose = TRUE)
+#> Error in check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, : Resampling-based bootstraps MBB and SB cannot handle unbalanced series.
+```
+
+Therefore, you should switch to one of the wild bootstrap methods. Here
+we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010)
+and Rho and Shao (2019).
 
 By default the union test is used for each series (`union = TRUE`), if
 this is set to `FALSE` the deterministic components and detrending
@@ -193,15 +201,12 @@ of dependence across units. The code will give a warning to recommend
 using a different bootstrap method.
 
 ``` r
-# This will give an error!
-# panel_out <- paneltest(MacroTS, boot = "MBB", B = 399, verbose = TRUE)
-# This works!
 panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 #> Panel Bootstrap Group-Mean Union Test
 #> The null hypothesis that all series have a unit root, is
 #>                   rejected at a significance level of 0.05.
 #>      test statistic    p-value
-#> [1,]     -0.8537718 0.03508772
+#> [1,]     -0.8474483 0.03759398
 ```
 
 ## Tests for Multiple Time Series
@@ -225,12 +230,12 @@ iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, unio
 #> ----------------------------------------
 #> Type of unit root test performed: detr = OLS, dc = intercept and trend
 #> There are 0 stationary time series
-#>        test statistic   p-value
-#> GDP_BE      -2.792169 0.2330827
-#> GDP_DE      -2.774320 0.0877193
-#> GDP_FR      -2.048760 0.4837093
-#> GDP_NL      -2.515285 0.1954887
-#> GDP_UK      -2.449065 0.2857143
+#>        test statistic    p-value
+#> GDP_BE      -2.792169 0.24060150
+#> GDP_DE      -2.774320 0.07769424
+#> GDP_FR      -2.048760 0.52882206
+#> GDP_NL      -2.515285 0.19047619
+#> GDP_UK      -2.449065 0.30325815
 ```
 
 Note that `iADFtest` (intentionally) does not provide a correction for
@@ -277,18 +282,18 @@ Urbain (2020).
 N <- ncol(MacroTS)
 # Test each unit sequentially
 BSQT_out1 <- BSQTtest(MacroTS, q = 0:N, boot = "AWB", B = 399, verbose = TRUE)
-#> There are 2 stationary time series, namely: HICP_BE HICP_DE.
+#> There is 1 stationary time series, namely: HICP_DE.
 #> Details of the BSQT ssquential tests:
 #>        Unit H0 Unit H1 Test statistic    p-value
-#> Step 1       0       1      -1.619140 0.01754386
-#> Step 2       1       2      -1.550431 0.03007519
-#> Step 3       2       3      -1.340742 0.18546366
+#> Step 1       0       1      -1.645621 0.02005013
+#> Step 2       1       2      -1.361195 0.17794486
 # Split in four equally sized groups (motivated by the 4 series per country)
 BSQT_out2 <- BSQTtest(MacroTS, q = 0:4 / 4, boot = "AWB", B = 399, verbose = TRUE)
-#> There are 0 stationary time series.
+#> There are 5 stationary time series, namely: GDP_DE HICP_BE HICP_DE HICP_FR HICP_NL.
 #> Details of the BSQT ssquential tests:
 #>        Unit H0 Unit H1 Test statistic    p-value
-#> Step 1       0       5       -1.00877 0.05513784
+#> Step 1       0       5      -1.073928 0.01503759
+#> Step 2       5      10      -0.888729 0.34586466
 ```
 
 ### Bootstrap FDR Controlling Tests
@@ -315,11 +320,13 @@ block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 
 ``` r
 N <- ncol(MacroTS)
-bFDR_out <- bFDRtest(MacroTS[, 1:10], level = 0.1, boot = "BWB", B = 399, verbose = TRUE)
-#> There are 0 stationary time series
+bFDR_out <- bFDRtest(MacroTS, level = 0.1, boot = "BWB", B = 399, verbose = TRUE)
+#> There are 2 stationary time series, namely: HICP_BE HICP_DE
 #> Details of the FDR sequential tests:
-#>        test statistic critical value
-#> GDP_DE      -1.060895      -1.577345
+#>         test statistic critical value
+#> HICP_BE      -1.844523      -1.664123
+#> HICP_DE      -1.761817      -1.534352
+#> HICP_NL      -1.457067      -1.458327
 ```
 
 ## References

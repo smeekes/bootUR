@@ -88,16 +88,19 @@ union_out <- boot_union(GDP_NL, B = 399, boot = "SWB", verbose = TRUE)
 ## Panel Unit Root Test
 The function `panel_test` performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. A rejection is typically interpreted as evidence that a 'significant proportion' of the series is stationary, although how large that proportion is - or which series are stationary - is not given by the test. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 
-Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`boot = "MBB"`), which is the standard option. However, this resampling-based method cannot handle unbalancedness, and will therefore give an error when applied to `MacroTS`. Therefore, you should switch to one of the wild bootstrap methods. Here we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao (2019).
+Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`boot = "MBB"`), which is the standard option. However, this resampling-based method cannot handle unbalancedness, and will therefore give an error when applied to `MacroTS`:
+
+```{r panel-error, error = TRUE, purl = FALSE}
+panel_out <- paneltest(MacroTS, boot = "MBB", B = 399, verbose = TRUE)
+```
+
+Therefore, you should switch to one of the wild bootstrap methods. Here we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao (2019).
 
 By default the union test is used for each series (`union = TRUE`), if this is set to `FALSE` the deterministic components and detrending methods can be specified as in the univariate Dickey-Fuller test.
 
 Although the sieve bootstrap method `"SB"` and `"SWB"` can be used (historically they have been popular among practitioners), Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units. The code will give a warning to recommend using a different bootstrap method.
 
 ```{r panel}
-# This will give an error!
-# panel_out <- paneltest(MacroTS, boot = "MBB", B = 399, verbose = TRUE)
-# This works!
 panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 ```
 
