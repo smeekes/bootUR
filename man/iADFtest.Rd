@@ -4,7 +4,7 @@
 \alias{iADFtest}
 \title{Individual Unit Root Tests without multiple testing control}
 \usage{
-iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+iADFtest(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
   ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
   dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
   show_progress = FALSE)
@@ -24,7 +24,7 @@ iADFtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
-\item{B}{Number of bootstrap replications. Default is 9999.}
+\item{B}{Number of bootstrap replications. Default is 1999.}
 
 \item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
 
@@ -54,7 +54,7 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 
-\item{show_progress}{Logical indicator whether a bootstrap progress indicator should be printed to the console. Default is FALSE. The indicator is only activated for B larger than 99.}
+\item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 }
 \value{
 A list with the following components
@@ -68,7 +68,7 @@ This function performs bootstrap unit root tests on each time series individuall
 \details{
 The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 
-Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
+Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 }
 \section{Warnings}{
 

@@ -136,8 +136,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
       if (!iADF_test) {
         stop("Resampling-based bootstraps MBB and SB cannot handle unbalanced series.")
       } else if (N > 1) {
-        warning("Missing values cause resampling bootstrap to be executed
-                for each time series individually.")
+        warning("Missing values cause resampling bootstrap to be executed for each time series individually.")
       }
     }
     check_nonmiss <- find_nonmissing_subsample(y)
@@ -206,12 +205,33 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   # Defaults
   p_vec <- NULL
   if (BSQT_test) {
-    if (is.numeric(q) && all(q == floor(q) & q >= 0)) {
-      p_vec <- sort(unique(q))
-    } else if (is.numeric(q) && all(q >= 0 & q <= 1)) {
-      p_vec <- sort(unique(round(q*N)))
+    if (is.numeric(q) & all(q == floor(q) & q >= 0) & !anyNA(q)) {
+      p_vec <- sort(unique(q[q <= N]))
+      if (max(p_vec) < N) {
+        p_vec <- c(p_vec, N)
+      }
+      if (min(p_vec) > 0) {
+        p_vec <- c(0, p_vec)
+      }
+      if (!identical(p_vec, q)) {
+        warning(paste0(paste0("Input to argument q transformed to fit sequential test: q = c("),
+                       paste0(p_vec, collapse = ", "), ")."))
+      }
+    } else if (is.numeric(q) & all(q >= 0 & q <= 1) & !anyNA(q)) {
+      q_vec <- sort(unique(q))
+      if (max(q_vec) < 1) {
+        q_vec <- c(q_vec, 1)
+      }
+      if (min(p_vec) > 0) {
+        q_vec <- c(0, q_vec)
+      }
+      if (!identical(q_vec, q)) {
+        warning(paste0(paste0("Input to argument q transformed to fit sequential test: q = c("),
+                       paste0(q_vec, collapse = ", "), ")"))
+      }
+      p_vec <- round(q * N)
     } else {
-      stop("Invalid input values for q: must be quantiles or positive integers")
+      stop("Invalid input values for q: must be quantiles or positive integers.")
     }
   }
   if (boot == 1){

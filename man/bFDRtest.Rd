@@ -4,7 +4,7 @@
 \alias{bFDRtest}
 \title{Bootstrap Unit Root Tests with False Discovery Rate control}
 \usage{
-bFDRtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+bFDRtest(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
   ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
   dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
   show_progress = FALSE)
@@ -24,7 +24,7 @@ bFDRtest(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
-\item{B}{Number of bootstrap replications. Default is 9999.}
+\item{B}{Number of bootstrap replications. Default is 1999.}
 
 \item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
 
@@ -54,7 +54,7 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 
-\item{show_progress}{Logical indicator whether a bootstrap progress indicator should be printed to the console. Default is FALSE. The indicator is only activated for B larger than 99.}
+\item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 }
 \value{
 A list with the following components
@@ -73,10 +73,10 @@ See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag select
 \section{Errors and warnings}{
 
 \describe{
-\item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values}}{If the time series in \code{Y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
-\item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
-\item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
-\item{\code{Warning: Detrending method in argument detr is ignored, as union test is applied}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
+\item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{Y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
+\item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
+\item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
+\item{\code{Warning: Detrending method in argument detr is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
 }
 }
 

@@ -26,7 +26,7 @@ check_inputs(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
 \item{\verb{"SWB"}}{Sieve wild boostrap.}
 }}
 
-\item{B}{Number of bootstrap replications. Default is 9999.}
+\item{B}{Number of bootstrap replications. Default is 1999.}
 
 \item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)}; this can be overwritten by setting \verb{ar_AWB} directly. If NULL, sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.}
 

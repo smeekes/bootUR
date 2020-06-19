@@ -28,5 +28,6 @@ LinkingTo: Rcpp,  RcppArmadillo
 URL: https://github.com/smeekes/bootUR
 Suggests: 
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
 VignetteBuilder: knitr

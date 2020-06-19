@@ -4,7 +4,7 @@
 \alias{boot_union}
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
-boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+boot_union(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
   ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC",
   ic_scale = TRUE, verbose = FALSE, show_progress = FALSE)
 }
@@ -23,7 +23,7 @@ boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 }}
 
-\item{B}{Number of bootstrap replications. Default is 9999.}
+\item{B}{Number of bootstrap replications. Default is 1999.}
 
 \item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
 
@@ -39,7 +39,7 @@ boot_union(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 
-\item{show_progress}{Logical indicator whether a bootstrap progress indicator should be printed to the console. Default is FALSE. The indicator is only activated for B larger than 99.}
+\item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 }
 \value{
 Value of the union test statistic and the bootstrap p-values.
