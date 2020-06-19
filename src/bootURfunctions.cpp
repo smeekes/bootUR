@@ -98,7 +98,7 @@ arma::mat de_trend(const arma::mat& y, const int& dc = 1, const bool& QD = false
 }
 
 adfvout adf_cpp(const arma::vec& z, const int& p, const int& dc = 1, const bool& QD = false,
-                   const bool& trim = true, const int& trim_ic = 0) {
+                const bool& trim = true, const int& trim_ic = 0) {
   arma::mat x;
   arma::vec y_ls;
   const int n = z.n_elem;
@@ -198,8 +198,8 @@ icFun ic_function(const int& ic) {
 }
 
 adfvout adf_selectlags_cpp(const arma::vec& y, const int& pmin, const int& pmax, icFun ic_type,
-                              const int& dc = 1, const bool& QD = false, const bool& ic_scale = false,
-                              const double& h_rs = 0.1, const int& p_rs = 0, const bool& trim = true){
+                           const int& dc = 1, const bool& QD = false, const bool& ic_scale = false,
+                           const double& h_rs = 0.1, const int& p_rs = 0, const bool& trim = true){
   const int n = y.n_elem;
   arma::vec ys = y;
   if (ic_scale) {
@@ -305,7 +305,7 @@ arma::mat adf_tests_all_units_cpp(const arma::mat& y, const int& pmin, const int
 
 // [[Rcpp::export]]
 arma::mat adf_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& pmax, const int& ic,
-                                  const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range){
+                              const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range){
   icFun ic_type = ic_function(ic);
   const arma::mat adf_out = adf_tests_all_units_cpp(y, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
   return(adf_out);
@@ -469,7 +469,7 @@ bFun boot_func(const int& boot) {
 }
 
 arma::mat bootstrap_tests_cpp(const arma::mat& u, const arma::mat& e, bFun boot_f, const double& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0,
-                               const int& pmin, const int& pmax, icFun ic_type, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range) {
+                              const int& pmin, const int& pmax, icFun ic_type, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range) {
 
   const arma::mat y_star = boot_f(u, e, l, s, ar, ar_est, y0);
   const arma::mat adf_btests = adf_tests_all_units_cpp(y_star, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
@@ -493,21 +493,17 @@ arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e
   arma::cube output = zeros(B, dclength*detrlength, N);
   if (joint) {
     for (int iB = 0; iB < B; iB++) {
-      if ((iB + 1) % 100 == 0) {
-        Rcpp::checkUserInterrupt();
-        if (show_progress) {
-          Rcpp::Rcout << "Bootstrap progress: " << round(100 * (iB + 1) / B) << "%" << std::endl;
-        }
+      Rcpp::checkUserInterrupt();
+      if (show_progress & (floor(10 * (iB + 1) / B) > floor(10 * iB / B))) {
+          Rcpp::Rcout << "Bootstrap progress: " << floor(100 * (iB + 1) / B) << "%" << std::endl;
       }
-      output.subcube(iB, 0, 0,iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+      output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
     }
   } else {
     for (int iB = 0; iB < B; iB++) {
-      if ((iB + 1) % 100 == 0) {
-        Rcpp::checkUserInterrupt();
-        if (show_progress) {
-          Rcpp::Rcout << "Bootstrap progress: " << round(100 * (iB + 1) / B) << "%" << std::endl;
-        }
+      Rcpp::checkUserInterrupt();
+      if (show_progress & (floor(10 * (iB + 1) / B) > floor(10 * iB / B))) {
+        Rcpp::Rcout << "Bootstrap progress: " << floor(100 * (iB + 1) / B) << "%" << std::endl;
       }
       for (int iN = 0; iN < N; iN++) {
         output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
@@ -606,7 +602,7 @@ arma::mat union_tests_cpp(const arma::cube& t, arma::mat& s){
 // [[Rcpp::export]]
 arma::vec union_test_cpp(const arma::mat& t, arma::vec& s){
   int B = t.n_rows;
- // arma::mat s_rep = repelem(s.t(), B, 1)
+  // arma::mat s_rep = repelem(s.t(), B, 1)
   arma::vec un_tests = zeros(B);
   arma::rowvec test;
   for (int iB = 0; iB < B; iB++) {
@@ -697,7 +693,7 @@ Rcpp:: List FDR_cpp(const arma::mat& test_i, const arma::mat& t_star, const doub
     if (j == 0) {
       cv_fdr(0, N-1) = cv_star(std::min(B, int(N * level * B)) - (N * level <= 1), 0);
     } else if ((j > 0) & (j < (N-1))) {
-       // Count number of non-rejections in the j "least-significant" statistics, add one supperflous column for easier coding
+      // Count number of non-rejections in the j "least-significant" statistics, add one supperflous column for easier coding
       noreject_jplus = ones(B + 1, j);
       noreject_jplus.elem( find(cv_star.cols(1, j) <= repelem(cv_fdr(0, span(N - j, N - 1) ), B + 1, 1)) ).zeros();
       noreject_jplus = join_rows(noreject_jplus, ones(B + 1));

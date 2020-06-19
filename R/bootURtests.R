@@ -11,7 +11,7 @@
 #' \item{\code{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
 #' \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
-#' @param B Number of bootstrap replications. Default is 9999.
+#' @param B Number of bootstrap replications. Default is 1999.
 #' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).
 #' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.
 #' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
@@ -30,10 +30,10 @@
 #' @param detr String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
 #' @param ic_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
-#' @param show_progress Logical indicator whether a bootstrap progress indicator should be printed to the console. Default is FALSE. The indicator is only activated for B larger than 99.
+#' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
 #' @details The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
-#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
+#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #'
 #' @export
 #' @return A list with the following components
@@ -67,7 +67,7 @@
 #' @examples
 #' # iADFtest on GDP_BE and GDP_DE
 #' two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B=399, verbose = TRUE)
-iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
+iADFtest <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
                      verbose = FALSE, show_progress = FALSE){
@@ -181,7 +181,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' }
 #' @details The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
-#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
+#' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #' @export
 #' @return Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.
 #' @section Errors and warnings:
@@ -207,7 +207,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL,
 #' @examples
 #' # boot_df on GDP_BE
 #' GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
-boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
+boot_df <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                     p_min = 0, p_max = NULL, ic = "MAIC", dc = 1, detr = "OLS",
                     ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
   if (NCOL(y) > 1) {
@@ -267,7 +267,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = 
 #' @examples
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
-boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
+boot_union <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                        p_min = 0, p_max = NULL, ic = "MAIC", ic_scale = TRUE, verbose = FALSE,
                        show_progress = FALSE){
 
@@ -327,7 +327,7 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 9999, l = NULL, ar_AWB
 #' @examples
 #' # bFDRtest on GDP_BE and GDP_DE
 #' two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
-bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
+bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                      union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
                      detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
 
@@ -462,7 +462,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB 
 #' @examples
 #' # BSQTtest on GDP_BE and GDP_DE
 #' two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
-BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 9999, l = NULL,
+BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
                      detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
 
@@ -587,7 +587,7 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 9999, l 
 #' @examples
 #' # paneltest on GDP_BE and GDP_DE
 #' two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
-paneltest <- function(y, level = 0.05,  boot = "MBB", B = 9999, l = NULL, ar_AWB = NULL,
+paneltest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                       union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL,
                       ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
 

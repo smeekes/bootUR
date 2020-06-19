@@ -214,8 +214,21 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
       stop("Invalid input values for q: must be quantiles or positive integers")
     }
   }
+  if (boot == 1){
+    # Obtain the probability that we draw identical blocks for the whole time series:
+    # This will cause multicollinearity if p_max is larger than l.
+    prob_identical_bl <- 1 - (1 - (1 / (n - l))^(ceiling(n / l) - 1))^B
+  }
   if(is.null(p_max)){
-    p_max = round(12*(n/100)^(1/4)) #- 5*max(1 - n/30, 0)^(1/2)
+    # Correction for small samples as formula doesn't work well for micropanels
+    p_max = round(12*(n/100)^(1/4)) - 7*max(1 - n/50, 0)*(n/100)^(1/4)
+    if (boot == 1) {
+      if (prob_identical_bl > 0.01) {
+        # If the probability of obtaining a multicollinear bootstrap sample is too large,
+        # force p_max to be smaller than l.
+        p_max <- min(p_max, l)
+      }
+    }
   }
   s_DWB <- matrix(0, n, n)
   if (boot == 3) {
