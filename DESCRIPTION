@@ -6,8 +6,6 @@ Authors@R: c(
    person("Stephan", "Smeekes", email = "s.smeekes@maastrichtuniversity.nl", role = c("cre", "aut"), 
    comment = c(ORCID = "0000-0002-0157-639X")),
    person("Ines", "Wilms", email = "i.wilms@maastrichtuniversity.nl", role = "aut"))
-Author: Stephan Smeekes [cre, aut],
-  Ines Wilms [aut]
 Maintainer: Stephan Smeekes <s.smeekes@maastrichtuniversity.nl>
 Description: Set of functions to perform various bootstrap unit root tests for both individual time series
   (including augmented Dickey-Fuller test and union tests), multiple time series and panel data; see
