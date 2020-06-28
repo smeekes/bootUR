@@ -13,16 +13,28 @@ knitr::opts_chunk$set(
 ```
 
 # bootUR: Bootstrap Unit Root Tests
+<!-- badges: start -->
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version-last-release/bootUR)](https://cran.r-project.org/package=bootUR)
+[![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
+<!-- badges: end -->
+
 The R package `bootUR` implements several bootstrap tests for unit roots, both for single time series and for (potentially) large systems of time series.
 
 ## Installation and Loading
 ### Installation
+The package can be installed from CRAN using
+```{r install-cran, eval = FALSE}
+install.packages("bootUR")
+```
+
 The development version of the `bootUR` package can be installed from GitHub using
-```{r install, eval = FALSE}
+```{r install-github, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("smeekes/bootUR")
 ```
-If you want the vignette to appear in your package, use
+When installing from GitHub, in order to build the package from source, you need to have the apprpriate R development tools installed (such as [Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows.)
+
+If you want the vignette to appear in your package when installing from GitHub, use
 ```{r install-vign, eval = FALSE}
 # install.packages("devtools")
 devtools::install_github("smeekes/bootUR", build_vignettes = TRUE, dependencies = TRUE)

@@ -3,6 +3,12 @@
 
 # bootUR: Bootstrap Unit Root Tests
 
+<!-- badges: start -->
+
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-last-release/bootUR)](https://cran.r-project.org/package=bootUR)
+[![CRAN\_Downloads\_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
+<!-- badges: end -->
+
 The R package `bootUR` implements several bootstrap tests for unit
 roots, both for single time series and for (potentially) large systems
 of time series.
@@ -10,6 +16,12 @@ of time series.
 ## Installation and Loading
 
 ### Installation
+
+The package can be installed from CRAN using
+
+``` r
+install.packages("bootUR")
+```
 
 The development version of the `bootUR` package can be installed from
 GitHub using
@@ -19,7 +31,12 @@ GitHub using
 devtools::install_github("smeekes/bootUR")
 ```
 
-If you want the vignette to appear in your package, use
+When installing from GitHub, in order to build the package from source,
+you need to have the apprpriate R development tools installed (such as
+[Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows.)
+
+If you want the vignette to appear in your package when installing from
+GitHub, use
 
 ``` r
 # install.packages("devtools")
@@ -109,7 +126,7 @@ default is by the modified Akaike information criterion (MAIC) proposed
 by Ng and Perron (2001) with the correction of Perron and Qu (2008).
 Other options include the regular Akaike information criterion (AIC), as
 well as the Bayesian information criterion and its modified variant. In
-addition, the rescaling suggested by Cavaliere et al. (2015) is
+addition, the rescaling suggested by Cavaliere et al. (2015) is
 implemented to improve the power of the test under heteroskedasticity;
 this can be turned off by setting `ic_scale = FALSE`. To overwrite
 data-driven lag length selection with a pre-specified lag length, simply
@@ -225,8 +242,9 @@ is given to alert the user. The other options are the same as for
 ``` r
 iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, union = FALSE, 
                      dc = 2, detr = "OLS")
-#> Warning in check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, : Missing values cause resampling bootstrap to be executed
-#>                 for each time series individually.
+#> Warning in check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, :
+#> Missing values cause resampling bootstrap to be executed for each time series
+#> individually.
 #> ----------------------------------------
 #> Type of unit root test performed: detr = OLS, dc = intercept and trend
 #> There are 0 stationary time series
@@ -289,6 +307,10 @@ BSQT_out1 <- BSQTtest(MacroTS, q = 0:N, boot = "AWB", B = 399, verbose = TRUE)
 #> Step 2       1       2      -1.361195 0.17794486
 # Split in four equally sized groups (motivated by the 4 series per country)
 BSQT_out2 <- BSQTtest(MacroTS, q = 0:4 / 4, boot = "AWB", B = 399, verbose = TRUE)
+#> Warning in min(p_vec): no non-missing arguments to min; returning Inf
+#> Warning in check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, :
+#> Input to argument q transformed to fit sequential test: q = c(0, 0, 0.25, 0.5,
+#> 0.75, 1)
 #> There are 5 stationary time series, namely: GDP_DE HICP_BE HICP_DE HICP_FR HICP_NL.
 #> Details of the BSQT ssquential tests:
 #>        Unit H0 Unit H1 Test statistic    p-value
