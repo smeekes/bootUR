@@ -30,7 +30,7 @@ The development version of the `bootUR` package can be installed from GitHub usi
 # install.packages("devtools")
 devtools::install_github("smeekes/bootUR")
 ```
-When installing from GitHub, in order to build the package from source, you need to have the apprpriate R development tools installed (such as [Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows.)
+When installing from GitHub, in order to build the package from source, you need to have the appropriate R development tools installed (such as [Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows.)
 
 If you want the vignette to appear in your package when installing from GitHub, use
 ```{r install-vign, eval = FALSE}

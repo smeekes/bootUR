@@ -5,8 +5,10 @@
 
 <!-- badges: start -->
 
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version-last-release/bootUR)](https://cran.r-project.org/package=bootUR)
+[![CRAN\_Version\_Badge](http://www.r-pkg.org/badges/version/bootUR)](https://cran.r-project.org/package=bootUR)
 [![CRAN\_Downloads\_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
+[![License\_GPLv2\_Badge](https://img.shields.io/badge/License-GPLv2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![License\_GPLv3\_Badge](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 <!-- badges: end -->
 
 The R package `bootUR` implements several bootstrap tests for unit
@@ -32,7 +34,7 @@ devtools::install_github("smeekes/bootUR")
 ```
 
 When installing from GitHub, in order to build the package from source,
-you need to have the apprpriate R development tools installed (such as
+you need to have the appropriate R development tools installed (such as
 [Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows.)
 
 If you want the vignette to appear in your package when installing from
