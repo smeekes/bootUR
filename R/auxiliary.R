@@ -131,20 +131,21 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   check_missing <- check_missing_insample_values(y)
   if (any(check_missing)) {
     stop("Missing values detected inside sample.")
-  } else if (anyNA(y)) {
-    if (boot %in% c("MBB", "SB")) {
-      if (!iADF_test) {
-        stop("Resampling-based bootstraps MBB and SB cannot handle unbalanced series.")
-      } else if (N > 1) {
-        warning("Missing values cause resampling bootstrap to be executed for each time series individually.")
-      }
-    }
+  } else {
+    joint <- TRUE
     check_nonmiss <- find_nonmissing_subsample(y)
     range_nonmiss <- check_nonmiss$range - 1
-    joint <- check_nonmiss$all_equal
-  } else {
-    range_nonmiss <- matrix(c(0, n - 1), nrow = 2, ncol = N)
-    joint <- TRUE
+    all_range_equal <- check_nonmiss$all_equal
+    if (!all_range_equal) {
+      if (boot %in% c("MBB", "SB")) {
+        if (!iADF_test) {
+          stop("Resampling-based bootstraps MBB and SB cannot handle unbalanced series.")
+        } else if (N > 1) {
+          joint <- FALSE
+          warning("Missing values cause resampling bootstrap to be executed for each time series individually.")
+        }
+      }
+    }
   }
 
   # Checks on inputs
