@@ -223,7 +223,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
       if (max(q_vec) < 1) {
         q_vec <- c(q_vec, 1)
       }
-      if (min(p_vec) > 0) {
+      if (min(q_vec) > 0) {
         q_vec <- c(0, q_vec)
       }
       if (!identical(q_vec, q)) {
