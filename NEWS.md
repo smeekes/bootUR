@@ -8,6 +8,8 @@ balanced.
 performed individually in the presence of NAs even if S(W)B was not used.
 * Fixed bug/incorrect warning in BSQTtest() that incorrectly added another 0
 to argument q even if one was present already.
+* Fixed possibility of taking a too fine grid for argument q in BSQTtest()
+leading to duplicates. Duplicates are now removed with a warning given.
 
 ## Version 0.1.0
 First release; package available on CRAN.
