@@ -1,5 +1,12 @@
 ## Version 0.1.0.901
 
+* Added functions order_integration() to determine the order of integration of 
+each time series in a dataset. In addition mult_diff() is added to difference
+the time series accordingly to eliminate stochastic trends, and 
+plot_order_integration() is added to plot the found orders of integration.
+* Added function plot_missing_values() to give a visual representation of the
+pattern of missing values in the data.
+
 ### Bug Fixes
 * Fixed an incorrect warning in check_inputs() function which was given
 whenever NAs were present and S(W)B was used, even if the dataset remained

@@ -1,7 +1,7 @@
 Package: bootUR
 Type: Package
 Title: Bootstrap Unit Root Tests
-Version: 0.1.0.901
+Version: 0.1.0.902
 Authors@R: c(
    person("Stephan", "Smeekes", email = "s.smeekes@maastrichtuniversity.nl", role = c("cre", "aut"), 
    comment = c(ORCID = "0000-0002-0157-639X")),
@@ -25,7 +25,5 @@ Imports:
 LinkingTo: Rcpp,  RcppArmadillo
 URL: https://github.com/smeekes/bootUR
 Suggests: 
-    knitr,
-    rmarkdown,
-    testthat
+    knitr, rmarkdown, testthat, ggplot2
 VignetteBuilder: knitr

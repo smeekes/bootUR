@@ -7,7 +7,7 @@
 find_nonmissing_subsample(X)
 }
 \arguments{
-\item{X}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}). Assumes a prior check on missing vaues in-sample has been done.}
+\item{X}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame. Assumes a prior check on missing values in-sample has been done.}
 }
 \value{
 A list with the following components

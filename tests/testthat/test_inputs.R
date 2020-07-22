@@ -63,4 +63,5 @@ test_that("BSQT q spec", {
   expect_warning(BSQTtest(y, q = 0:4, level = 0.1, B = 19, boot = "AWB"), "Input to argument q transformed to fit sequential test:")
   expect_warning(BSQTtest(y, q = 1:5/5, level = 0.1, B = 19, boot = "AWB"), "Input to argument q transformed to fit sequential test:")
   expect_warning(BSQTtest(y, q = 0:4/5, level = 0.1, B = 19, boot = "AWB"), "Input to argument q transformed to fit sequential test:")
+  expect_warning(BSQTtest(y, q = 0:9/10, level = 0.1, B = 19, boot = "AWB"), "Input to argument q transformed to remove duplicate groups after transformation to integers:")
 })

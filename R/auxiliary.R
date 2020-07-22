@@ -218,9 +218,9 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
         warning(paste0(paste0("Input to argument q transformed to fit sequential test: q = c("),
                        paste0(p_vec, collapse = ", "), ")."))
       }
-      if(unique(p_vec) != p_vec){
+      if (!identical(unique(p_vec), p_vec)) {
         p_vec <- unique(p_vec)
-        warning(paste0(paste0("Input to argument q transformed to remove duplicate goups: q = c("),
+        warning(paste0(paste0("Input to argument q transformed to remove duplicate groups: q = c("),
                        paste0(p_vec, collapse = ", "), ")."))
       }
     } else if (is.numeric(q) & all(q >= 0 & q <= 1) & !anyNA(q)) {
@@ -235,12 +235,11 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
         warning(paste0(paste0("Input to argument q transformed to fit sequential test: q = c("),
                        paste0(q_vec, collapse = ", "), ")"))
       }
-      
+
       p_vec <- round(q_vec * N)
-      
-      if(unique(p_vec) != p_vec){
+      if (!identical(unique(p_vec), p_vec)) {
         p_vec <- unique(p_vec)
-        warning(paste0(paste0("Input to argument q transformed to remove duplicate goups: q = c("),
+        warning(paste0(paste0("Input to argument q transformed to remove duplicate groups after transformation to integers: q = c("),
                        paste0(p_vec, collapse = ", "), ")."))
       }
     } else {

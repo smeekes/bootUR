@@ -105,6 +105,18 @@ sample_check$all_equal
 #> [1] FALSE
 ```
 
+### Visualizing Missing Data
+
+If you have `ggplot2` installed, you can also plot the missing data
+patterns in your series to get a quick overview. We need to manipulate
+some arguments to get the plot properly sized:
+
+``` r
+plot_missing_values(MacroTS, show_names = TRUE, axis_text_size = 5, legend_size = 6)
+```
+
+![](README-plot_na-1.png)<!-- -->
+
 ## Univariate Bootstrap Unit Root Tests
 
 ### Augmented Dickey-Fuller Test
@@ -222,10 +234,10 @@ using a different bootstrap method.
 ``` r
 panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 #> Panel Bootstrap Group-Mean Union Test
-#> The null hypothesis that all series have a unit root, is
+#> The null hypothesis that all series have a unit root, is not
 #>                   rejected at a significance level of 0.05.
-#>      test statistic    p-value
-#> [1,]     -0.8474483 0.03759398
+#>      test statistic   p-value
+#> [1,]     -0.8629371 0.0952381
 ```
 
 ## Tests for Multiple Time Series
@@ -251,11 +263,11 @@ iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, unio
 #> Type of unit root test performed: detr = OLS, dc = intercept and trend
 #> There are 0 stationary time series
 #>        test statistic    p-value
-#> GDP_BE      -2.792169 0.24060150
-#> GDP_DE      -2.774320 0.07769424
-#> GDP_FR      -2.048760 0.52882206
-#> GDP_NL      -2.515285 0.19047619
-#> GDP_UK      -2.449065 0.30325815
+#> GDP_BE      -2.792169 0.22807018
+#> GDP_DE      -2.774320 0.09022556
+#> GDP_FR      -2.048760 0.49373434
+#> GDP_NL      -2.515285 0.21804511
+#> GDP_UK      -2.449065 0.27819549
 ```
 
 Note that `iADFtest` (intentionally) does not provide a correction for
@@ -305,19 +317,14 @@ BSQT_out1 <- BSQTtest(MacroTS, q = 0:N, boot = "AWB", B = 399, verbose = TRUE)
 #> There is 1 stationary time series, namely: HICP_DE.
 #> Details of the BSQT ssquential tests:
 #>        Unit H0 Unit H1 Test statistic    p-value
-#> Step 1       0       1      -1.645621 0.02005013
-#> Step 2       1       2      -1.361195 0.17794486
+#> Step 1       0       1      -1.685652 0.03258145
+#> Step 2       1       2      -1.510314 0.07268170
 # Split in four equally sized groups (motivated by the 4 series per country)
 BSQT_out2 <- BSQTtest(MacroTS, q = 0:4 / 4, boot = "AWB", B = 399, verbose = TRUE)
-#> Warning in min(p_vec): no non-missing arguments to min; returning Inf
-#> Warning in check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, :
-#> Input to argument q transformed to fit sequential test: q = c(0, 0, 0.25, 0.5,
-#> 0.75, 1)
-#> There are 5 stationary time series, namely: GDP_DE HICP_BE HICP_DE HICP_FR HICP_NL.
+#> There are 0 stationary time series.
 #> Details of the BSQT ssquential tests:
 #>        Unit H0 Unit H1 Test statistic    p-value
-#> Step 1       0       5      -1.073928 0.01503759
-#> Step 2       5      10      -0.888729 0.34586466
+#> Step 1       0       5      -1.029474 0.09022556
 ```
 
 ### Bootstrap FDR Controlling Tests
@@ -348,10 +355,57 @@ bFDR_out <- bFDRtest(MacroTS, level = 0.1, boot = "BWB", B = 399, verbose = TRUE
 #> There are 2 stationary time series, namely: HICP_BE HICP_DE
 #> Details of the FDR sequential tests:
 #>         test statistic critical value
-#> HICP_BE      -1.844523      -1.664123
-#> HICP_DE      -1.761817      -1.534352
-#> HICP_NL      -1.457067      -1.458327
+#> HICP_DE      -1.901442      -1.670323
+#> HICP_BE      -1.838008      -1.530485
+#> HICP_NL      -1.445552      -1.468574
 ```
+
+## Determining Order of Integration
+
+Generally the unit root tests above would only be used as a single step
+in a larger algorithm to determine the orders of integration of the time
+series in the dataset. In particular, many economic datasets contain
+variables that have order of integration 2, and would so need to be
+differenced twice to eliminate all trends. A standard unit root test
+cannot determine this however. For this purpose, we add the function
+`order_integration()` which performs a sequence of unit root tests to
+determine the orders of each time series.
+
+### How does it work
+
+Starting from a maximum order  (by default equal to 2), it differences
+the data  time until there can be at most one unit root. If the test is
+not rejected for a particular, we know this series if of order . The
+series for which we do reject are integrated once (such that they are
+differenced  times from their original level), and the test is repeated.
+By doing so until we have classified all series, we obtain a full
+specification of the orders of all time series.
+
+### Implementation
+
+The function allows us to choose which unit root test we want to use.
+Here we take the `bFDRtest`. We don’t only get the orders out, but also
+the appropriately differenced data.
+
+``` r
+out_orders <- order_integration(MacroTS[, 11:15], test = "bFDRtest", B = 399)
+# Orders
+out_orders$order_int
+#> HICP_BE HICP_DE HICP_FR HICP_NL HICP_UK 
+#>       0       0       1       0       1
+# Differenced data
+stationary_data <- out_orders$diff_data
+```
+
+To achieve the differencing, `order_integration()` uses the function
+`diff_mult()` which is also available as stand-alone function in the
+package. Finally, a function is provided to plot the found orders:
+
+``` r
+plot_order_integration(out_orders$order_int)
+```
+
+![](README-plot_orders-1.png)<!-- -->
 
 ## References
 
