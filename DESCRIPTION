@@ -22,7 +22,7 @@ Roxygen: list(old_usage = TRUE)
 RoxygenNote: 7.1.0
 Imports: 
     Rcpp, stats
-LinkingTo: Rcpp,  RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo, RcppProgress
 URL: https://github.com/smeekes/bootUR
 Suggests: 
     knitr, rmarkdown, testthat, ggplot2

@@ -7,7 +7,7 @@
 boot_df(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
   ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC", dc = 1,
   detr = "OLS", ic_scale = TRUE, verbose = FALSE,
-  show_progress = FALSE)
+  show_progress = FALSE, do_parallel = FALSE, nc = NULL)
 }
 \arguments{
 \item{y}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
@@ -53,6 +53,10 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
+
+\item{do_parallel}{Logical indicator whether bootstrap lool should be executed in parallel. Parallel computnig is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+
+\item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \value{
 Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.

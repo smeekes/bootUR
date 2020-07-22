@@ -5,7 +5,8 @@
 \title{Auxiliary Function (not accessible to users) to create all bootstrap statistics used to perform the unit root tests.}
 \usage{
 do_tests_and_bootstrap(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB,
-  union, p_min, p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress)
+  union, p_min, p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress,
+  do_parallel, nc)
 }
 \arguments{
 \item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -51,6 +52,10 @@ do_tests_and_bootstrap(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB,
 \item{h_rs}{Bandwidth used in rescaled information criteria.}
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
+
+\item{do_parallel}{Logical indicator whether bootstrap lool should be executed in parallel. Parallel computnig is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+
+\item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \description{
 Auxiliary Function (not accessible to users) to create all bootstrap statistics used to perform the unit root tests.

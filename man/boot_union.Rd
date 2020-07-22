@@ -6,7 +6,8 @@
 \usage{
 boot_union(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
   ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC",
-  ic_scale = TRUE, verbose = FALSE, show_progress = FALSE)
+  ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+  do_parallel = FALSE, nc = NULL)
 }
 \arguments{
 \item{y}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
@@ -40,6 +41,10 @@ boot_union(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
+
+\item{do_parallel}{Logical indicator whether bootstrap lool should be executed in parallel. Parallel computnig is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+
+\item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \value{
 Value of the union test statistic and the bootstrap p-values.

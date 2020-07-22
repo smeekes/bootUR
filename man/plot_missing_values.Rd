@@ -28,4 +28,6 @@ Plots missing values of different types for a time series dataset.
 }
 \details{
 The function distinguish four types of data: observed data (non-missing) and three missing types. Type \code{"Balanced NA"} indicates where entire rows are missing (\code{NA}). These do not cause unbalancedness as the missing rows can simply be deleted.  Type \code{"Unalanced NA"} are missing values on the beginning or end of the sample, which cause unbalancedness. These affect some (but not all) bootstrap methods, see e.g.~\code{\link{bFDRtest}}. Type \code{"Internal NA"} are missing values inside the sample, which need to be removed before the bootstrap unit root tests can be used.
+
+This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 }

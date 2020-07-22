@@ -5,7 +5,7 @@
 \title{Auxiliary Function (not accessible to users) to check if all arguments put in by the user are correct, and to perform some preliminary calculations.}
 \usage{
 check_inputs(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
-  p_max, ic, dc, detr, q)
+  p_max, ic, dc, detr, q, do_parallel, nc)
 }
 \arguments{
 \item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -45,6 +45,10 @@ check_inputs(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
 \item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS). If NULL, set to \verb{"OLS"}.}
 
 \item{q}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
+
+\item{do_parallel}{Logical indicator whether bootstrap lool should be executed in parallel. Parallel computnig is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+
+\item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 
 \item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria (\verb{TRUE}) or not (\verb{FALSE}).}
 

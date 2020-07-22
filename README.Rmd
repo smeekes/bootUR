@@ -72,9 +72,9 @@ sample_check$all_equal
 ```
 
 ### Visualizing Missing Data
-If you have `ggplot2` installed, you can also plot the missing data patterns in your series to get a quick overview. We need to manipulate some arguments to get the plot properly sized:
+If you have `ggplot2` installed, you can also plot the missing data patterns in your series to get a quick overview. You may need to manipulate some arguments to get the plot properly sized (therefore it is not run here automatically).
 
-```{r plot_na, fig.height = 4, fig.width = 7}
+```{r plot_na, eval = FALSE}
 plot_missing_values(MacroTS, show_names = TRUE, axis_text_size = 5, legend_size = 6)
 ```
 
@@ -88,7 +88,9 @@ Lag length selection is done automatically in the ADF regression; the default is
 
 **Implementation**
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. To see live progress updates on the bootstrap, set `show_progress = TRUE`. This is particularly useful for large `B`, so we leave it out here. As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. To see live progress updates on the bootstrap, set `show_progress = TRUE`. This is particularly useful for large `B`, so we leave it out here. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up yourself.
+
+As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
 ```{r adf}
 set.seed(155776)
@@ -173,8 +175,8 @@ out_orders$order_int
 # Differenced data
 stationary_data <- out_orders$diff_data
 ```
-To achieve the differencing, `order_integration()` uses the function `diff_mult()` which is also available as stand-alone function in the package. Finally, a function is provided to plot the found orders:
-```{r plot_orders, fig.width = 7, fig.height = 4}
+To achieve the differencing, `order_integration()` uses the function `diff_mult()` which is also available as stand-alone function in the package. Finally, a function is provided to plot the found orders (not run):
+```{r plot_orders, eval = FALSE}
 plot_order_integration(out_orders$order_int)
 ```
 

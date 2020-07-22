@@ -26,13 +26,14 @@
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
 do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
-                                   p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress){
+                                   p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress,
+                                   do_parallel, nc){
   y <- as.matrix(y)
 
   # Check correctness arguments and perform initial calculations and transformations
   inputs <- check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, level = level, boot = boot,
                B = B, l = l, ar_AWB = ar_AWB, union = union, p_min = p_min, p_max = p_max, ic = ic,
-               dc = dc, detr = detr, q = q)
+               dc = dc, detr = detr, q = q, do_parallel = do_parallel, nc = nc)
 
   boot <- inputs$boot
   l <- inputs$l
@@ -47,6 +48,7 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
   p_vec <- inputs$p_vec
   range_nonmiss <- inputs$range_nonmiss
   joint <- inputs$joint
+  nc <- inputs$nc
 
   # Dimensions
   n <- nrow(y)
@@ -63,7 +65,8 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
   t_star <- bootstrap_cpp(B = B, boot = boot, u = u_boot, e = res, l = l, s = s_DWB, ar = ar_AWB,
                           ar_est = ar_est, y0 = matrix(0, ncol = N), pmin = p_min, pmax = p_max,
                           ic = ic, dc = dc, detr = detr_int, ic_scale = ic_scale, h_rs = h_rs,
-                          range = range_nonmiss, joint = joint, show_progress = show_progress)
+                          range = range_nonmiss, joint = joint, show_progress = show_progress,
+                          do_parallel = do_parallel, nc = nc)
   tests_i <- adf_tests_panel_cpp(y, pmin = p_min, pmax = p_max, ic = ic, dc = dc, detr = detr_int,
                                   ic_scale = ic_scale, h_rs = h_rs, range = range_nonmiss)
 
@@ -117,7 +120,7 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
 check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
-                         p_min, p_max, ic, dc, detr, q){
+                         p_min, p_max, ic, dc, detr, q, do_parallel, nc){
 
   # Dimensions
   n <- nrow(y)
@@ -127,6 +130,18 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   if (level * (B + 1) < 1) {
     stop("Bootstrap iterations B too low to perform test at desired significance level.")
   }
+  # Set up parallel computing
+  if (is.null(nc)) {
+    if (do_parallel) {
+      nc <- parallel::detectCores() - 1
+    } else {
+      nc <- 1
+    }
+  }
+  if ((nc != round(nc)) | (nc < 1)) {
+    stop("Invalid value for argument nc")
+  }
+
   # Check for missing values or unbalanced panels (MBB, SB)
   check_missing <- check_missing_insample_values(y)
   if (any(check_missing)) {
@@ -289,7 +304,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   }
   out <- list(boot = boot, l = l, s_DWB = s_DWB, ar_AWB = ar_AWB, dc = dc,
               dc_boot = dc_boot, detr = detr, detr_int = detr_int, ic = ic,
-              p_max = p_max, p_vec = p_vec, range_nonmiss = range_nonmiss, joint = joint)
+              p_max = p_max, p_vec = p_vec, range_nonmiss = range_nonmiss, joint = joint, nc = nc)
 
   return(out)
 }

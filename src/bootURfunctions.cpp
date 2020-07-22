@@ -1,5 +1,11 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+// [[Rcpp::depends(RcppProgress)]]
+#include <progress.hpp>
+#include <progress_bar.hpp>
 using namespace arma;
 
 struct adfmout {
@@ -101,6 +107,7 @@ adfvout adf_cpp(const arma::vec& z, const int& p, const int& dc = 1, const bool&
                 const bool& trim = true, const int& trim_ic = 0) {
   arma::mat x;
   arma::vec y_ls;
+  arma::mat x_ls;
   const int n = z.n_elem;
 
   const arma::vec y = de_trend(z, dc, QD);
@@ -113,18 +120,20 @@ adfvout adf_cpp(const arma::vec& z, const int& p, const int& dc = 1, const bool&
   } else {
     x = y_lag;
   }
+  const int trim_t = (trim_ic == 0) * p + trim_ic;
   if (trim) {
-    const int trim_t = (trim_ic == 0) * p + trim_ic;
-    x = x.rows(trim_t + 1, n - 1);
+    x_ls = x.rows(trim_t + 1, n - 1);
     y_ls = y_dif.rows(trim_t + 1, n - 1);
   } else {
+    x_ls = x;
     y_ls = y_dif;
   }
-  const arma::mat xxi = arma::inv_sympd(x.t() * x);
-  const arma::vec b = xxi * x.t() * y_ls;
-  const arma::vec e = y_ls - x * b;
+  const arma::mat xxi = arma::inv_sympd(x_ls.t() * x_ls);
+  const arma::vec b = xxi * x_ls.t() * y_ls;
+  const arma::vec e = y_dif - x * b;
   const arma::vec e_b = y_dif - y_lag * b(0);
-  const double s2 = arma::dot(e, e) / e.n_elem;
+  const arma::vec e_ls = e.subvec(trim_t + 1, n - 1);
+  const double s2 = arma::dot(e_ls, e_ls) / e_ls.n_elem;
   const double t_adf = b(0) / std::sqrt(s2 * xxi(0, 0));
   const double c_adf = n * b(0) / (1 - arma::sum(b) + b(0));
 
@@ -146,7 +155,7 @@ arma::vec npve_cpp(const arma::vec& z, const double& h){
 }
 
 arma::vec rescale_cpp(const arma::vec& y, const double& h = 0.1, const int& p = 0, const int& dc = 1,
-                      const bool& QD = false, const bool& trim = false, const int& trim_ic = 0){
+                      const bool& QD = false, const bool& trim = true, const int& trim_ic = 0){
   const adfvout adf_fit = adf_cpp(y, p, dc, QD, trim, trim_ic);
   const arma::vec u = adf_fit.res;
   arma::vec ydif = diff(y, false);
@@ -203,61 +212,19 @@ adfvout adf_selectlags_cpp(const arma::vec& y, const int& pmin, const int& pmax,
   const int n = y.n_elem;
   arma::vec ys = y;
   if (ic_scale) {
-    ys = rescale_cpp(y, h_rs, p_rs, dc, false, false, 0);
+    ys = rescale_cpp(y, h_rs, p_rs, dc, false, true, 0);
   }
   arma::vec ylag = de_trend(ys, dc, false).subvec(pmax + 1, n - 2);
-
   arma::vec icvalue = zeros(pmax - pmin + 1);
   adfvout adfp;
   for(int ip = pmin; ip < (pmax + 1); ip++){
-    adfp = adf_cpp(ys, ip, dc, false , trim , pmax);
+    adfp = adf_cpp(ys, ip, dc, false, trim, pmax);
     icvalue(ip - pmin) = ic_type(adfp.res.tail(n - pmax - 1), ip, n - pmax - 1, adfp.par(0), ylag);
   }
 
   const int p_opt = icvalue.index_min() + pmin;
   const adfvout ADFp = adf_cpp(y, p_opt, dc, QD, trim, 0);
   return ADFp;
-}
-
-arma::rowvec adf_tests_uni_cpp(const arma::vec& y, const int& pmin, const int& pmax, const int& ic,
-                               const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs){
-
-  const int dclength= dc.size();
-  const int detrlength = detr.size();
-  arma::mat ols_tests = zeros(2, dclength);
-  arma::mat qd_tests = zeros(1, dclength);
-  adfvout adf_OLS, adf_QD;
-  arma::rowvec adftests = zeros(detrlength*dclength);
-  icFun ic_type = ic_function(ic);
-
-  if (any(detr == 1)) {
-    for (int idc = 0; idc < dclength; idc++) {
-      adf_OLS = adf_selectlags_cpp(y, pmin, pmax, ic_type, dc[idc], false, ic_scale, h_rs, 0, true);
-      ols_tests(0, idc) = adf_OLS.tests(0);
-      ols_tests(1, idc) = adf_OLS.par.n_elem - 1;
-    }
-
-    if (any(detr == 2)) {
-      for(int idc = 0; idc < dclength; idc++) {
-        adf_QD = adf_cpp(y, ols_tests(1, idc), dc[idc], true, true, 0);
-        qd_tests(0, idc) = adf_QD.tests(0);
-      }
-      adftests.head(dclength) = ols_tests.row(0);
-      adftests.tail(dclength) = qd_tests.row(0);
-    } else {
-      adftests = ols_tests.row(0);
-    }
-
-  } else {
-    if (any(detr == 2) ){
-      for (int idc = 0; idc < dclength; idc++) {
-        adf_QD = adf_selectlags_cpp(y, pmin, pmax, ic_type, dc[idc], true, ic_scale, h_rs, 0, true);
-        qd_tests(0, idc) = adf_QD.tests(0);
-      }
-      adftests = qd_tests.row(0);
-    }
-  }
-  return adftests;
 }
 
 arma::mat adf_tests_all_units_cpp(const arma::mat& y, const int& pmin, const int& pmax, icFun ic_type,
@@ -324,8 +291,7 @@ Rcpp::List adf_panel_bootstrap_dgp_cpp(const arma::mat& y, const int& pmin, cons
 
   for (int iN = 0; iN < N; iN++){
     adf_fit = adf_selectlags_cpp(y(span(range(0, iN), range(1, iN)), iN), pmin, pmax, ic_type, dc, QD, ic_scale, h_rs, 0, trim);
-    tests(0, iN) = adf_fit.tests(0);
-    tests(1, iN) = adf_fit.tests(1);
+    tests.col(iN) = adf_fit.tests;
     p[iN] = adf_fit.par.n_elem - 1;
     par.submat(0, iN, p[iN], iN) = adf_fit.par;
     eb(span(range(0, iN), range(1, iN)), iN) = adf_fit.b_res;
@@ -374,11 +340,11 @@ arma::vec gen_AR_cpp(const arma::vec& x, const arma::vec& ar, const arma::vec& i
   return(y);
 }
 
-arma::mat MBB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
+arma::mat MBB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
   const int T = u.n_rows;
   const int N = u.n_cols;
   const int nb = ceil(double(T) / double(l));
-  const arma::ivec startb = randi(nb, distr_param(0, T-l));
+  const arma::uvec startb = i.subvec(0, nb - 1);
   arma::mat u_star = zeros(nb*l + 1, N);
   u_star.row(0) = y0;
   for(int i = 0; i < nb; i++){
@@ -388,41 +354,41 @@ arma::mat MBB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const ar
   return y_star.tail_rows(T);
 }
 
-arma::mat BWB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
+arma::mat BWB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
   const int T = u.n_rows;
   const int N = u.n_cols;
   const int nb = ceil(double(T) / double(l));
-  const arma::mat xi_rep = repelem(randn(nb), l, N);
+  const arma::mat xi_rep = repelem(z.subvec(0, nb - 1), l, N);
   const arma::mat u_star = join_cols(y0, u % xi_rep.head_rows(T));
   const arma::mat y_star = cumsum(u_star);
   return y_star.tail_rows(T);
 }
 
-arma::mat DWB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
+arma::mat DWB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
   const int T = u.n_rows;
   const int N = u.n_cols;
-  const arma::mat xi = s * randn(T);
+  const arma::mat xi = s * z.subvec(0, T - 1);
   const arma::mat xi_rep = arma::repelem(xi, 1, N);
   const arma::mat u_star = join_cols(y0, u % xi_rep);
   const arma::mat y_star = cumsum(u_star);
   return y_star.tail_rows(T);
 }
 
-arma::mat AWB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
+arma::mat AWB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
   const int T = u.n_rows;
   const int N = u.n_cols;
-  const arma::vec zi = randn(T-1) * sqrt(1 - pow(ar, 2));
-  const arma::vec xi = gen_AR_cpp(zi, ar, as_scalar(randn(1)), true);
+  const arma::vec zi = z.subvec(1, T - 1) * sqrt(1 - pow(ar, 2));
+  const arma::vec xi = gen_AR_cpp(zi, ar, as_scalar(z(0)), true);
   const arma::mat xi_rep = arma::repelem(xi, 1, N);
   const arma::mat u_star = join_cols(y0, u % xi_rep);
   const arma::mat y_star = cumsum(u_star);
   return y_star.tail_rows(T);
 }
 
-arma::mat SB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
+arma::mat SB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
   const int T = e.n_rows;
   const int N = e.n_cols;
-  const arma::uvec index = randi<uvec>(T, distr_param(0, T-l));
+  const arma::uvec index = i.subvec(0, T - 1);
   const arma::mat e_star = e.rows(index);
   arma::mat u_star = zeros(T, N);
   arma::vec init = zeros(ar_est.n_rows);
@@ -434,7 +400,7 @@ arma::mat SB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const arm
   return y_star.tail_rows(T);
 }
 
-arma::mat SWB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
+arma::mat SWB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
   const int T = e.n_rows;
   const int N = e.n_cols;
   const arma::mat e_star = repelem(randn(T), 1, N) % e;
@@ -448,7 +414,7 @@ arma::mat SWB_cpp(const arma::mat& u, const arma::mat& e, const int& l, const ar
   return y_star.tail_rows(T);
 }
 
-typedef arma::mat (*bFun) (const arma::mat&, const arma::mat&, const int&, const arma::mat&, const double&, const arma::mat&, const arma::rowvec&);
+typedef arma::mat (*bFun) (const arma::mat&, const arma::mat&, const arma::vec&, const arma::uvec&, const int&, const arma::mat&, const double&, const arma::mat&, const arma::rowvec&);
 
 bFun boot_func(const int& boot) {
   if (boot == 1) {
@@ -468,47 +434,87 @@ bFun boot_func(const int& boot) {
   }
 }
 
-arma::mat bootstrap_tests_cpp(const arma::mat& u, const arma::mat& e, bFun boot_f, const double& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0,
+arma::mat bootstrap_tests_cpp(const arma::mat& u, const arma::mat& e, bFun boot_f, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0,
                               const int& pmin, const int& pmax, icFun ic_type, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range) {
 
-  const arma::mat y_star = boot_f(u, e, l, s, ar, ar_est, y0);
+  const arma::mat y_star = boot_f(u, e, z, i, l, s, ar, ar_est, y0);
   const arma::mat adf_btests = adf_tests_all_units_cpp(y_star, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
   return adf_btests;
 }
 
 // [[Rcpp::export]]
-arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e, const int& boot, const double& l, const arma::mat& s,
+arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s,
                          const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc,
-                         const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint = true, const bool& show_progress = false){
+                         const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint = true,
+                         const bool& do_parallel = false, const int& nc = 1, const bool& show_progress = false){
 
   const int detrlength = detr.size();
   const int dclength = dc.size();
   const int N = u.n_cols;
+  const int T = u.n_rows;
+  int ub;
   const bFun boot_f = boot_func(boot);
   const icFun ic_type = ic_function(ic);
   arma::mat u0 = u, e0 = e;
   u0.replace(datum::nan, 0);
   e0.replace(datum::nan, 0);
+  const arma::mat z = randn(T, B);
+  if (boot == 6) {
+    ub = 1;
+  } else {
+    ub = l;
+  }
+  const arma::umat i = randi<umat>(T, B, distr_param(0, T-ub));
 
   arma::cube output = zeros(B, dclength*detrlength, N);
-  if (joint) {
-    for (int iB = 0; iB < B; iB++) {
-      Rcpp::checkUserInterrupt();
-      if (show_progress & (floor(10 * (iB + 1) / B) > floor(10 * iB / B))) {
-          Rcpp::Rcout << "Bootstrap progress: " << floor(100 * (iB + 1) / B) << "%" << std::endl;
+  #ifdef _OPENMP
+    omp_set_num_threads(nc);
+  #endif
+  Progress prog(B, show_progress);
+  bool break_flag = false;
+  if (do_parallel) {
+    if (joint) {
+      #pragma omp parallel for schedule(static)
+      for (int iB = 0; iB < B; iB++) {
+        if ( ! Progress::check_abort() ) {
+          output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+          prog.increment();
+        }
       }
-      output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+    } else {
+      #pragma omp parallel for schedule(static)
+      for (int iB = 0; iB < B; iB++) {
+        if ( ! Progress::check_abort() ) {
+          for (int iN = 0; iN < N; iN++) {
+            output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
+          }
+          prog.increment();
+        }
+      }
     }
   } else {
-    for (int iB = 0; iB < B; iB++) {
-      Rcpp::checkUserInterrupt();
-      if (show_progress & (floor(10 * (iB + 1) / B) > floor(10 * iB / B))) {
-        Rcpp::Rcout << "Bootstrap progress: " << floor(100 * (iB + 1) / B) << "%" << std::endl;
+    if (joint) {
+      for (int iB = 0; iB < B; iB++) {
+        if ( ! Progress::check_abort() ) {
+          output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+          prog.increment();
+        } else {
+          break_flag = true;
+        }
       }
-      for (int iN = 0; iN < N; iN++) {
-        output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
+    } else {
+      for (int iB = 0; iB < B; iB++) {
+        if ( ! Progress::check_abort() ) {
+          for (int iN = 0; iN < N; iN++) {
+            output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
+          }
+          prog.increment();
+        }
       }
     }
+  }
+  if (break_flag) {
+    Rcpp::stop("Bootstrap loop aborted.");
   }
   return(output);
 }

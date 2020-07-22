@@ -108,14 +108,13 @@ sample_check$all_equal
 ### Visualizing Missing Data
 
 If you have `ggplot2` installed, you can also plot the missing data
-patterns in your series to get a quick overview. We need to manipulate
-some arguments to get the plot properly sized:
+patterns in your series to get a quick overview. You may need to
+manipulate some arguments to get the plot properly sized (therefore it
+is not run here automatically).
 
 ``` r
 plot_missing_values(MacroTS, show_names = TRUE, axis_text_size = 5, legend_size = 6)
 ```
-
-![](README-plot_na-1.png)<!-- -->
 
 ## Univariate Bootstrap Unit Root Tests
 
@@ -157,9 +156,15 @@ add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS)
 detrending. The option `verbose = TRUE` prints easy to read output on
 the console. To see live progress updates on the bootstrap, set
 `show_progress = TRUE`. This is particularly useful for large `B`, so we
-leave it out here. As random number generation is required to draw
-bootstrap samples, we first set the seed of the random number generator
-to obtain replicable results.
+leave it out here. The bootstrap loop can also be run in parallel by
+setting `do_parallel = TRUE`. Note that parallelization requires OpenMP
+to be available on your system, which is typically not the case on
+macOS; see \[<https://mac.r-project.org/openmp/>\]\[this page\] for ways
+to set it up yourself.
+
+As random number generation is required to draw bootstrap samples, we
+first set the seed of the random number generator to obtain replicable
+results.
 
 ``` r
 set.seed(155776)
@@ -173,7 +178,7 @@ adf_out <- boot_df(GDP_NL, B = 399, boot = "SB", dc = 2, detr = c("OLS", "QD"), 
 #> ----------------------------------------
 #> Type of unit root test performed: detr = QD, dc = intercept and trend
 #> test statistic        p-value 
-#>     -1.5965001      0.4185464
+#>      -1.596500       0.433584
 ```
 
 ### Union of Rejections Test
@@ -194,7 +199,7 @@ union_out <- boot_union(GDP_NL, B = 399, boot = "SWB", verbose = TRUE)
 #> The null hypothesis of a unit root is not rejected at a significance
 #>                     level of 0.05.
 #> test statistic        p-value 
-#>     -0.6722611      0.6090226
+#>     -0.6536848      0.7092732
 ```
 
 ## Panel Unit Root Test
@@ -237,7 +242,7 @@ panel_out <- paneltest(MacroTS, boot = "DWB", B = 399, verbose = TRUE)
 #> The null hypothesis that all series have a unit root, is not
 #>                   rejected at a significance level of 0.05.
 #>      test statistic   p-value
-#> [1,]     -0.8629371 0.0952381
+#> [1,]     -0.8552014 0.1253133
 ```
 
 ## Tests for Multiple Time Series
@@ -263,11 +268,11 @@ iADF_out <- iADFtest(MacroTS[, 1:5], boot = "MBB", B = 399, verbose = TRUE, unio
 #> Type of unit root test performed: detr = OLS, dc = intercept and trend
 #> There are 0 stationary time series
 #>        test statistic    p-value
-#> GDP_BE      -2.792169 0.22807018
-#> GDP_DE      -2.774320 0.09022556
-#> GDP_FR      -2.048760 0.49373434
-#> GDP_NL      -2.515285 0.21804511
-#> GDP_UK      -2.449065 0.27819549
+#> GDP_BE      -2.792169 0.23308271
+#> GDP_DE      -2.774320 0.06516291
+#> GDP_FR      -2.048760 0.52380952
+#> GDP_NL      -2.515285 0.22807018
+#> GDP_UK      -2.449065 0.31829574
 ```
 
 Note that `iADFtest` (intentionally) does not provide a correction for
@@ -314,17 +319,18 @@ Urbain (2020).
 N <- ncol(MacroTS)
 # Test each unit sequentially
 BSQT_out1 <- BSQTtest(MacroTS, q = 0:N, boot = "AWB", B = 399, verbose = TRUE)
-#> There is 1 stationary time series, namely: HICP_DE.
+#> There are 2 stationary time series, namely: HICP_BE HICP_DE.
 #> Details of the BSQT ssquential tests:
 #>        Unit H0 Unit H1 Test statistic    p-value
-#> Step 1       0       1      -1.685652 0.03258145
-#> Step 2       1       2      -1.510314 0.07268170
+#> Step 1       0       1      -1.592714 0.03258145
+#> Step 2       1       2      -1.541328 0.03508772
+#> Step 3       2       3      -1.236478 0.32581454
 # Split in four equally sized groups (motivated by the 4 series per country)
 BSQT_out2 <- BSQTtest(MacroTS, q = 0:4 / 4, boot = "AWB", B = 399, verbose = TRUE)
 #> There are 0 stationary time series.
 #> Details of the BSQT ssquential tests:
 #>        Unit H0 Unit H1 Test statistic    p-value
-#> Step 1       0       5      -1.029474 0.09022556
+#> Step 1       0       5      -1.043973 0.05263158
 ```
 
 ### Bootstrap FDR Controlling Tests
@@ -355,9 +361,9 @@ bFDR_out <- bFDRtest(MacroTS, level = 0.1, boot = "BWB", B = 399, verbose = TRUE
 #> There are 2 stationary time series, namely: HICP_BE HICP_DE
 #> Details of the FDR sequential tests:
 #>         test statistic critical value
-#> HICP_DE      -1.901442      -1.670323
-#> HICP_BE      -1.838008      -1.530485
-#> HICP_NL      -1.445552      -1.468574
+#> HICP_BE      -2.027137      -1.633918
+#> HICP_DE      -1.879959      -1.530622
+#> HICP_NL      -1.271105      -1.480647
 ```
 
 ## Determining Order of Integration
@@ -399,13 +405,12 @@ stationary_data <- out_orders$diff_data
 
 To achieve the differencing, `order_integration()` uses the function
 `diff_mult()` which is also available as stand-alone function in the
-package. Finally, a function is provided to plot the found orders:
+package. Finally, a function is provided to plot the found orders (not
+run):
 
 ``` r
 plot_order_integration(out_orders$order_int)
 ```
-
-![](README-plot_orders-1.png)<!-- -->
 
 ## References
 

@@ -1,5 +1,7 @@
-## Version 0.1.0.901
+## Version 0.1.0.902
 
+### New Functionality
+* Added parallel loops using OpenMP.
 * Added functions order_integration() to determine the order of integration of 
 each time series in a dataset. In addition mult_diff() is added to difference
 the time series accordingly to eliminate stochastic trends, and 
@@ -17,6 +19,7 @@ performed individually in the presence of NAs even if S(W)B was not used.
 to argument q even if one was present already.
 * Fixed possibility of taking a too fine grid for argument q in BSQTtest()
 leading to duplicates. Duplicates are now removed with a warning given.
+* Fixed bug in SB where the last l observations were excluded from resampling.
 
 ## Version 0.1.0
 First release; package available on CRAN.

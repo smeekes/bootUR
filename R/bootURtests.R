@@ -31,6 +31,8 @@
 #' @param ic_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
+#' @param do_parallel Logical indicator whether bootstrap lool should be executed in parallel. Parallel computnig is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
+#' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @details The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
@@ -71,13 +73,15 @@
 iADFtest <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
-                     verbose = FALSE, show_progress = FALSE){
+                     verbose = FALSE, show_progress = FALSE,
+                     do_parallel = FALSE, nc = NULL){
 
   inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress)
+                                   show_progress = show_progress,
+                                   do_parallel = do_parallel, nc = nc)
 
   if (!is.null(colnames(y))) {
     var_names <- colnames(y)
@@ -210,7 +214,8 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
 #' GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
 boot_df <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                     p_min = 0, p_max = NULL, ic = "MAIC", dc = 1, detr = "OLS",
-                    ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
+                    ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+                    do_parallel = FALSE, nc = NULL){
   if (NCOL(y) > 1) {
     stop("Multiple time series not allowed. Switch to a multivariate method such as iADFtest,
          or change argument y to a univariate time series.")
@@ -222,7 +227,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = 
   out <- iADFtest(y, level = level, boot = boot, B = B, l = l, ar_AWB = ar_AWB,
                   union = FALSE, p_min = p_min, p_max = p_max, ic = ic, dc = dc,
                   detr = detr, ic_scale = ic_scale, verbose = verbose,
-                  show_progress = show_progress)
+                  show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   return(aperm(out$ADF_tests, 3:1)[, , 1])
 }
 
@@ -270,7 +275,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = 
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
 boot_union <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                        p_min = 0, p_max = NULL, ic = "MAIC", ic_scale = TRUE, verbose = FALSE,
-                       show_progress = FALSE){
+                       show_progress = FALSE, do_parallel = FALSE, nc = NULL){
 
   if (verbose) {
     cat("Bootstrap Test with", boot, "bootstrap method.\n")
@@ -281,7 +286,8 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB
   }
   out <- iADFtest(y, level = level, boot = boot, B = B, l = l, ar_AWB = ar_AWB,
                   union = TRUE, p_min = p_min, p_max = p_max, ic = ic, ic_scale = ic_scale,
-                  verbose = verbose, show_progress = show_progress)
+                  verbose = verbose, show_progress = show_progress,
+                  do_parallel = do_parallel, nc = nc)
   return(out$ADF_tests[1, ])
 }
 
@@ -330,13 +336,14 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB
 #' two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                      union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
-                     detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
+                     detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+                     do_parallel = FALSE, nc = NULL){
 
   inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
 
   if (!is.null(colnames(y))) {
     var_names <- colnames(y)
@@ -465,13 +472,14 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB 
 #' two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
-                     detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
+                     detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+                     do_parallel = FALSE, nc = NULL){
 
   inputs <- do_tests_and_bootstrap(y = y, BSQT_test = TRUE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = q, h_rs = 0.1,
-                                   show_progress = show_progress)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
 
   if (!is.null(colnames(y))) {
     var_names <- colnames(y)
@@ -590,13 +598,14 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 1999, l 
 #' two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 paneltest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
                       union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL,
-                      ic_scale = TRUE, verbose = FALSE, show_progress = FALSE){
+                      ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+                      do_parallel = FALSE, nc = NULL){
 
   inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
 
   if (union) { # Union Tests
     GM_test <- mean(inputs$test_stats)
