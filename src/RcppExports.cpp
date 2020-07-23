@@ -46,12 +46,12 @@ BEGIN_RCPP
 END_RCPP
 }
 // bootstrap_cpp
-arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint, const bool& do_parallel, const int& nc, const bool& show_progress);
+arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint, const bool& do_parallel, const int& nc, const bool& show_progress);
 RcppExport SEXP _bootUR_bootstrap_cpp(SEXP BSEXP, SEXP uSEXP, SEXP eSEXP, SEXP bootSEXP, SEXP lSEXP, SEXP sSEXP, SEXP arSEXP, SEXP ar_estSEXP, SEXP y0SEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP detrSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP, SEXP jointSEXP, SEXP do_parallelSEXP, SEXP ncSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const double& >::type B(BSEXP);
+    Rcpp::traits::input_parameter< const int& >::type B(BSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type u(uSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type e(eSEXP);
     Rcpp::traits::input_parameter< const int& >::type boot(bootSEXP);

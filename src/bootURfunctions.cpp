@@ -403,7 +403,7 @@ arma::mat SB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, con
 arma::mat SWB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, const arma::uvec& i, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::rowvec& y0){
   const int T = e.n_rows;
   const int N = e.n_cols;
-  const arma::mat e_star = repelem(randn(T), 1, N) % e;
+  const arma::mat e_star = repelem(z, 1, N) % e;
   arma::mat u_star = zeros(T, N);
   arma::vec init = zeros(ar_est.n_rows);
   for (int iN = 0; iN < N; iN++){
@@ -443,7 +443,7 @@ arma::mat bootstrap_tests_cpp(const arma::mat& u, const arma::mat& e, bFun boot_
 }
 
 // [[Rcpp::export]]
-arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s,
+arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s,
                          const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc,
                          const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint = true,
                          const bool& do_parallel = false, const int& nc = 1, const bool& show_progress = false){
@@ -453,20 +453,24 @@ arma::cube bootstrap_cpp(const double& B, const arma::mat& u, const arma::mat& e
   const int N = u.n_cols;
   const int T = u.n_rows;
   int ub;
-  const bFun boot_f = boot_func(boot);
+
   const icFun ic_type = ic_function(ic);
   arma::mat u0 = u, e0 = e;
   u0.replace(datum::nan, 0);
   e0.replace(datum::nan, 0);
   const arma::mat z = randn(T, B);
+
   if (boot == 6) {
     ub = 1;
   } else {
     ub = l;
   }
-  const arma::umat i = randi<umat>(T, B, distr_param(0, T-ub));
 
+  const arma::umat i = randi<umat>(T, B, distr_param(0, T-ub));
   arma::cube output = zeros(B, dclength*detrlength, N);
+  
+  const bFun boot_f = boot_func(boot);
+  
   #ifdef _OPENMP
     omp_set_num_threads(nc);
   #endif
