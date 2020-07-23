@@ -159,8 +159,8 @@ the console. To see live progress updates on the bootstrap, set
 leave it out here. The bootstrap loop can also be run in parallel by
 setting `do_parallel = TRUE`. Note that parallelization requires OpenMP
 to be available on your system, which is typically not the case on
-macOS; see \[<https://mac.r-project.org/openmp/>\]\[this page\] for ways
-to set it up yourself.
+macOS; see <https://mac.r-project.org/openmp/> for ways to set it up
+manually.
 
 As random number generation is required to draw bootstrap samples, we
 first set the seed of the random number generator to obtain replicable
@@ -213,9 +213,9 @@ test. The test is based on averaging the individual test statistics,
 also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 
 Palm, Smeekes and Urbain (2011) introduced this test with the moving
-block bootstrap (`boot = "MBB"`), which is the standard option. However,
-this resampling-based method cannot handle unbalancedness, and will
-therefore give an error when applied to `MacroTS`:
+block bootstrap (`boot = "MBB"`). However, this resampling-based method
+cannot handle unbalancedness, and will therefore give an error when
+applied to `MacroTS`:
 
 ``` r
 panel_out <- paneltest(MacroTS, boot = "MBB", B = 399, verbose = TRUE)
@@ -381,11 +381,11 @@ determine the orders of each time series.
 
 Starting from a maximum order  (by default equal to 2), it differences
 the data  time until there can be at most one unit root. If the test is
-not rejected for a particular, we know this series if of order . The
-series for which we do reject are integrated once (such that they are
-differenced  times from their original level), and the test is repeated.
-By doing so until we have classified all series, we obtain a full
-specification of the orders of all time series.
+not rejected for a particular series, we know this series if of order .
+The series for which we do reject are integrated once (such that they
+are differenced  times from their original level), and the test is
+repeated. By doing so until we have classified all series, we obtain a
+full specification of the orders of all time series.
 
 ### Implementation
 

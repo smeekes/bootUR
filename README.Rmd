@@ -88,7 +88,7 @@ Lag length selection is done automatically in the ADF regression; the default is
 
 **Implementation**
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. To see live progress updates on the bootstrap, set `show_progress = TRUE`. This is particularly useful for large `B`, so we leave it out here. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up yourself.
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`boot = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`dc = 2`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. To see live progress updates on the bootstrap, set `show_progress = TRUE`. This is particularly useful for large `B`, so we leave it out here. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually.
 
 As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
@@ -108,7 +108,7 @@ union_out <- boot_union(GDP_NL, B = 399, boot = "SWB", verbose = TRUE)
 ## Panel Unit Root Test
 The function `panel_test` performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. A rejection is typically interpreted as evidence that a 'significant proportion' of the series is stationary, although how large that proportion is - or which series are stationary - is not given by the test. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 
-Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`boot = "MBB"`), which is the standard option. However, this resampling-based method cannot handle unbalancedness, and will therefore give an error when applied to `MacroTS`:
+Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`boot = "MBB"`). However, this resampling-based method cannot handle unbalancedness, and will therefore give an error when applied to `MacroTS`:
 
 ```{r panel-error, error = TRUE, purl = FALSE}
 panel_out <- paneltest(MacroTS, boot = "MBB", B = 399, verbose = TRUE)
@@ -164,7 +164,7 @@ bFDR_out <- bFDRtest(MacroTS, level = 0.1, boot = "BWB", B = 399, verbose = TRUE
 Generally the unit root tests above would only be used as a single step in a larger algorithm to determine the orders of integration of the time series in the dataset. In particular, many economic datasets contain variables that have order of integration 2, and would so need to be differenced twice to eliminate all trends. A standard unit root test cannot determine this however. For this purpose, we add the function `order_integration()` which performs a sequence of unit root tests to determine the orders of each time series. 
 
 ### How does it work
-Starting from a maximum order \eqn{d} (by default equal to 2), it differences the data \eqn{d-1} time until there can be at most one unit root. If the test is not rejected for a particular, we know this series if of order \eqn{d}. The series for which we do reject are integrated once (such that they are differenced \eqn{d-1} times from their original level), and the test is repeated. By doing so until we have classified all series, we obtain a full specification of the orders of all time series.
+Starting from a maximum order \eqn{d} (by default equal to 2), it differences the data \eqn{d-1} time until there can be at most one unit root. If the test is not rejected for a particular series, we know this series if of order \eqn{d}. The series for which we do reject are integrated once (such that they are differenced \eqn{d-1} times from their original level), and the test is repeated. By doing so until we have classified all series, we obtain a full specification of the orders of all time series.
 
 ### Implementation
 The function allows us to choose which unit root test we want to use. Here we take the `bFDRtest`. We don't only get the orders out, but also the appropriately differenced data.

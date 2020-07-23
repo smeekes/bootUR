@@ -4,10 +4,10 @@
 #' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
-#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011), this is the default;}
+#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 #' \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
 #' \item{\code{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
-#' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
+#' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020), this is the default;}
 #' \item{\code{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
 #' \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
@@ -177,10 +177,10 @@ iADFtest <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 #' @param y A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
-#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003), this is the default;}
+#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003);}
 #' \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011);}
 #' \item{\code{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Rho and Shao, 2019);}
-#' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
+#' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020), this is the default;}
 #' \item{\code{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
 #' \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
@@ -237,10 +237,10 @@ boot_df <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = 
 #' @param y A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
-#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003), this is the default;}
+#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003);}
 #' \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011);}
 #' \item{\code{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Rho and Shao, 2019);}
-#' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020);}
+#' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020), this is the default;}
 #' \item{\code{"SB" }}{Sieve bootstrap (Palm, Smeekes and Urbain, 2008);}
 #' \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
