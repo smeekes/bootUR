@@ -4,7 +4,7 @@
 \alias{boot_df}
 \title{Bootstrap augmented Dickey-Fuller Unit Root Test}
 \usage{
-boot_df(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
+boot_df(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
   ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC", dc = 1,
   detr = "OLS", ic_scale = TRUE, verbose = FALSE,
   show_progress = FALSE, do_parallel = FALSE, nc = NULL)

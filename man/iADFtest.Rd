@@ -4,7 +4,7 @@
 \alias{iADFtest}
 \title{Individual Unit Root Tests without multiple testing control}
 \usage{
-iADFtest(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
+iADFtest(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
   ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
   dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
   show_progress = FALSE, do_parallel = FALSE, nc = NULL)

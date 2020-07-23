@@ -4,7 +4,7 @@
 \alias{BSQTtest}
 \title{Bootstrap Sequential Quantile Test}
 \usage{
-BSQTtest(y, q = 0:NCOL(y), level = 0.05, boot = "MBB", B = 1999,
+BSQTtest(y, q = 0:NCOL(y), level = 0.05, boot = "AWB", B = 1999,
   l = NULL, ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
   ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
   verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
@@ -92,7 +92,7 @@ See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag select
 
 \examples{
 # BSQTtest on GDP_BE and GDP_DE
-two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
 }
 \references{
 Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.

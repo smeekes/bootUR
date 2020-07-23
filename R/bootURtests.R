@@ -70,7 +70,7 @@
 #' # iADFtest on GDP_BE and GDP_DE
 #' two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B = 399,
 #' verbose = TRUE)
-iADFtest <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
+iADFtest <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
                      verbose = FALSE, show_progress = FALSE,
@@ -212,7 +212,7 @@ iADFtest <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
 #' @examples
 #' # boot_df on GDP_BE
 #' GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
-boot_df <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_df <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
                     p_min = 0, p_max = NULL, ic = "MAIC", dc = 1, detr = "OLS",
                     ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                     do_parallel = FALSE, nc = NULL){
@@ -273,7 +273,7 @@ boot_df <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = 
 #' @examples
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
-boot_union <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
                        p_min = 0, p_max = NULL, ic = "MAIC", ic_scale = TRUE, verbose = FALSE,
                        show_progress = FALSE, do_parallel = FALSE, nc = NULL){
 
@@ -334,7 +334,7 @@ boot_union <- function(y, level = 0.05, boot = "MBB", B = 1999, l = NULL, ar_AWB
 #' @examples
 #' # bFDRtest on GDP_BE and GDP_DE
 #' two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
-bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
+bFDRtest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
                      union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
                      detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
@@ -469,8 +469,8 @@ bFDRtest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB 
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # BSQTtest on GDP_BE and GDP_DE
-#' two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
-BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 1999, l = NULL,
+#' two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
                      detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
@@ -595,8 +595,8 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "MBB", B = 1999, l 
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # paneltest on GDP_BE and GDP_DE
-#' two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
-paneltest <- function(y, level = 0.05,  boot = "MBB", B = 1999, l = NULL, ar_AWB = NULL,
+#' two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+paneltest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
                       union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL,
                       ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                       do_parallel = FALSE, nc = NULL){

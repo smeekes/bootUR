@@ -4,7 +4,7 @@
 \alias{boot_union}
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
-boot_union(y, level = 0.05, boot = "MBB", B = 1999, l = NULL,
+boot_union(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
   ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC",
   ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
   do_parallel = FALSE, nc = NULL)
