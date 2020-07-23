@@ -882,7 +882,7 @@ plot_missing_values <- function(y, show_names = FALSE, show_legend = TRUE,
                                 axis_text_size = NULL, legend_size = NULL,
                                 cols = NULL) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
-    stop("Cannot plot orders of integration as package ggplot2 not installed.")
+    stop("Cannot plot missing values as package ggplot2 not installed.")
   } else {
     y <- as.matrix(y)
     if (!is.null(colnames(y))) {
@@ -941,7 +941,7 @@ plot_missing_values <- function(y, show_names = FALSE, show_legend = TRUE,
                        panel.border = ggplot2::element_blank(),
                        panel.grid.major = ggplot2::element_blank(),
                        panel.grid.minor = ggplot2::element_blank(),
-                       axis.title = ggplot2::element_text(size = 8))
+                       axis.title = ggplot2::element_text(size = axis_text_size))
     } else {
       g <- ggplot2::ggplot(data = df, ggplot2::aes(x = var_names, y = obs,
                                                    fill = missing_type)) +
@@ -949,7 +949,8 @@ plot_missing_values <- function(y, show_names = FALSE, show_legend = TRUE,
         ggplot2::labs(x = "Variables", y = "Observations", fill = "Missing Type") +
         ggplot2::scale_fill_manual(values = col_sel) +
         ggplot2::theme_minimal() +
-        ggplot2::theme(legend.title = ggplot2::element_text(size = axis_text_size),
+        ggplot2::theme(legend.title = ggplot2::element_text(size = legend_size),
+                       legend.text = ggplot2::element_text(size = legend_size),
                        axis.text.x = ggplot2::element_blank(),
                        axis.text.y = ggplot2::element_blank(),
                        panel.border = ggplot2::element_blank(),
