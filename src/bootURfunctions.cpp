@@ -1,5 +1,6 @@
 // [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
+#include <RcppArmadilloExtensions/sample.h>
 #ifdef _OPENMP
 #include <omp.h>
 #endif
@@ -454,11 +455,13 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
   const int T = u.n_rows;
   int ub;
 
+  const bFun boot_f = boot_func(boot);
   const icFun ic_type = ic_function(ic);
   arma::mat u0 = u, e0 = e;
   u0.replace(datum::nan, 0);
   e0.replace(datum::nan, 0);
-  const arma::mat z = randn(T, B);
+  const arma::vec z_vec = Rcpp::rnorm(T * B, 0, 1);
+  const arma::mat z = reshape(z_vec, T, B); //randn(T, B);
 
   if (boot == 6) {
     ub = 1;
@@ -466,11 +469,10 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
     ub = l;
   }
 
-  const arma::umat i = randi<umat>(T, B, distr_param(0, T-ub));
-  arma::cube output = zeros(B, dclength*detrlength, N);
-  
-  const bFun boot_f = boot_func(boot);
-  
+  const arma::uvec i_vec = Rcpp::RcppArmadillo::sample(arma::linspace<arma::uvec>(0, T - ub, T - ub + 1), T * B, true);
+  const arma::umat i = reshape(i_vec, T, B);//randi<umat>(T, B, distr_param(0, T - ub));
+  arma::cube output = zeros(B, dclength * detrlength, N);
+
   #ifdef _OPENMP
     omp_set_num_threads(nc);
   #endif

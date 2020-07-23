@@ -11,7 +11,7 @@ diff_mult(y, d, keep_NAs = TRUE)
 
 \item{d}{An \eqn{N}-dimensional vector containing the orders}
 
-\item{keep_NAs}{Logical indicator whether or not to keep the \code{NA} values resulting from differencing at the bieginning of the sample. Default is \code{TRUE}. If \code{FALSE}, the entire row containing the \code{NA} values is removed.}
+\item{keep_NAs}{Logical indicator whether or not to keep the \code{NA} values resulting from differencing at the beginning of the sample. Default is \code{TRUE}. If \code{FALSE}, the entire row containing the \code{NA} values is removed.}
 }
 \value{
 The appropriately differenced data in the same format as the original data.

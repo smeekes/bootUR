@@ -18,13 +18,13 @@ plot_order_integration(d, show_names = TRUE, show_legend = TRUE,
 
 \item{legend_size}{Size of the text in the legend if \code{show_legend = TRUE}. Default takes \code{ggplot2} defaults.}
 
-\item{cols}{Vector with colours for displyaing the orders of integration. At least as many colours as orders of integration need to be supplied. Default supplies 4 colours for displaying up to \eqn{I(3)} series.}
+\item{cols}{Vector with colours for displaying the orders of integration. At least as many colours as orders of integration need to be supplied. Default supplies 4 colours for displaying up to \eqn{I(3)} series.}
 }
 \value{
 A \code{ggplot2} object containing the plot of the orders of integration.
 }
 \description{
-Plots a vetor with orders of integration of time series.
+Plots a vector with orders of integration of time series.
 }
 \details{
 This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.

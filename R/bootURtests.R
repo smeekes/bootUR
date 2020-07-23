@@ -511,7 +511,7 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
           cat(paste("There are ", p_hat, " stationary time series.\n", sep = ""))
         }
       }
-      cat("Details of the BSQT ssquential tests:\n")
+      cat("Details of the BSQT sequential tests:\n")
       print(BSQT_seq)
     }
   } else { # No Union Tests
@@ -734,7 +734,7 @@ order_integration <- function(y, max_order = 2, test = NULL, plot_orders = FALSE
   i_in_yd <- 1:N
   for (d_i in (max_order - 1):0) {
     yd <- diff_mult(y[, i_in_yd], rep(d_i, length(i_in_yd)), keep_NAs = FALSE)
-    if (test == "iADFtest" & N > 1) {
+    if (test == "iADFtest") {
       out <- iADFtest(yd, ...)
     } else if (test == "bFDRtest" & N > 1) {
       out <- bFDRtest(yd, ...)
