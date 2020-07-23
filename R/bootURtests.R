@@ -31,7 +31,7 @@
 #' @param ic_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
-#' @param do_parallel Logical indicator whether bootstrap lool should be executed in parallel. Parallel computnig is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
+#' @param do_parallel Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
 #' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @details The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
@@ -667,7 +667,7 @@ paneltest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB
 #' @description Performs differencing of multiple time series, with possibly different orders for each time series.
 #' @param y A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.
 #' @param d An \eqn{N}-dimensional vector containing the orders
-#' @param keep_NAs Logical indicator whether or not to keep the \code{NA} values resulting from differencing at the bieginning of the sample. Default is \code{TRUE}. If \code{FALSE}, the entire row containing the \code{NA} values is removed.
+#' @param keep_NAs Logical indicator whether or not to keep the \code{NA} values resulting from differencing at the beginning of the sample. Default is \code{TRUE}. If \code{FALSE}, the entire row containing the \code{NA} values is removed.
 #' @export
 #' @return The appropriately differenced data in the same format as the original data.
 diff_mult <- function(y, d, keep_NAs = TRUE) {
@@ -770,13 +770,13 @@ order_integration <- function(y, max_order = 2, test = NULL, plot_orders = FALSE
 }
 
 #' Plot Orders of Integration
-#' @description Plots a vetor with orders of integration of time series.
+#' @description Plots a vector with orders of integration of time series.
 #' @param d T\eqn{N}-dimensional vector with time series' orders of integration. Elements should be named after the respective time series to ensure easy interpretation of the plot.
 #' @param show_names Show the time series' names on the plot (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param show_legend Logical indicator whether a legend should be displayed. Default is \code{TRUE}.
 #' @param names_size Size of the time series' names if \code{show_names = TRUE}. Default takes \code{ggplot2} defaults.
 #' @param legend_size Size of the text in the legend if \code{show_legend = TRUE}. Default takes \code{ggplot2} defaults.
-#' @param cols Vector with colours for displyaing the orders of integration. At least as many colours as orders of integration need to be supplied. Default supplies 4 colours for displaying up to \eqn{I(3)} series.
+#' @param cols Vector with colours for displaying the orders of integration. At least as many colours as orders of integration need to be supplied. Default supplies 4 colours for displaying up to \eqn{I(3)} series.
 #' @export
 #' @details This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 #' @return A \code{ggplot2} object containing the plot of the orders of integration.
