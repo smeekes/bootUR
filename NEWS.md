@@ -1,4 +1,4 @@
-## Version 0.1.0.902
+## Version 0.2.0
 
 ### New Functionality
 * Added parallel loops using OpenMP.
@@ -20,6 +20,8 @@ to argument q even if one was present already.
 * Fixed possibility of taking a too fine grid for argument q in BSQTtest()
 leading to duplicates. Duplicates are now removed with a warning given.
 * Fixed bug in SB where the last l observations were excluded from resampling.
+* Fixed bug in S(W)B where too short vector with ADF residuals was used 
+(supplemented with zeros) in bootstrap.
 
 ## Version 0.1.0
 First release; package available on CRAN.
