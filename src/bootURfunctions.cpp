@@ -461,7 +461,7 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
   u0.replace(datum::nan, 0);
   e0.replace(datum::nan, 0);
   const arma::vec z_vec = Rcpp::rnorm(T * B, 0, 1);
-  const arma::mat z = reshape(z_vec, T, B); //randn(T, B);
+  const arma::mat z = reshape(z_vec, T, B);
 
   if (boot == 6) {
     ub = 1;
@@ -469,8 +469,8 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
     ub = l;
   }
 
-  const arma::uvec i_vec = Rcpp::RcppArmadillo::sample(arma::linspace<arma::uvec>(0, T - ub, T - ub + 1), T * B, true);
-  const arma::umat i = reshape(i_vec, T, B);//randi<umat>(T, B, distr_param(0, T - ub));
+  const arma::uvec i_vec = Rcpp::RcppArmadillo::sample(linspace<arma::uvec>(0, T - ub, T - ub + 1), T * B, true);
+  const arma::umat i = reshape(i_vec, T, B);
   arma::cube output = zeros(B, dclength * detrlength, N);
 
   #ifdef _OPENMP

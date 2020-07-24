@@ -1,7 +1,7 @@
 ---
 title: "Introduction to bootUR"
 author: "Stephan Smeekes and Ines Wilms"
-date: "June 15, 2020"
+date: "July 24, 2020"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to bootUR}

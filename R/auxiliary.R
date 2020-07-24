@@ -295,12 +295,12 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
       y <- (x/c) * (x >= 0) * (x<c) + (x >= c) * (x <= 1-c) + ((1-x) / c) * (x > 1-c) * (x <= 1)
       return(y)
     }
-    m <- self.conv(outer(1:n,1:n,"-") / l, 0.43)/ drop(self.conv(0, 0.43))
+    m <- self.conv(outer(1:n, 1:n, "-") / l, 0.43)/ drop(self.conv(0, 0.43))
     ev <- eigen(m)
     e_va <- ev$values
     e_ve <- ev$vectors
     e_va <- diag((e_va > 1e-10) * e_va + (e_va <= 1e-10) * 1e-10)
-    s_DWB <- e_ve%*%sqrt(e_va)
+    s_DWB <- e_ve %*% sqrt(e_va)
   }
   out <- list(boot = boot, l = l, s_DWB = s_DWB, ar_AWB = ar_AWB, dc = dc,
               dc_boot = dc_boot, detr = detr, detr_int = detr_int, ic = ic,
