@@ -3,9 +3,34 @@
 \name{bootUR-deprecated}
 \alias{bootUR-deprecated}
 \alias{iADFtest}
+\alias{boot_df}
+\alias{bFDRtest}
+\alias{BSQTtest}
+\alias{paneltest}
 \title{Deprecated functions in package \pkg{bootUR}.}
 \usage{
 iADFtest(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
+  ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
+  dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
+  show_progress = FALSE, do_parallel = FALSE, nc = NULL)
+
+boot_df(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
+  ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC", dc = 1,
+  detr = "OLS", ic_scale = TRUE, verbose = FALSE,
+  show_progress = FALSE, do_parallel = FALSE, nc = NULL)
+
+bFDRtest(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
+  ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
+  dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
+  show_progress = FALSE, do_parallel = FALSE, nc = NULL)
+
+BSQTtest(y, q = 0:NCOL(y), level = 0.05, boot = "AWB", B = 1999,
+  l = NULL, ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
+  ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
+  verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
+  nc = NULL)
+
+paneltest(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
   ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
   dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
   show_progress = FALSE, do_parallel = FALSE, nc = NULL)
@@ -19,6 +44,26 @@ The functions listed below are deprecated and will be defunct in
 \section{\code{iADFtest}}{
 
 For \code{iADFtest}, use \code{\link{boot_adf}}.
+}
+
+\section{\code{boot_df}}{
+
+For \code{boot_df}, use \code{\link{boot_adf}}.
+}
+
+\section{\code{bFDRtest}}{
+
+For \code{bFDRtest}, use \code{\link{boot_fdr}}.
+}
+
+\section{\code{BSQTtest}}{
+
+For \code{BSQTtest}, use \code{\link{boot_sqt}}.
+}
+
+\section{\code{paneltest}}{
+
+For \code{paneltest}, use \code{\link{boot_panel}}.
 }
 
 \keyword{internal}

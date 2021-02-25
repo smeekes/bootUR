@@ -1,10 +1,10 @@
 context("Test inputs of boot functions")
 
-test_that("univ boot refuse matrix", {
-  y <- matrix(rnorm(10 * 5), nrow = 10, ncol = 5)
-  expect_error(boot_df(y, level = 0.1, B = 19))
-  expect_error(boot_union(y, level = 0.1, B = 19))
-})
+# test_that("univ boot refuse matrix", {
+#   y <- matrix(rnorm(10 * 5), nrow = 10, ncol = 5)
+#   expect_error(boot_df(y, level = 0.1, B = 19))
+#   expect_error(boot_union(y, level = 0.1, B = 19))
+# })
 
 test_that("Missing values in sample", {
   y <- matrix(rnorm(10 * 5), nrow = 10, ncol = 5)
@@ -42,17 +42,17 @@ test_that("Panel Sieve Bootstrap", {
   expect_warning(paneltest(y, level = 0.1, B = 19, boot = "SWB"), "SB and SWB bootstrap only recommended for iADFtest; see help for details.")
 })
 
-test_that("Union specs", {
-  y <- matrix(rnorm(20 * 5), nrow = 20, ncol = 5)
-  expect_warning(iADFtest(y, level = 0.1, B = 19, dc = 1, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(bFDRtest(y, level = 0.1, B = 19, dc = 2, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(BSQTtest(y, level = 0.1, B = 19, dc = 1, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(paneltest(y, level = 0.1, B = 19, dc = 2, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(iADFtest(y, level = 0.1, B = 19, detr = "OLS", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
-  expect_warning(bFDRtest(y, level = 0.1, B = 19, detr = "QD", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
-  expect_warning(BSQTtest(y, level = 0.1, B = 19, detr = "OLS", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
-  expect_warning(paneltest(y, level = 0.1, B = 19, detr = "QD", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
-})
+# test_that("Union specs", {
+#   y <- matrix(rnorm(20 * 5), nrow = 20, ncol = 5)
+#   expect_warning(iADFtest(y, level = 0.1, B = 19, dc = 1, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
+#   expect_warning(bFDRtest(y, level = 0.1, B = 19, dc = 2, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
+#   expect_warning(BSQTtest(y, level = 0.1, B = 19, dc = 1, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
+#   expect_warning(paneltest(y, level = 0.1, B = 19, dc = 2, boot = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
+#   expect_warning(iADFtest(y, level = 0.1, B = 19, detr = "OLS", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
+#   expect_warning(bFDRtest(y, level = 0.1, B = 19, detr = "QD", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
+#   expect_warning(BSQTtest(y, level = 0.1, B = 19, detr = "OLS", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
+#   expect_warning(paneltest(y, level = 0.1, B = 19, detr = "QD", boot = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
+# })
 
 test_that("BSQT q spec", {
   y <- matrix(rnorm(20 * 5), nrow = 20, ncol = 5)

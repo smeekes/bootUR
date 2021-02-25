@@ -2,12 +2,12 @@
 % Please edit documentation in R/bootURtests-new.R
 \name{boot_adf}
 \alias{boot_adf}
-\title{Individual Unit Root Tests without multiple testing control}
+\title{Bootstrap augmented Dickey-Fuller Unit Root Tests without multiple testing control}
 \usage{
 boot_adf(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
-  ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
-  detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
-  do_parallel = FALSE, nc = NULL)
+  ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC", dc = 1,
+  detr = "OLS", ic_scale = TRUE, verbose = FALSE,
+  show_progress = FALSE, do_parallel = FALSE, nc = NULL)
 }
 \arguments{
 \item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -36,7 +36,7 @@ boot_adf(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
+\item{dc}{Numeric vector indicating the deterministic specification. Options are (combinations of)
 
 \verb{0 } no deterministics;
 
@@ -44,9 +44,9 @@ boot_adf(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \verb{2 } intercept and trend.
 
-If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
+The default is adding an intercept.}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
+\item{detr}{String vector indicating the type of detrending to be performed. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
 \item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
@@ -62,7 +62,7 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 A list with the following components
 \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
+The output is arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
 }
 \description{
 This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series or on each time series individually in case multiple time series are provided.
@@ -77,14 +77,12 @@ Lag length selection is done automatically in the ADF regression with the specif
 The function may give the following warnings.
 \describe{
 \item{\code{Warning: Missing values cause resampling bootstrap to be executed for each time series individually.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used directly, as they create holes (internal missings) in the bootstrap samples. These bootstrap methods are therefore not applied jointly as usual, but individually to each series.}
-\item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
-\item{\code{Warning: Detrending method in argument detr is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
 }
 }
 
 \examples{
-# iADFtest on GDP_BE and GDP_DE
-two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B = 399,
+# boot_adf on GDP_BE and GDP_DE
+two_series_boot_adf <- boot_adf(MacroTS[, 1:2], boot = "MBB", B = 399,
 verbose = TRUE)
 }
 \references{
