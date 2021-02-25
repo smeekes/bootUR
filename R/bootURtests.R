@@ -37,7 +37,6 @@
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
 #'
-#' @export
 #' @return A list with the following components
 #' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
@@ -70,12 +69,27 @@
 #' # iADFtest on GDP_BE and GDP_DE
 #' two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B = 399,
 #' verbose = TRUE)
+#' 
+#' @name iADFtest-deprecated
+#' @usage iADFtest(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL, union = TRUE, 
+#' p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE, 
+#' verbose = FALSE, show_progress = FALSE, do_parallel = FALSE, nc = NULL)
+#' @seealso \code{\link{bootUR-deprecated}}
+#' @keywords internal
+NULL
+#' @rdname bootUR-deprecated
+#' @section \code{iADFtest}:
+#' For \code{iADFtest}, use \code{\link{boot_adf}}.
+#'
+#' @export
 iADFtest <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
                      ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
                      verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
 
+  .Deprecated("boot_adf")
+  
   inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
@@ -173,7 +187,7 @@ iADFtest <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 #' Bootstrap augmented Dickey-Fuller Unit Root Test
 #' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series.
-#' @inheritParams iADFtest
+#' @inheritParams boot_adf
 #' @param y A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
@@ -233,7 +247,7 @@ boot_df <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = 
 
 #' Bootstrap Union Test for Unit Roots
 #' @description Performs bootstrap unit root test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Harvey, Leybourne and Taylor, 2012; Smeekes and Taylor, 2012).
-#' @inheritParams iADFtest
+#' @inheritParams boot_adf
 #' @param y A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
@@ -293,7 +307,7 @@ boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB
 
 #' Bootstrap Unit Root Tests with False Discovery Rate control
 #' @description Controls for multiple testing by controlling the false discovery rate (FDR), see Moon and Perron (2012) and Romano, Shaikh and Wolf (2008).
-#' @inheritParams iADFtest
+#' @inheritParams boot_adf
 #' @param level Desired False Discovery Rate level of the unit root tests. Default is 0.05.
 #' @details The false discovery rate FDR is defined as the expected proportion of false rejections relative to the total number of rejections.
 #'
@@ -426,7 +440,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB 
 
 #' Bootstrap Sequential Quantile Test
 #' @description Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).
-#' @inheritParams iADFtest
+#' @inheritParams boot_adf
 #' @param q Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.
 #' @details The parameter \code{q} can either be set as an increasing sequence of integers smaller or equal to the number of series \code{N}, or fractions of the total number of series (quantiles). For \code{N} time series, setting \code{q = 0:N} means each unit should be tested sequentially. In this case the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate. To split the series in \code{K} equally sized groups, use \code{q = 0:K / K}.
 #'
@@ -562,7 +576,7 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
 
 #' Panel Unit Root Test
 #' @description Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
-#' @inheritParams iADFtest
+#' @inheritParams boot_adf
 #' @export
 #' @details See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag selection.
 #'

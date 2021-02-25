@@ -1,5 +1,5 @@
 #' Auxiliary Function (not accessible to users) to create all bootstrap statistics used to perform the unit root tests.
-#' @inheritParams iADFtest
+#' @inheritParams boot_adf
 #' @param BSQT_test Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param iADF_test Logical indicator whether or not to perform the individual ADF Tests (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param level Desired significance level of the unit root test.
@@ -93,7 +93,7 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
 }
 
 #' Auxiliary Function (not accessible to users) to check if all arguments put in by the user are correct, and to perform some preliminary calculations.
-#' @inheritParams iADFtest
+#' @inheritParams boot_adf
 #' @param BSQT_test Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param iADF_test Logical indicator whether or not to perform the individual ADF Tests (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param level Desired significance level of the unit root test.

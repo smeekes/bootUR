@@ -2,6 +2,7 @@
 
 export(BSQTtest)
 export(bFDRtest)
+export(boot_adf)
 export(boot_df)
 export(boot_union)
 export(check_missing_insample_values)
