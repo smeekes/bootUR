@@ -132,3 +132,98 @@ boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
   return(list(rej_H0 = rej_H0, ADF_tests = iADFout))
 }
+
+
+#' Bootstrap Union Test for Unit Roots
+#' @description Performs bootstrap unit root tests based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Harvey, Leybourne and Taylor, 2012; Smeekes and Taylor, 2012).
+#' @inheritParams boot_adf
+#' @param boot String for bootstrap method to be used. Options are
+#' \describe{
+#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
+#' \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
+#' \item{\code{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
+#' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020), this is the default;}
+#' \item{\code{"SB"}}{Sieve bootstrap (Chang and Park, 2003; Palm, Smeekes and Urbain, 2008; Smeekes, 2013);}
+#' \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
+#' }
+#' @details The union is taken over the combination of tests with intercept only and intercept plus trend, coupled with OLS detrending and QD detrending, as in Harvey, Leybourne and Taylor (2012) and Smeekes an Taylor (2012). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
+#'
+#' Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
+#' @export
+#' @return Value of the union test statistic and the bootstrap p-values.
+#' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
+#' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
+#' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
+#' (2015). Lag length selection for unit root tests in the presence of nonstationary volatility. \emph{Econometric Reviews}, 34(4), 512-536.
+#' @references Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive wild bootstrap inference for nonparametric trends. \emph{Journal of Econometrics}, 214(1), 81-109.
+#' @references Harvey, D.I., Leybourne, S.J., and Taylor, A.M.R. (2012). Testing for unit roots in the presence of uncertainty over both the trend and initial condition. \emph{Journal of Econometrics}, 169(2), 188-195.
+#' @references Ng, S. and Perron, P. (2001). Lag Length Selection and the Construction of Unit Root Tests with Good Size and Power. \emph{Econometrica}, 69(6), 1519-1554,
+#' @references Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008). Bootstrap unit root tests: Comparison and extensions. \emph{Journal of Time Series Analysis}, 29(1), 371-401.
+#' @references Paparoditis, E. and Politis, D.N. (2003). Residual-based block bootstrap for unit root testing. \emph{Econometrica}, 71(3), 813-855.
+#' @references Perron, P. and Qu, Z. (2008). A simple modification to improve the finite sample properties of Ng and Perron's unit root tests. \emph{Economic Letters}, 94(1), 12-19.
+#' @references Rho, Y. and Shao, X. (2019). Bootstrap-assisted unit root testing with piecewise locally stationary errors. \emph{Econometric Theory}, 35(1), 142-166.
+#' @references Shao, X. (2010). The dependent wild bootstrap. \emph{Journal of the American Statistical Association}, 105(489), 218-235.
+#' @references Shao, X. (2011). A bootstrap-assisted spectral test of white noise under unknown dependence. \emph{Journal of Econometrics}, 162, 213-224.
+#' @references Smeekes, S. (2013). Detrending bootstrap unit root tests. \emph{Econometric Reviews}, 32(8), 869-891.
+#' @references Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit roots in the presence of nonstationary volatility. \emph{Econometric Theory}, 28(2), 422-456.
+#' @references Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
+#' @examples
+#' # boot_union on GDP_BE
+#' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
+boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
+                       p_min = 0, p_max = NULL, ic = "MAIC", ic_scale = TRUE, verbose = FALSE,
+                       show_progress = FALSE, do_parallel = FALSE, nc = NULL){
+  
+  if (verbose) {
+    cat("Bootstrap Test with", boot, "bootstrap method.\n")
+  }
+  
+  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
+                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = TRUE,
+                                   p_min = p_min, p_max = p_max, ic = ic, dc = NULL, detr = NULL,
+                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1,
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
+  
+  if (!is.null(colnames(y))) {
+    var_names <- colnames(y)
+  } else {
+    var_names <- paste0("Variable ", 1:NCOL(y))
+  }
+  
+  # Union Tests
+    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
+                        level = inputs$level)
+    rej_H0 <- (iADFout[, 2] < level)
+    colnames(iADFout) <- c("test statistic", "p-value")
+    rownames(iADFout) <- var_names
+    
+    if (verbose) {
+      p_hat <- sum(rej_H0)
+      if (NCOL(y) > 1) {
+        if (p_hat > 1) {
+          cat(paste("There are ", p_hat, " stationary time series, namely: ",
+                    paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
+        } else {
+          if (p_hat == 1) {
+            cat(paste("There is ", p_hat, " stationary time series, namely: ",
+                      paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
+          } else {
+            cat(paste("There are ", p_hat, " stationary time series.\n", sep = ""))
+          }
+        }
+        print(iADFout)
+      } else {
+        cat("Bootstrap Union Test:\n")
+        if (rej_H0) {
+          cat(paste("The null hypothesis of a unit root is rejected at a significance
+                    level of ", level, ".\n", sep = ""))
+        } else {
+          cat(paste("The null hypothesis of a unit root is not rejected at a significance
+                    level of ", level, ".\n", sep = ""))
+        }
+        print(iADFout[1, ])
+      }
+    }
+  
+  return(list(rej_H0 = rej_H0, ADF_tests = iADFout))
+}
