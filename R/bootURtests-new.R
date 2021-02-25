@@ -1,5 +1,5 @@
-#' Individual Unit Root Tests without multiple testing control
-#' @description This function performs bootstrap unit root tests on each time series individually.
+#' Bootstrap augmented Dickey-Fuller Unit Root Tests without multiple testing control
+#' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series or on each time series individually in case multiple time series are provided.
 #' @param y A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.
 #' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param boot String for bootstrap method to be used. Options are
@@ -14,11 +14,10 @@
 #' @param B Number of bootstrap replications. Default is 1999.
 #' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).
 #' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.
-#' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
 #' @param p_min Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
 #' @param p_max Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
 #' @param ic String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).
-#' @param dc Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
+#' @param dc Numeric vector indicating the deterministic specification. Options are (combinations of)
 #'
 #' \verb{0 } no deterministics;
 #'
@@ -26,8 +25,8 @@
 #'
 #' \verb{2 } intercept and trend.
 #'
-#' If \code{union = FALSE}, the default is adding an intercept (a warning is given).
-#' @param detr String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
+#' The default is adding an intercept.
+#' @param detr String vector indicating the type of detrending to be performed. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
 #' @param ic_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
@@ -40,13 +39,11 @@
 #' @return A list with the following components
 #' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-#' For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
+#' The output is arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
 #' @section Warnings:
 #' The function may give the following warnings.
 #' \describe{
 #' \item{\code{Warning: Missing values cause resampling bootstrap to be executed for each time series individually.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used directly, as they create holes (internal missings) in the bootstrap samples. These bootstrap methods are therefore not applied jointly as usual, but individually to each series.}
-#' \item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
-#' \item{\code{Warning: Detrending method in argument detr is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
 #' }
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
@@ -71,19 +68,16 @@
 #' verbose = TRUE)
 #' @export
 boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
-                     ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL,
-                     ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE,
+                     ar_AWB = NULL, p_min = 0, p_max = NULL,
+                     ic = "MAIC", dc = 1, detr = "OLS", ic_scale = TRUE,
                      verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
   
-  .Deprecated("boot_adf")
-  
   inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
-                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = FALSE,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress,
-                                   do_parallel = do_parallel, nc = nc)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
   if (!is.null(colnames(y))) {
     var_names <- colnames(y)
@@ -91,41 +85,7 @@ boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
     var_names <- paste0("Variable ", 1:NCOL(y))
   }
   
-  if (union) { # Union Tests
-    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
-                        level = inputs$level)
-    rej_H0 <- (iADFout[, 2] < level)
-    colnames(iADFout) <- c("test statistic", "p-value")
-    rownames(iADFout) <- var_names
-    
-    if (verbose) {
-      p_hat <- sum(rej_H0)
-      if (NCOL(y) > 1) {
-        if (p_hat > 1) {
-          cat(paste("There are ", p_hat, " stationary time series, namely: ",
-                    paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
-        } else {
-          if (p_hat == 1) {
-            cat(paste("There is ", p_hat, " stationary time series, namely: ",
-                      paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
-          } else {
-            cat(paste("There are ", p_hat, " stationary time series.\n", sep = ""))
-          }
-        }
-        print(iADFout)
-      } else {
-        cat("Bootstrap Union Test:\n")
-        if (rej_H0) {
-          cat(paste("The null hypothesis of a unit root is rejected at a significance
-                    level of ", level, ".\n", sep = ""))
-        } else {
-          cat(paste("The null hypothesis of a unit root is not rejected at a significance
-                    level of ", level, ".\n", sep = ""))
-        }
-        print(iADFout[1, ])
-      }
-    }
-  } else { # No Union Tests
+    # No Union Tests
     detr_names <- rep(NA, length(inputs$detr))
     detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
     detr_names[inputs$detr=="QD"] <- c("detr = QD")
@@ -169,6 +129,6 @@ boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
         }
       }
     }
-  }
+
   return(list(rej_H0 = rej_H0, ADF_tests = iADFout))
 }

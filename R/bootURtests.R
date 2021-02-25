@@ -309,6 +309,7 @@ boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB
 #' @description Controls for multiple testing by controlling the false discovery rate (FDR), see Moon and Perron (2012) and Romano, Shaikh and Wolf (2008).
 #' @inheritParams boot_adf
 #' @param level Desired False Discovery Rate level of the unit root tests. Default is 0.05.
+#' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
 #' @details The false discovery rate FDR is defined as the expected proportion of false rejections relative to the total number of rejections.
 #'
 #' See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag selection.
@@ -442,6 +443,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB 
 #' @description Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).
 #' @inheritParams boot_adf
 #' @param q Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.
+#' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
 #' @details The parameter \code{q} can either be set as an increasing sequence of integers smaller or equal to the number of series \code{N}, or fractions of the total number of series (quantiles). For \code{N} time series, setting \code{q = 0:N} means each unit should be tested sequentially. In this case the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate. To split the series in \code{K} equally sized groups, use \code{q = 0:K / K}.
 #'
 #' By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. If the initial \code{0} or final value (\code{1} or \code{N}) are omitted, they are automatically added by the function.
@@ -577,6 +579,7 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
 #' Panel Unit Root Test
 #' @description Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
 #' @inheritParams boot_adf
+#' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
 #' @export
 #' @details See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag selection.
 #'
