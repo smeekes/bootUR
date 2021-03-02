@@ -29,7 +29,7 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
                                    p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress,
                                    do_parallel, nc){
   y <- as.matrix(y)
-
+  
   # Check correctness arguments and perform initial calculations and transformations
   inputs <- check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, level = level, boot = boot,
                B = B, l = l, ar_AWB = ar_AWB, union = union, p_min = p_min, p_max = p_max, ic = ic,
@@ -180,7 +180,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   # Bootstrap Union Tests: Settings
   if (union) {
     if (!is.null(dc)) {
-      warning("Deterministic specification in argument dc is ignored, as union test is applied.")
+      warning("Deterministic specification in argument deterministics is ignored, as union test is applied.")
     }
     if (!is.null(detr)) {
       warning("Detrending method in argument detr is ignored, as union test is applied.")
@@ -191,11 +191,14 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   } else {
     if (is.null(dc)) {
       stop("No deterministic specification set.
-           Set dc to 0, 1 or 2, or set union to TRUE for union test.")
+           Set deterministics to 0, 1 and/or 2, or set union to TRUE for union test.")
+      # stop("No deterministic specification set.
+      #      Set deterministics to the strings none, intercept or trend, or set union to TRUE for union test.")
     } else if (any(!is.element(dc, 0:2))){
-      stop("The argument dc should only contain values 0, 1, and/or 2:
-           (0: no deterministics, 1: intercept, 2: intercept and trend)")
+      stop("The argument deterministics should only contain 0, 1 and/or 2:
+           (0: no deterministics, 1: intercept only, 2: intercept and trend)")
     }
+    # dc <- 0*(dc=="none") + 1*(dc=="intercept") + 2*(dc=="trend")
     dc <- sort(dc)
     dc_boot <- max(dc)
     if (is.null(detr)) {

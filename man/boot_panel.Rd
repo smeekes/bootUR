@@ -4,13 +4,14 @@
 \alias{boot_panel}
 \title{Panel Unit Root Test}
 \usage{
-boot_panel(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
-  ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC",
-  dc = NULL, detr = NULL, ic_scale = TRUE, verbose = FALSE,
-  show_progress = FALSE, do_parallel = FALSE, nc = NULL)
+boot_panel(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
+  ar_AWB = NULL, union = TRUE, min.lag = 0, max.lag = NULL,
+  ic = "MAIC", deterministics = NULL, detr = NULL, ic_scale = TRUE,
+  verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
+  nc = NULL)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
+\item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
@@ -32,19 +33,19 @@ boot_panel(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \item{union}{Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.}
 
-\item{p_min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+\item{min.lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{p_max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+\item{max.lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Options are (combinations of)
+\item{deterministics}{Numeric vector indicating the deterministic specification. Options are (combinations of)
 
-\verb{0 } no deterministics;
+\verb{none} no deterministics;
 
-\verb{1 } intercept only;
+\verb{intercept} intercept only;
 
-\verb{2 } intercept and trend.
+\verb{trend} intercept and trend.
 
 The default is adding an intercept.}
 
@@ -61,7 +62,7 @@ The default is adding an intercept.}
 \item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \value{
-For the union test (\code{union = TRUE}), the test statistic and p-value are returned. If \code{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\code{dc}) and detrending method (\code{detr}).
+For the union test (\code{union = TRUE}), the test statistic and p-value are returned. If \code{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\code{deterministics}) and detrending method (\code{detr}).
 }
 \description{
 Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).
@@ -72,9 +73,9 @@ See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag select
 \section{Errors and warnings}{
 
 \describe{
-\item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
+\item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
 \item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
-\item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
+\item{\code{Warning: Deterministic specification in argument deterministics is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 \item{\code{Warning: Detrending method in argument detr is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
 }
 }

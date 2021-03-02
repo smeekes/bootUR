@@ -4,13 +4,14 @@
 \alias{boot_adf}
 \title{Bootstrap augmented Dickey-Fuller Unit Root Tests without multiple testing control}
 \usage{
-boot_adf(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
-  ar_AWB = NULL, p_min = 0, p_max = NULL, ic = "MAIC", dc = 1,
-  detr = "OLS", ic_scale = TRUE, verbose = FALSE,
-  show_progress = FALSE, do_parallel = FALSE, nc = NULL)
+boot_adf(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
+  ar_AWB = NULL, min.lag = 0, max.lag = NULL, ic = "MAIC",
+  deterministics = "intercept", detr = "OLS", ic_scale = TRUE,
+  verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
+  nc = NULL)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
+\item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
@@ -30,19 +31,19 @@ boot_adf(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
 
-\item{p_min}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+\item{min.lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{p_max}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+\item{max.lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Options are (combinations of)
+\item{deterministics}{Numeric vector indicating the deterministic specification. Options are (combinations of)
 
-\verb{0 } no deterministics;
+\verb{none} no deterministics;
 
-\verb{1 } intercept only;
+\verb{intercept} intercept only;
 
-\verb{2 } intercept and trend.
+\verb{trend} intercept and trend.
 
 The default is adding an intercept.}
 
@@ -62,21 +63,21 @@ The default is adding an intercept.}
 A list with the following components
 \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-The output is arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
+The output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detr}).
 }
 \description{
 This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series or on each time series individually in case multiple time series are provided.
 }
 \details{
-The options encompass many test proposed in the literature. \code{dc = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{dc = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
+The options encompass many test proposed in the literature. \code{detr = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{detr = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 
-Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `p_min` and maximum lag length `p_max` for the selection algorithm equal to the desired lag length.
+Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min.lag` and maximum lag length `max.lag` for the selection algorithm equal to the desired lag length.
 }
 \section{Warnings}{
 
 The function may give the following warnings.
 \describe{
-\item{\code{Warning: Missing values cause resampling bootstrap to be executed for each time series individually.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used directly, as they create holes (internal missings) in the bootstrap samples. These bootstrap methods are therefore not applied jointly as usual, but individually to each series.}
+\item{\code{Warning: Missing values cause resampling bootstrap to be executed for each time series individually.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used directly, as they create holes (internal missings) in the bootstrap samples. These bootstrap methods are therefore not applied jointly as usual, but individually to each series.}
 }
 }
 

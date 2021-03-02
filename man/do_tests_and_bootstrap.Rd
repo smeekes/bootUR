@@ -9,8 +9,6 @@ do_tests_and_bootstrap(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB,
   do_parallel, nc)
 }
 \arguments{
-\item{y}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
-
 \item{BSQT_test}{Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).}
 
 \item{iADF_test}{Logical indicator whether or not to perform the individual ADF Tests (\verb{TRUE}) or not (\verb{FALSE}).}
