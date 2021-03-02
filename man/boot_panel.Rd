@@ -6,9 +6,9 @@
 \usage{
 boot_panel(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
   ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
-  ic = "MAIC", deterministics = NULL, detr = NULL, ic_scale = TRUE,
-  verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
-  nc = NULL)
+  criterion = "MAIC", deterministics = NULL, detr = NULL,
+  criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+  do_parallel = FALSE, nc = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -37,7 +37,7 @@ boot_panel(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
-\item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
+\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
 \item{deterministics}{Numeric vector indicating the deterministic specification. Options are (combinations of)
 
@@ -51,7 +51,7 @@ The default is adding an intercept.}
 
 \item{detr}{String vector indicating the type of detrending to be performed. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
-\item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+\item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{verbose}{Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.}
 

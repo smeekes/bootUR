@@ -16,7 +16,7 @@
 #' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.
 #' @param min_lag Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
 #' @param max_lag Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
-#' @param ic String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).
+#' @param criterion String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).
 #' @param deterministics Numeric vector indicating the deterministic specification. Options are (combinations of)
 #'
 #' \verb{none} no deterministics;
@@ -27,7 +27,7 @@
 #'
 #' The default is adding an intercept.
 #' @param detr String vector indicating the type of detrending to be performed. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
-#' @param ic_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
+#' @param criterion_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
 #' @param do_parallel Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
@@ -69,7 +69,7 @@
 #' @export
 boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
                      ar_AWB = NULL, min_lag = 0, max_lag = NULL,
-                     ic = "MAIC", deterministics = "intercept", detr = "OLS", ic_scale = TRUE,
+                     criterion = "MAIC", deterministics = "intercept", detr = "OLS", criterion_scale = TRUE,
                      verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
   
@@ -86,8 +86,8 @@ boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = TRUE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = FALSE,
-                                   p_min = min_lag, p_max = max_lag, ic = ic, dc = deterministics, detr = detr,
-                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1,
+                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detr,
+                                   ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
   if (!is.null(colnames(data))) {
@@ -182,7 +182,7 @@ boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
 boot_union <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
-                       min_lag = 0, max_lag = NULL, ic = "MAIC", ic_scale = TRUE, verbose = FALSE,
+                       min_lag = 0, max_lag = NULL, criterion = "MAIC", criterion_scale = TRUE, verbose = FALSE,
                        show_progress = FALSE, do_parallel = FALSE, nc = NULL){
   
   if (verbose) {
@@ -191,8 +191,8 @@ boot_union <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = TRUE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = TRUE,
-                                   p_min = min_lag, p_max = max_lag, ic = ic, dc = NULL, detr = NULL,
-                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1,
+                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = NULL, detr = NULL,
+                                   ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
   if (!is.null(colnames(data))) {
@@ -284,8 +284,8 @@ boot_union <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_
 #' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 #' @export
 boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
-                     union = TRUE, min_lag = 0, max_lag = NULL, ic = "MAIC", deterministics = NULL,
-                     detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+                     union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL,
+                     detr = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
   
   # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
@@ -301,8 +301,8 @@ boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_A
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
-                                   p_min = min_lag, p_max = max_lag, ic = ic, dc = deterministics, detr = detr,
-                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1,
+                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detr,
+                                   ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
   if (!is.null(colnames(data))) {
@@ -432,8 +432,8 @@ boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_A
 #' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
 #' @export
 boot_sqt <- function(data, q = 0:NCOL(data), level = 0.05,  boot = "AWB", B = 1999, l = NULL,
-                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, ic = "MAIC", deterministics = NULL,
-                     detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL,
+                     detr = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
   
   # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
@@ -449,8 +449,8 @@ boot_sqt <- function(data, q = 0:NCOL(data), level = 0.05,  boot = "AWB", B = 19
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = TRUE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
-                                   p_min = min_lag, p_max = max_lag, ic = ic, dc = deterministics, detr = detr,
-                                   ic_scale = ic_scale, q = q, h_rs = 0.1,
+                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detr,
+                                   ic_scale = criterion_scale, q = q, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
   if (!is.null(colnames(data))) {
@@ -570,8 +570,8 @@ boot_sqt <- function(data, q = 0:NCOL(data), level = 0.05,  boot = "AWB", B = 19
 #' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
 #' @export
 boot_panel <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
-                      union = TRUE, min_lag = 0, max_lag = NULL, ic = "MAIC", deterministics = NULL, detr = NULL,
-                      ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
+                      union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL, detr = NULL,
+                      criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                       do_parallel = FALSE, nc = NULL){
   
   # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
@@ -587,8 +587,8 @@ boot_panel <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
-                                   p_min = min_lag, p_max = max_lag, ic = ic, dc = deterministics, detr = detr,
-                                   ic_scale = ic_scale, q = NULL, h_rs = 0.1,
+                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detr,
+                                   ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
   if (union) { # Union Tests
