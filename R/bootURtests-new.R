@@ -1,6 +1,6 @@
 #' Bootstrap augmented Dickey-Fuller Unit Root Tests without multiple testing control
 #' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series or on each time series individually in case multiple time series are provided.
-#' @param y A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.
+#' @param data A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.
 #' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param boot String for bootstrap method to be used. Options are
 #' \describe{
@@ -43,7 +43,7 @@
 #' @section Warnings:
 #' The function may give the following warnings.
 #' \describe{
-#' \item{\code{Warning: Missing values cause resampling bootstrap to be executed for each time series individually.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used directly, as they create holes (internal missings) in the bootstrap samples. These bootstrap methods are therefore not applied jointly as usual, but individually to each series.}
+#' \item{\code{Warning: Missing values cause resampling bootstrap to be executed for each time series individually.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used directly, as they create holes (internal missings) in the bootstrap samples. These bootstrap methods are therefore not applied jointly as usual, but individually to each series.}
 #' }
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
@@ -67,22 +67,22 @@
 #' two_series_boot_adf <- boot_adf(MacroTS[, 1:2], boot = "MBB", B = 399,
 #' verbose = TRUE)
 #' @export
-boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
+boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
                      ar_AWB = NULL, p_min = 0, p_max = NULL,
                      ic = "MAIC", dc = 1, detr = "OLS", ic_scale = TRUE,
                      verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
+  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = TRUE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = FALSE,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
-  if (!is.null(colnames(y))) {
-    var_names <- colnames(y)
+  if (!is.null(colnames(data))) {
+    var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(y))
+    var_names <- paste0("Variable ", 1:NCOL(data))
   }
   
     # No Union Tests
@@ -97,9 +97,9 @@ boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
     
     detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
                            rep(dc_names, length(inputs$detr)), sep = "")
-    iADFout <- array(NA, c(NCOL(y), 2, length(detr_dc_names)), dimnames =
+    iADFout <- array(NA, c(NCOL(data), 2, length(detr_dc_names)), dimnames =
                        list(var_names, c("test statistic", "p-value"), detr_dc_names))
-    rej_H0 <- array(NA, c(NCOL(y), length(inputs$dc)*length(inputs$detr)), dimnames =
+    rej_H0 <- array(NA, c(NCOL(data), length(inputs$dc)*length(inputs$detr)), dimnames =
                       list(var_names, detr_dc_names))
     for(i in 1:nrow(inputs$tests_i)){
       iADFout[, , i] <- iADF_cpp(test_i = matrix(inputs$tests_i[i, ], nrow = 1),
@@ -110,7 +110,7 @@ boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
       if (verbose) {
         cat(paste(c(rep("-", 40), "\n"), sep = "", collapse = ""))
         cat(paste("Type of unit root test performed: ", detr_dc_names[i], "\n", sep = ""))
-        if (NCOL(y) > 1) {
+        if (NCOL(data) > 1) {
           p_hat <- sum(rej_H0[, i])
           if (p_hat > 1) {
             cat(paste("There are ", p_hat, " stationary time series, namely: ",
@@ -170,7 +170,7 @@ boot_adf <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 #' @examples
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
-boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_union <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
                        p_min = 0, p_max = NULL, ic = "MAIC", ic_scale = TRUE, verbose = FALSE,
                        show_progress = FALSE, do_parallel = FALSE, nc = NULL){
   
@@ -178,16 +178,16 @@ boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB
     cat("Bootstrap Test with", boot, "bootstrap method.\n")
   }
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
+  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = TRUE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = TRUE,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = NULL, detr = NULL,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
-  if (!is.null(colnames(y))) {
-    var_names <- colnames(y)
+  if (!is.null(colnames(data))) {
+    var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(y))
+    var_names <- paste0("Variable ", 1:NCOL(data))
   }
   
   # Union Tests
@@ -199,7 +199,7 @@ boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB
     
     if (verbose) {
       p_hat <- sum(rej_H0)
-      if (NCOL(y) > 1) {
+      if (NCOL(data) > 1) {
         if (p_hat > 1) {
           cat(paste("There are ", p_hat, " stationary time series, namely: ",
                     paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
@@ -242,7 +242,7 @@ boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB
 #' For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
 #' @section Errors and warnings:
 #' \describe{
-#' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
+#' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
 #' \item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
 #' \item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 #' \item{\code{Warning: Detrending method in argument detr is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
@@ -272,27 +272,27 @@ boot_union <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB
 #' # boot_fdr on GDP_BE and GDP_DE
 #' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
 #' @export
-boot_fdr <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
                      union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
                      detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
-  if (!is.null(colnames(y))) {
-    var_names <- colnames(y)
+  if (!is.null(colnames(data))) {
+    var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(y))
+    var_names <- paste0("Variable ", 1:NCOL(data))
   }
   
   if (union) { # Union Tests
     bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
                        level = inputs$level)
-    rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(y))
+    rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
     FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
     
     rownames(rej_H0) <- var_names
@@ -327,7 +327,7 @@ boot_fdr <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB 
     
     detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
                            rep(dc_names, length(inputs$detr)), sep = "")
-    rej_H0 <- matrix(nrow = NCOL(y), ncol = length(inputs$dc)*length(inputs$detr))
+    rej_H0 <- matrix(nrow = NCOL(data), ncol = length(inputs$dc)*length(inputs$detr))
     rownames(rej_H0) <- var_names
     colnames(rej_H0) <- detr_dc_names
     FDR_seq <- vector("list", length(inputs$dc)*length(inputs$detr))
@@ -378,7 +378,7 @@ boot_fdr <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB 
 #' For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{dc}) and detrending method (\code{detr}).
 #' @section Errors and warnings:
 #' \describe{
-#' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
+#' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
 #' \item{\code{Error: Invalid input values for q: must be quantiles or positive integers.}}{Construction of \code{q} does not satisfy the criteria listed under 'Details'.}
 #' \item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
 #' \item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
@@ -409,27 +409,27 @@ boot_fdr <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB 
 #' # boot_sqt on GDP_BE and GDP_DE
 #' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
 #' @export
-boot_sqt <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l = NULL,
+boot_sqt <- function(data, q = 0:NCOL(data), level = 0.05,  boot = "AWB", B = 1999, l = NULL,
                      ar_AWB = NULL, union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL,
                      detr = NULL, ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, nc = NULL){
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = TRUE, iADF_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = TRUE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = q, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel, nc = nc)
   
-  if (!is.null(colnames(y))) {
-    var_names <- colnames(y)
+  if (!is.null(colnames(data))) {
+    var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(y))
+    var_names <- paste0("Variable ", 1:NCOL(data))
   }
   
   if (union) { # Union Tests
     BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = inputs$test_stats, t_star =
                           inputs$test_stats_star, level = inputs$level)
-    rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(y))
+    rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
     BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
     
     rownames(rej_H0) <- var_names
@@ -465,7 +465,7 @@ boot_sqt <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
     
     detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
                            rep(dc_names, length(inputs$detr)), sep = "")
-    rej_H0 <- matrix(nrow = NCOL(y), ncol = length(inputs$dc)*length(inputs$detr))
+    rej_H0 <- matrix(nrow = NCOL(data), ncol = length(inputs$dc)*length(inputs$detr))
     rownames(rej_H0) <- var_names
     colnames(rej_H0) <- detr_dc_names
     BSQT_seq <- vector("list", length(inputs$dc)*length(inputs$detr))
@@ -507,7 +507,7 @@ boot_sqt <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
 #'
 #' @section Errors and warnings:
 #' \describe{
-#' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{y} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
+#' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
 #' \item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
 #' \item{\code{Warning: Deterministic specification in argument dc is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 #' \item{\code{Warning: Detrending method in argument detr is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
@@ -536,12 +536,12 @@ boot_sqt <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
 #' # boot_panel on GDP_BE and GDP_DE
 #' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
 #' @export
-boot_panel <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_panel <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
                       union = TRUE, p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL,
                       ic_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                       do_parallel = FALSE, nc = NULL){
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
