@@ -5,7 +5,7 @@
 \title{Panel Unit Root Test}
 \usage{
 boot_panel(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
-  ar_AWB = NULL, union = TRUE, min.lag = 0, max.lag = NULL,
+  ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
   ic = "MAIC", deterministics = NULL, detr = NULL, ic_scale = TRUE,
   verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
   nc = NULL)
@@ -33,9 +33,9 @@ boot_panel(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \item{union}{Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.}
 
-\item{min.lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{max.lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
 
 \item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
