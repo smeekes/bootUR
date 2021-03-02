@@ -6,7 +6,7 @@
 \usage{
 boot_adf(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
   ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-  deterministics = "intercept", detr = "OLS", criterion_scale = TRUE,
+  deterministics = "intercept", detrend = "OLS", criterion_scale = TRUE,
   verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
   nc = NULL)
 }
@@ -47,7 +47,7 @@ boot_adf(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 The default is adding an intercept.}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
+\item{detrend}{String vector indicating the type of detrending to be performed. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
@@ -63,13 +63,13 @@ The default is adding an intercept.}
 A list with the following components
 \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-The output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detr}).
+The output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
 }
 \description{
 This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series or on each time series individually in case multiple time series are provided.
 }
 \details{
-The options encompass many test proposed in the literature. \code{detr = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{detr = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
+The options encompass many test proposed in the literature. \code{detrend = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{detrend = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 
 Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 }
