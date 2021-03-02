@@ -23,6 +23,7 @@
 #' @param ic_scale Logical indicator whether or not to use the rescaled information criteria (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param q Numeric vector of quantiles to be tested. Default is to test each unit sequentially.
 #' @param h_rs Bandwidth used in rescaled information criteria.
+#' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
 do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
@@ -117,6 +118,7 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
 #' @param ic_scale Logical indicator whether or not to use the rescaled information criteria (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param q Numeric vector of quantiles to be tested. Default is to test each unit sequentially.
 #' @param h_rs Bandwidth used in rescaled information criteria.
+#' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
 check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,

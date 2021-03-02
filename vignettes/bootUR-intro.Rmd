@@ -97,9 +97,9 @@ adf_out <- boot_df(GDP_NL, B = 399, boot = "SB", dc = 2, detr = c("OLS", "QD"), 
 ### Union of Rejections Test
 Use `boot_union()` for a test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012). The advantage of the union test is that you don't have to specify these (rather influential) specification tests. This makes the union test a safe option for quick or automatic unit root testing where careful manual specification setup is not viable. Here we illustrate it with the sieve wild bootstrap as proposed by Smeekes and Taylor (2012).
 
-```{r union}
-union_out <- boot_union(GDP_NL, B = 399, boot = "SWB", verbose = TRUE)
-```
+# ```{r union}
+# union_out <- boot_union(GDP_NL, B = 399, boot = "SWB", verbose = TRUE)
+# ```
 
 ## Panel Unit Root Test
 The function `panel_test` performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. A rejection is typically interpreted as evidence that a 'significant proportion' of the series is stationary, although how large that proportion is - or which series are stationary - is not given by the test. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).

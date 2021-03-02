@@ -2,7 +2,7 @@
 #' @description This function performs a standard augmented Dickey-Fuller bootstrap unit root test on a single time series or on each time series individually in case multiple time series are provided.
 #' @param data A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.
 #' @param level Desired significance level of the unit root test. Default is 0.05.
-#' @param boot String for bootstrap method to be used. Options are
+#' @param bootstrap String for bootstrap method to be used. Options are
 #' \describe{
 #' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 #' \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
@@ -12,8 +12,8 @@
 #' \item{\code{"SWB"}}{Sieve wild boostrap (Cavaliere and Taylor, 2009; Smeekes and Taylor, 2012).}
 #' }
 #' @param B Number of bootstrap replications. Default is 1999.
-#' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).
-#' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.
+#' @param block_length Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).
+#' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\code{bootstrap = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length.
 #' @param min_lag Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
 #' @param max_lag Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
 #' @param criterion String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).
@@ -31,7 +31,7 @@
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
 #' @param do_parallel Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
-#' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
+#' @param cores The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @details The options encompass many test proposed in the literature. \code{detrend = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{detrend = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
@@ -64,14 +64,14 @@
 #' @references Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
 #' @examples
 #' # boot_adf on GDP_BE and GDP_DE
-#' two_series_boot_adf <- boot_adf(MacroTS[, 1:2], boot = "MBB", B = 399,
+#' two_series_boot_adf <- boot_adf(MacroTS[, 1:2], bootstrap = "MBB", B = 399,
 #' verbose = TRUE)
 #' @export
-boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
+boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL,
                      ar_AWB = NULL, min_lag = 0, max_lag = NULL,
                      criterion = "MAIC", deterministics = "intercept", detrend = "OLS", criterion_scale = TRUE,
                      verbose = FALSE, show_progress = FALSE,
-                     do_parallel = FALSE, nc = NULL){
+                     do_parallel = FALSE, cores = NULL){
   
   # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
   # Putting this now already in check_inputs would mean the old functions don't work anymore
@@ -85,10 +85,10 @@ boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
   }
 
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = TRUE, level = level,
-                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = FALSE,
+                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = FALSE,
                                    p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
                                    ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
   
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -148,7 +148,7 @@ boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 #' Bootstrap Union Test for Unit Roots
 #' @description Performs bootstrap unit root tests based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Harvey, Leybourne and Taylor, 2012; Smeekes and Taylor, 2012).
 #' @inheritParams boot_adf
-#' @param boot String for bootstrap method to be used. Options are
+#' @param bootstrap String for bootstrap method to be used. Options are
 #' \describe{
 #' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 #' \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
@@ -181,19 +181,19 @@ boot_adf <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 #' @examples
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
-boot_union <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL, ar_AWB = NULL,
                        min_lag = 0, max_lag = NULL, criterion = "MAIC", criterion_scale = TRUE, verbose = FALSE,
-                       show_progress = FALSE, do_parallel = FALSE, nc = NULL){
+                       show_progress = FALSE, do_parallel = FALSE, cores = NULL){
   
   if (verbose) {
-    cat("Bootstrap Test with", boot, "bootstrap method.\n")
+    cat("Bootstrap Test with", bootstrap, "bootstrap method.\n")
   }
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = TRUE, level = level,
-                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = TRUE,
-                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = NULL, detrend = NULL,
+                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = TRUE,
+                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = NULL, detr = NULL,
                                    ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
   
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -281,12 +281,12 @@ boot_union <- function(data, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # boot_fdr on GDP_BE and GDP_DE
-#' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+#' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], bootstrap = "MBB", B = 399,  verbose = TRUE)
 #' @export
-boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL, ar_AWB = NULL,
                      union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL,
                      detrend = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
-                     do_parallel = FALSE, nc = NULL){
+                     do_parallel = FALSE, cores = NULL){
   
   # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
   # Putting this now already in check_inputs would mean the old functions don't work anymore
@@ -300,10 +300,10 @@ boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_A
   }
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
-                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = union,
                                    p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
                                    ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
   
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -387,9 +387,9 @@ boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_A
 #' Bootstrap Sequential Quantile Test
 #' @description Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).
 #' @inheritParams boot_adf
-#' @param q Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.
+#' @param steps Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.
 #' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
-#' @details The parameter \code{q} can either be set as an increasing sequence of integers smaller or equal to the number of series \code{N}, or fractions of the total number of series (quantiles). For \code{N} time series, setting \code{q = 0:N} means each unit should be tested sequentially. In this case the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate. To split the series in \code{K} equally sized groups, use \code{q = 0:K / K}.
+#' @details The parameter \code{steps} can either be set as an increasing sequence of integers smaller or equal to the number of series \code{N}, or fractions of the total number of series (quantiles). For \code{N} time series, setting \code{steps = 0:N} means each unit should be tested sequentially. In this case the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate. To split the series in \code{K} equally sized groups, use \code{steps = 0:K / K}.
 #'
 #' By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. If the initial \code{0} or final value (\code{1} or \code{N}) are omitted, they are automatically added by the function.
 #'
@@ -401,7 +401,7 @@ boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_A
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
-#' \item{\code{Error: Invalid input values for q: must be quantiles or positive integers.}}{Construction of \code{q} does not satisfy the criteria listed under 'Details'.}
+#' \item{\code{Error: Invalid input values for steps: must be quantiles or positive integers.}}{Construction of \code{steps} does not satisfy the criteria listed under 'Details'.}
 #' \item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
 #' \item{\code{Warning: Deterministic specification in argument deterministics is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 #' \item{\code{Warning: Detrending method in argument detrend is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
@@ -429,12 +429,12 @@ boot_fdr <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_A
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # boot_sqt on GDP_BE and GDP_DE
-#' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+#' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399,  verbose = TRUE)
 #' @export
-boot_sqt <- function(data, q = 0:NCOL(data), level = 0.05,  boot = "AWB", B = 1999, l = NULL,
+boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL,
                      ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL,
                      detrend = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
-                     do_parallel = FALSE, nc = NULL){
+                     do_parallel = FALSE, cores = NULL){
   
   # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
   # Putting this now already in check_inputs would mean the old functions don't work anymore
@@ -448,10 +448,10 @@ boot_sqt <- function(data, q = 0:NCOL(data), level = 0.05,  boot = "AWB", B = 19
   }
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = TRUE, iADF_test = FALSE, level = level,
-                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = union,
                                    p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
-                                   ic_scale = criterion_scale, q = q, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
+                                   ic_scale = criterion_scale, q = steps, h_rs = 0.1,
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
   
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -567,12 +567,12 @@ boot_sqt <- function(data, q = 0:NCOL(data), level = 0.05,  boot = "AWB", B = 19
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # boot_panel on GDP_BE and GDP_DE
-#' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+#' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 399,  verbose = TRUE)
 #' @export
-boot_panel <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
+boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL, ar_AWB = NULL,
                       union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL, detrend = NULL,
                       criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
-                      do_parallel = FALSE, nc = NULL){
+                      do_parallel = FALSE, cores = NULL){
   
   # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
   # Putting this now already in check_inputs would mean the old functions don't work anymore
@@ -586,10 +586,10 @@ boot_panel <- function(data, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar
   }
   
   inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
-                                   boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
+                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = union,
                                    p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
                                    ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = nc)
+                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
   
   if (union) { # Union Tests
     GM_test <- mean(inputs$test_stats)

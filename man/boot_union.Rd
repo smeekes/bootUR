@@ -4,17 +4,17 @@
 \alias{boot_union}
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
-boot_union(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
-  ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-  criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
-  do_parallel = FALSE, nc = NULL)
+boot_union(data, level = 0.05, bootstrap = "AWB", B = 1999,
+  block_length = NULL, ar_AWB = NULL, min_lag = 0, max_lag = NULL,
+  criterion = "MAIC", criterion_scale = TRUE, verbose = FALSE,
+  show_progress = FALSE, do_parallel = FALSE, cores = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
-\item{boot}{String for bootstrap method to be used. Options are
+\item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
 \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
@@ -26,9 +26,9 @@ boot_union(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \item{B}{Number of bootstrap replications. Default is 1999.}
 
-\item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
+\item{block_length}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
 
-\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
+\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{bootstrap = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length.}
 
 \item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
@@ -44,7 +44,7 @@ boot_union(data, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
 \item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
 
-\item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
+\item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \value{
 Value of the union test statistic and the bootstrap p-values.

@@ -6,16 +6,16 @@ context("Test inputs of boot functions")
 #   expect_error(boot_union(y, level = 0.1, B = 19))
 # })
 
-test_that("Missing values in sample", {
-  y <- matrix(rnorm(10 * 5), nrow = 10, ncol = 5)
-  y[5, 1] <- NA
-  expect_error(boot_df(y[, 1], level = 0.1, B = 19), "Missing values detected inside sample.")
-  expect_error(boot_union(y[, 1], level = 0.1, B = 19), "Missing values detected inside sample.")
-  expect_error(iADFtest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
-  expect_error(bFDRtest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
-  expect_error(BSQTtest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
-  expect_error(paneltest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
-})
+# test_that("Missing values in sample", {
+#   y <- matrix(rnorm(10 * 5), nrow = 10, ncol = 5)
+#   y[5, 1] <- NA
+#   expect_error(boot_df(y[, 1], level = 0.1, B = 19), "Missing values detected inside sample.")
+#   expect_error(boot_union(y[, 1], level = 0.1, B = 19), "Missing values detected inside sample.")
+#   expect_error(iADFtest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
+#   expect_error(bFDRtest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
+#   expect_error(BSQTtest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
+#   expect_error(paneltest(y, level = 0.1, B = 19), "Missing values detected inside sample.")
+# })
 
 test_that("Unbalanced Panels", {
   y <- matrix(rnorm(30 * 5), nrow = 30, ncol = 5)

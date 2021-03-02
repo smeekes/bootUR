@@ -4,20 +4,21 @@
 \alias{boot_sqt}
 \title{Bootstrap Sequential Quantile Test}
 \usage{
-boot_sqt(data, q = 0:NCOL(data), level = 0.05, boot = "AWB", B = 1999,
-  l = NULL, ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
-  criterion = "MAIC", deterministics = NULL, detrend = NULL,
-  criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
-  do_parallel = FALSE, nc = NULL)
+boot_sqt(data, steps = 0:NCOL(data), level = 0.05, bootstrap = "AWB",
+  B = 1999, block_length = NULL, ar_AWB = NULL, union = TRUE,
+  min_lag = 0, max_lag = NULL, criterion = "MAIC",
+  deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
+  verbose = FALSE, show_progress = FALSE, do_parallel = FALSE,
+  cores = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
-\item{q}{Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.}
+\item{steps}{Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.}
 
 \item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
-\item{boot}{String for bootstrap method to be used. Options are
+\item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
 \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
@@ -29,9 +30,9 @@ boot_sqt(data, q = 0:NCOL(data), level = 0.05, boot = "AWB", B = 1999,
 
 \item{B}{Number of bootstrap replications. Default is 1999.}
 
-\item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
+\item{block_length}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
 
-\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
+\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{bootstrap = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length.}
 
 \item{union}{Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.}
 
@@ -61,7 +62,7 @@ The default is adding an intercept.}
 
 \item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
 
-\item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
+\item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \value{
 A list with the following components
@@ -73,7 +74,7 @@ For the union test (\code{union = TRUE}), the output is arranged per time series
 Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).
 }
 \details{
-The parameter \code{q} can either be set as an increasing sequence of integers smaller or equal to the number of series \code{N}, or fractions of the total number of series (quantiles). For \code{N} time series, setting \code{q = 0:N} means each unit should be tested sequentially. In this case the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate. To split the series in \code{K} equally sized groups, use \code{q = 0:K / K}.
+The parameter \code{steps} can either be set as an increasing sequence of integers smaller or equal to the number of series \code{N}, or fractions of the total number of series (quantiles). For \code{N} time series, setting \code{steps = 0:N} means each unit should be tested sequentially. In this case the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate. To split the series in \code{K} equally sized groups, use \code{steps = 0:K / K}.
 
 By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. If the initial \code{0} or final value (\code{1} or \code{N}) are omitted, they are automatically added by the function.
 
@@ -83,7 +84,7 @@ See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag select
 
 \describe{
 \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
-\item{\code{Error: Invalid input values for q: must be quantiles or positive integers.}}{Construction of \code{q} does not satisfy the criteria listed under 'Details'.}
+\item{\code{Error: Invalid input values for steps: must be quantiles or positive integers.}}{Construction of \code{steps} does not satisfy the criteria listed under 'Details'.}
 \item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
 \item{\code{Warning: Deterministic specification in argument deterministics is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 \item{\code{Warning: Detrending method in argument detrend is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
@@ -92,7 +93,7 @@ See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag select
 
 \examples{
 # boot_sqt on GDP_BE and GDP_DE
-two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399,  verbose = TRUE)
 }
 \references{
 Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
