@@ -30,7 +30,7 @@ boot_sqt(data, steps = 0:NCOL(data), level = 0.05, bootstrap = "AWB",
 
 \item{B}{Number of bootstrap replications. Default is 1999.}
 
-\item{block_length}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
+\item{block_length}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/block_length)} as in Smeekes and Urbain (2014a); this can be overwritten by setting \code{ar_AWB} directly. Default sets the block length as a function of the time series length T, via the rule \eqn{block_length = 1.75 T^(1/3)} of Palm, Smeekes and Urbain (2011).}
 
 \item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{bootstrap = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length.}
 
@@ -42,17 +42,17 @@ boot_sqt(data, steps = 0:NCOL(data), level = 0.05, bootstrap = "AWB",
 
 \item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{deterministics}{Numeric vector indicating the deterministic specification. Options are (combinations of)
+\item{deterministics}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
 
-\verb{none} no deterministics;
+\verb{0 } no deterministics;
 
-\verb{intercept} intercept only;
+\verb{1 } intercept only;
 
-\verb{trend} intercept and trend.
+\verb{2 } intercept and trend.
 
-The default is adding an intercept.}
+If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
-\item{detrend}{String vector indicating the type of detrending to be performed. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
+\item{detrend}{String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
@@ -78,14 +78,14 @@ The parameter \code{steps} can either be set as an increasing sequence of intege
 
 By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. If the initial \code{0} or final value (\code{1} or \code{N}) are omitted, they are automatically added by the function.
 
-See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag selection.
+See \code{\link{boot_ur}} for details on the bootstrap algorithm and lag selection.
 }
 \section{Errors and warnings}{
 
 \describe{
 \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
 \item{\code{Error: Invalid input values for steps: must be quantiles or positive integers.}}{Construction of \code{steps} does not satisfy the criteria listed under 'Details'.}
-\item{\code{Warning: SB and SWB bootstrap only recommended for iADFtest; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
+\item{\code{Warning: SB and SWB bootstrap only recommended for boot_ur; see help for details.}}{Although the sieve bootstrap methods \code{"SB"} and \code{"SWB"} can be used, Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units, and using them for joint or multiple testing is not valid. This warning thereofre serves to recommend the user to consider a different bootstrap method.}
 \item{\code{Warning: Deterministic specification in argument deterministics is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 \item{\code{Warning: Detrending method in argument detrend is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
 }
@@ -135,5 +135,5 @@ Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for m
 Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the sieve bootstrap in time series panels. \emph{Oxford Bulletin of Economics and Statistics}, 76(1), 139-151.
 }
 \seealso{
-\code{\link{iADFtest}}
+\code{\link{boot_ur}}
 }
