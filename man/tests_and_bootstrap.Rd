@@ -4,18 +4,20 @@
 \alias{tests_and_bootstrap}
 \title{Auxiliary Function (not accessible to users) to create all bootstrap statistics used to perform the unit root tests.}
 \usage{
-tests_and_bootstrap(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
-  p_min, p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress, do_parallel,
-  nc)
+tests_and_bootstrap(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
+  block_length, ar_AWB, union, min_lag, max_lag, criterion, deterministics,
+  detrend, criterion_scale, steps, h_rs, show_progress, do_parallel, cores)
 }
 \arguments{
-\item{BSQT_test}{Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).}
+\item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
-\item{iADF_test}{Logical indicator whether or not to perform the individual ADF Tests (\verb{TRUE}) or not (\verb{FALSE}).}
+\item{boot_sqt_test}{Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).}
+
+\item{boot_ur_test}{Logical indicator whether or not to perform the individual ADF Tests (\verb{TRUE}) or not (\verb{FALSE}).}
 
 \item{level}{Desired significance level of the unit root test.}
 
-\item{boot}{String for bootstrap method to be used. Options are
+\item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
 \item{\verb{"MBB"}}{Moving blocks bootstrap;}
 \item{\verb{"BWB"}}{Block wild bootstrap;}
@@ -27,25 +29,25 @@ tests_and_bootstrap(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
 
 \item{B}{Number of bootstrap replications. Default is 1999.}
 
-\item{l}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)}; this can be overwritten by setting \verb{ar_AWB} directly. If NULL, sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.}
+\item{block_length}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/block_length)}; this can be overwritten by setting \verb{ar_AWB} directly. If NULL, sets the block length as a function of the time series length T, via the rule \eqn{block_length = 1.75 T^(1/3)}.}
 
-\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\verb{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.}
+\item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\verb{bootstrap = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length.}
 
 \item{union}{Logical indicator whether or not to use bootstrap union tests (\verb{TRUE}) or not (\verb{FALSE}).}
 
-\item{p_min}{Minimum lag length in the augmented Dickey-Fuller regression.}
+\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression.}
 
-\item{p_max}{Maximum lag length in the augmented Dickey-Fuller regression.}
+\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression.}
 
-\item{ic}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}.}
+\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}.}
 
-\item{dc}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of): \code{0} - no deterministics; \code{1} - intercept only; \code{2} - intercept and trend. If \code{union = FALSE} and \code{NULL}, an intercpet is added.}
+\item{deterministics}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of): \code{0} - no deterministics; \code{1} - intercept only; \code{2} - intercept and trend. If \code{union = FALSE} and \code{NULL}, an intercpet is added.}
 
-\item{detr}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS). If NULL, set to \verb{"OLS"}.}
+\item{detrend}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS). If NULL, set to \verb{"OLS"}.}
 
-\item{ic_scale}{Logical indicator whether or not to use the rescaled information criteria (\verb{TRUE}) or not (\verb{FALSE}).}
+\item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria (\verb{TRUE}) or not (\verb{FALSE}).}
 
-\item{q}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
+\item{steps}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
 
 \item{h_rs}{Bandwidth used in rescaled information criteria.}
 
@@ -53,12 +55,12 @@ tests_and_bootstrap(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
 
 \item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
 
-\item{nc}{The number of cores to be used in the parallel loops. Default is to use all but one.}
+\item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \description{
 Auxiliary Function (not accessible to users) to create all bootstrap statistics used to perform the unit root tests.
 }
 \seealso{
-\code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
+\code{\link{boot_ur}}, \code{\link{boot_sqt}}, \code{\link{boot_fdr}}
 }
 \keyword{internal}

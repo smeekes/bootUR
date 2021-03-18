@@ -77,12 +77,11 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
                     do_parallel = FALSE, cores = NULL){
   
   
-  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = TRUE, level = level,
-                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = union,
-                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
-                                   ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress,
-                                   do_parallel = do_parallel, nc = cores)
+  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = TRUE, level = level,
+                                bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
+                                min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
+                                detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
+                                show_progress = show_progress, do_parallel = do_parallel, cores = cores)
   
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -463,22 +462,11 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
                      detrend = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, cores = NULL){
   
-  # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
-  # Putting this now already in check_inputs would mean the old functions don't work anymore
-  if(!is.null(deterministics)){
-    if(any(!is.element(deterministics, c("none", "intercept", "trend")))){
-      stop("The argument deterministics should only contain the strings none, intercept and/or trend:
-           (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
-    }else{
-      deterministics <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
-    }
-  }
-  
-  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
-                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = union,
-                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
-                                   ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
+  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE, level = level,
+                                bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
+                                min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
+                                detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
+                                show_progress = show_progress, do_parallel = do_parallel, cores = cores)
   
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -611,22 +599,11 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
                      detrend = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, cores = NULL){
   
-  # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
-  # Putting this now already in check_inputs would mean the old functions don't work anymore
-  if(!is.null(deterministics)){
-    if(any(!is.element(deterministics, c("none", "intercept", "trend")))){
-      stop("The argument deterministics should only contain the strings none, intercept and/or trend:
-           (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
-    }else{
-      deterministics <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
-    }
-  }
-  
-  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = TRUE, iADF_test = FALSE, level = level,
-                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = union,
-                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
-                                   ic_scale = criterion_scale, q = steps, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
+  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = TRUE, boot_ur_test = FALSE, level = level,
+                                   bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
+                                   min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
+                                   detrend = detrend, criterion_scale = criterion_scale, steps = steps, h_rs = 0.1,
+                                   show_progress = show_progress, do_parallel = do_parallel, cores = cores)
   
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -749,22 +726,11 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
                       criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                       do_parallel = FALSE, cores = NULL){
   
-  # Note: put this here until the old functions are removed, in later package version to be put in check_inputs
-  # Putting this now already in check_inputs would mean the old functions don't work anymore
-  if(!is.null(deterministics)){
-    if(any(!is.element(deterministics, c("none", "intercept", "trend")))){
-      stop("The argument deterministics should only contain the strings none, intercept and/or trend:
-           (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
-    }else{
-      deterministics <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
-    }
-  }
-  
-  inputs <- do_tests_and_bootstrap(y = data, BSQT_test = FALSE, iADF_test = FALSE, level = level,
-                                   boot = bootstrap, B = B, l = block_length, ar_AWB = ar_AWB, union = union,
-                                   p_min = min_lag, p_max = max_lag, ic = criterion, dc = deterministics, detr = detrend,
-                                   ic_scale = criterion_scale, q = NULL, h_rs = 0.1,
-                                   show_progress = show_progress, do_parallel = do_parallel, nc = cores)
+  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE, level = level,
+                                bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
+                                min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
+                                detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
+                                show_progress = show_progress, do_parallel = do_parallel, cores = cores)
   
   if (union) { # Union Tests
     GM_test <- mean(inputs$test_stats)
