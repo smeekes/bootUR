@@ -1,5 +1,5 @@
 #' Auxiliary Function (not accessible to users) to create all bootstrap statistics used to perform the unit root tests.
-#' @param y A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.
+#' @inheritParams boot_adf
 #' @param BSQT_test Logical indicator whether or not to perform the Bootstrap Quantile Test (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param iADF_test Logical indicator whether or not to perform the individual ADF Tests (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param level Desired significance level of the unit root test.
@@ -12,7 +12,6 @@
 #' \item{\verb{"SB"}}{Sieve bootstrap;}
 #' \item{\verb{"SWB"}}{Sieve wild boostrap.}
 #' }
-#' @param B Number of bootstrap replications. Default is 1999.
 #' @param l Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/l)}; this can be overwritten by setting \verb{ar_AWB} directly. If NULL, sets the block length as a function of the time series length T, via the rule \eqn{l = 1.75 T^(1/3)}.
 #' @param ar_AWB Autoregressive parameter used in the AWB bootstrap method (\verb{boot = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length l.
 #' @param union Logical indicator whether or not to use bootstrap union tests (\verb{TRUE}) or not (\verb{FALSE}).
@@ -24,34 +23,21 @@
 #' @param ic_scale Logical indicator whether or not to use the rescaled information criteria (\verb{TRUE}) or not (\verb{FALSE}).
 #' @param q Numeric vector of quantiles to be tested. Default is to test each unit sequentially.
 #' @param h_rs Bandwidth used in rescaled information criteria.
-#' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
-#' @param do_parallel Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
 #' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
-#' 
-#' @name do_tests_and_bootstrap-deprecated
-#' @usage do_tests_and_bootstrap(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, 
-#' union, p_min, p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress, do_parallel, nc)
-#' @seealso \code{\link{bootUR-deprecated}}
-#' @keywords internal
-NULL
-#' @rdname bootUR-deprecated
-#' @section \code{do_tests_and_bootstrap}:
-#' For \code{do_tests_and_bootstrap}, use \code{\link{tests_and_bootstrap}}.
-#'
-do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
-                                   p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress,
-                                   do_parallel, nc){
+tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
+                                       p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress,
+                                       do_parallel, nc){
   
-  .Deprecated("tests_and_bootstrap")
+
   y <- as.matrix(y)
   
   # Check correctness arguments and perform initial calculations and transformations
-  inputs <- check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, level = level, boot = boot,
-               B = B, l = l, ar_AWB = ar_AWB, union = union, p_min = p_min, p_max = p_max, ic = ic,
-               dc = dc, detr = detr, q = q, do_parallel = do_parallel, nc = nc)
-
+  inputs <- inspect_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, level = level, boot = boot,
+                             B = B, l = l, ar_AWB = ar_AWB, union = union, p_min = p_min, p_max = p_max, ic = ic,
+                             dc = dc, detr = detr, q = q, do_parallel = do_parallel, nc = nc)
+  
   boot <- inputs$boot
   l <- inputs$l
   s_DWB <- inputs$s_DWB
@@ -66,11 +52,11 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
   range_nonmiss <- inputs$range_nonmiss
   joint <- inputs$joint
   nc <- inputs$nc
-
+  
   # Dimensions
   n <- nrow(y)
   N <- ncol(y)
-
+  
   # ADF tests
   panel_est <- adf_panel_bootstrap_dgp_cpp(y = y, pmin = p_min, pmax = p_max, ic = ic,
                                            dc = dc_boot, QD = FALSE, trim = FALSE,
@@ -85,8 +71,8 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
                           range = range_nonmiss, joint = joint, show_progress = show_progress,
                           do_parallel = do_parallel, nc = nc)
   tests_i <- adf_tests_panel_cpp(y, pmin = p_min, pmax = p_max, ic = ic, dc = dc, detr = detr_int,
-                                  ic_scale = ic_scale, h_rs = h_rs, range = range_nonmiss)
-
+                                 ic_scale = ic_scale, h_rs = h_rs, range = range_nonmiss)
+  
   if (union) {
     scaling <- scaling_factors_cpp(t_star, level)
     if (N > 1) {
@@ -98,14 +84,14 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
       test_stats <- union_test_cpp(array(tests_i,
                                          dim = c(1, length(dc) * length(detr_int))), scaling)
     }
-   } else {
+  } else {
     test_stats_star <- NULL
     test_stats <- NULL
   }
   out <- list("y" = y, "p_vec" = p_vec, "t_star" = t_star, "test_stats_star" = test_stats_star,
               "tests_i" = tests_i, "test_stats" = test_stats, "level" = level, "dc" = dc,
               "detr" = detr)
-
+  
   return(out)
 }
 
@@ -138,26 +124,13 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
 #' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
-#' 
-#' @name check_inputs-deprecated
-#' @usage check_inputs(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
-#' p_min, p_max, ic, dc, detr, q, do_parallel, nc)
-#' @seealso \code{\link{bootUR-deprecated}}
-#' @keywords internal
-NULL
-#' @rdname bootUR-deprecated
-#' @section \code{check_inputs}:
-#' For \code{check_inputs}, use \code{\link{inspect_inputs}}.
-#'
-check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
-                         p_min, p_max, ic, dc, detr, q, do_parallel, nc){
+inspect_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
+                             p_min, p_max, ic, dc, detr, q, do_parallel, nc){
 
-  .Deprecated("inspect_inputs")
-  
   # Dimensions
   n <- nrow(y)
   N <- ncol(y)
-
+  
   # Check if sufficient bootstrap replications are done
   if (level * (B + 1) < 1) {
     stop("Bootstrap iterations B too low to perform test at desired significance level.")
@@ -173,7 +146,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   if ((nc != round(nc)) | (nc < 1)) {
     stop("Invalid value for argument nc")
   }
-
+  
   # Check for missing values or unbalanced panels (MBB, SB)
   check_missing <- check_missing_insample_values(y)
   if (any(check_missing)) {
@@ -194,7 +167,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
       }
     }
   }
-
+  
   # Checks on inputs
   if (!(boot %in% c("MBB", "BWB", "DWB", "AWB", "SB", "SWB")) | length(boot) > 1) {
     stop("The argument boot should be equal to either MBB, BWB, DWB, AWB, SB or SWB")
@@ -203,12 +176,12 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   }
   boot <- 1 * (boot == "MBB") + 2*(boot == "BWB") + 3 * (boot == "DWB") +
     4 * (boot == "AWB") + 5 * (boot == "SB") + 6 * (boot == "SWB")
-
+  
   if (any(!is.element(ic, c("AIC", "BIC", "MAIC", "MBIC"))) | length(ic) > 1) {
     stop("The argument ic should be equal to either AIC, BIC, MAIC, MBIC)")
   }
   ic <- 1*(ic=="AIC") + 2*(ic=="BIC") + 3*(ic=="MAIC") + 4*(ic=="MBIC")
-
+  
   # Bootstrap Union Tests: Settings
   if (union) {
     if (!is.null(dc)) {
@@ -242,17 +215,17 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
     detr_int <- 1*(detr=="OLS") + 2*(detr=="QD")
     detr_int <- sort(detr_int)
   }
-
+  
   if (is.null(l)) {
     l <- round(1.75 * nrow(y)^(1/3))
   }
-
+  
   if (is.null(ar_AWB)) {
     ar_AWB <- 0.01^(1/l)
   } else if (boot != 4){
     warning("Argument ar_AWB set, but AWB method not used. ar_AWB is ignored.")
   }
-
+  
   # Defaults
   p_vec <- NULL
   if (BSQT_test) {
@@ -285,7 +258,7 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
         warning(paste0(paste0("Input to argument q transformed to fit sequential test: q = c("),
                        paste0(q_vec, collapse = ", "), ")"))
       }
-
+      
       p_vec <- round(q_vec * N)
       if (!identical(unique(p_vec), p_vec)) {
         p_vec <- unique(p_vec)
@@ -340,6 +313,6 @@ check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, uni
   out <- list(boot = boot, l = l, s_DWB = s_DWB, ar_AWB = ar_AWB, dc = dc,
               dc_boot = dc_boot, detr = detr, detr_int = detr_int, ic = ic,
               p_max = p_max, p_vec = p_vec, range_nonmiss = range_nonmiss, joint = joint, nc = nc)
-
+  
   return(out)
 }
