@@ -196,9 +196,9 @@ inspect_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, 
       #      Set deterministics to 0, 1 and/or 2, or set union to TRUE for union test.")
       stop("No deterministic specification set.
            Set deterministics to the strings none, intercept or trend, or set union to TRUE for union test.")
-    } else if (any(!is.element(deterministics, 0:2))){
+    } else if (any(!is.element(deterministics, c("none", "intercept", "trend")))){
       stop("The argument deterministics should only contain  the string none, intercept and/or trend:
-           (none: no deterministics, intercpt: intercept only, trend: intercept and trend)")
+           (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
     }
     dc <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
     dc <- sort(dc)
