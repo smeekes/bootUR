@@ -73,7 +73,7 @@
 #' @name iADFtest-deprecated
 #' @usage iADFtest(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL, union = TRUE, 
 #' p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE, 
-#' verbose = FALSE, show_progress = FALSE, do_parallel = FALSE, nc = NULL)
+#' verbose = FALSE, show_progress = FALSE, do_parallel = FALSE, nc = NULL) 
 #' @seealso \code{\link{bootUR-deprecated}}
 #' @keywords internal
 NULL

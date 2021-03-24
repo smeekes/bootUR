@@ -37,7 +37,7 @@
 #' @keywords internal
 NULL
 #' @rdname bootUR-deprecated
-#' @section \code{do_tests_and_bootstrap}:
+#' @section \code{do_tests_and_bootstrap}: 
 #' For \code{do_tests_and_bootstrap}, use \code{\link{tests_and_bootstrap}}.
 #'
 do_tests_and_bootstrap_old <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
