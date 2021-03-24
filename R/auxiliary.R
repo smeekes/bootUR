@@ -40,7 +40,7 @@ NULL
 #' @section \code{do_tests_and_bootstrap}:
 #' For \code{do_tests_and_bootstrap}, use \code{\link{tests_and_bootstrap}}.
 #'
-do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
+do_tests_and_bootstrap_old <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
                                    p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress,
                                    do_parallel, nc){
   
@@ -48,7 +48,7 @@ do_tests_and_bootstrap <- function(y, BSQT_test, iADF_test, level, boot, B, l, a
   y <- as.matrix(y)
   
   # Check correctness arguments and perform initial calculations and transformations
-  inputs <- check_inputs(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, level = level, boot = boot,
+  inputs <- check_inputs_old(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, level = level, boot = boot,
                B = B, l = l, ar_AWB = ar_AWB, union = union, p_min = p_min, p_max = p_max, ic = ic,
                dc = dc, detr = detr, q = q, do_parallel = do_parallel, nc = nc)
 
@@ -149,7 +149,7 @@ NULL
 #' @section \code{check_inputs}:
 #' For \code{check_inputs}, use \code{\link{inspect_inputs}}.
 #'
-check_inputs <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
+check_inputs_old <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
                          p_min, p_max, ic, dc, detr, q, do_parallel, nc){
 
   .Deprecated("inspect_inputs")

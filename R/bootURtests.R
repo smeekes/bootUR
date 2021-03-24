@@ -90,7 +90,7 @@ iADFtest <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 
   .Deprecated("boot_ur")
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
+  inputs <- do_tests_and_bootstrap_old(y = y, BSQT_test = FALSE, iADF_test = TRUE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
@@ -377,7 +377,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB 
 
   .Deprecated("boot_fdr")
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap_old(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
@@ -560,7 +560,7 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
 
   .Deprecated("boot_sqt")
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = TRUE, iADF_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap_old(y = y, BSQT_test = TRUE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = q, h_rs = 0.1,
@@ -733,7 +733,7 @@ paneltest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB
   
   .Deprecated("boot_panel")
   
-  inputs <- do_tests_and_bootstrap(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap_old(y = y, BSQT_test = FALSE, iADF_test = FALSE, level = level,
                                    boot = boot, B = B, l = l, ar_AWB = ar_AWB, union = union,
                                    p_min = p_min, p_max = p_max, ic = ic, dc = dc, detr = detr,
                                    ic_scale = ic_scale, q = NULL, h_rs = 0.1,
