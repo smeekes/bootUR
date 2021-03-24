@@ -77,7 +77,7 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
                     do_parallel = FALSE, cores = NULL){
   
   
-  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = TRUE, level = level,
+  inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = TRUE, level = level,
                                 bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
                                 min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
                                 detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
@@ -343,7 +343,7 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
                      detrend = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, cores = NULL){
   
-  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE, level = level,
                                 bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
                                 min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
                                 detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
@@ -480,7 +480,7 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
                      detrend = NULL, criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                      do_parallel = FALSE, cores = NULL){
   
-  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = TRUE, boot_ur_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = TRUE, boot_ur_test = FALSE, level = level,
                                    bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
                                    min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
                                    detrend = detrend, criterion_scale = criterion_scale, steps = steps, h_rs = 0.1,
@@ -607,7 +607,7 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
                       criterion_scale = TRUE, verbose = FALSE, show_progress = FALSE,
                       do_parallel = FALSE, cores = NULL){
   
-  inputs <- tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE, level = level,
+  inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE, level = level,
                                 bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB, union = union,
                                 min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics, 
                                 detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,

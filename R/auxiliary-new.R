@@ -25,7 +25,7 @@
 #' @param h_rs Bandwidth used in rescaled information criteria.
 #' @seealso \code{\link{boot_ur}}, \code{\link{boot_sqt}}, \code{\link{boot_fdr}}
 #' @keywords internal
-tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length, ar_AWB, union, min_lag,
+do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length, ar_AWB, union, min_lag,
                                 max_lag, criterion, deterministics, detrend, criterion_scale, steps, h_rs, show_progress,
                                        do_parallel, cores){
   
@@ -33,7 +33,7 @@ tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, bootst
   data <- as.matrix(data)
   
   # Check correctness arguments and perform initial calculations and transformations
-  inputs <- inspect_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test = boot_ur_test, level = level, bootstrap = bootstrap,
+  inputs <- check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test = boot_ur_test, level = level, bootstrap = bootstrap,
                              B = B, block_length = block_length, ar_AWB = ar_AWB, union = union, min_lag = min_lag, max_lag = max_lag, criterion = criterion,
                               deterministics = deterministics, detrend = detrend, steps = steps, do_parallel = do_parallel, cores = cores)
   
@@ -121,7 +121,7 @@ tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, bootst
 #' @param h_rs Bandwidth used in rescaled information criteria.
 #' @seealso \code{\link{boot_ur}}, \code{\link{boot_sqt}}, \code{\link{boot_fdr}}
 #' @keywords internal
-inspect_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length, ar_AWB, union,
+check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length, ar_AWB, union,
                            min_lag, max_lag, criterion, deterministics, detrend, steps, do_parallel, cores){
 
   # Dimensions
