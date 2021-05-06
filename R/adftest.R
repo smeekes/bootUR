@@ -14,7 +14,7 @@
 #' # standard ADF test on GDP_BE
 #' GDP_BE_adf <- adf(MacroTS[, 1], deterministics = "trend")
 adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = "intercept", criterion_scale = TRUE){
-  #### !!! For now only with detr = "OLS" & 2-step detrending !!! ####
+  #### For now only with detr = "OLS" & 2-step detrending ####
   
   if (NCOL(data) > 1) {
     stop("Multiple time series not allowed. Switch to a multivariate method such as boot_ur,
