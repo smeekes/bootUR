@@ -16,13 +16,13 @@ adf(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
 
 \item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{deterministics}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
+\item{deterministics}{String indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are
 
-\verb{0 } no deterministics;
+\verb{"none":} no deterministics;
 
-\verb{1 } intercept only;
+\verb{"intercept":} intercept only;
 
-\verb{2 } intercept and trend.
+\verb{"trend":} intercept and trend.
 
 If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 

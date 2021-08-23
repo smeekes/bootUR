@@ -6,8 +6,32 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
+// adf_tests_panel_cpp_mat_out
+arma::mat adf_tests_panel_cpp_mat_out(const arma::mat& y, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range);
+RcppExport SEXP _bootUR_adf_tests_panel_cpp_mat_out(SEXP ySEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP detrSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const int& >::type pmin(pminSEXP);
+    Rcpp::traits::input_parameter< const int& >::type pmax(pmaxSEXP);
+    Rcpp::traits::input_parameter< const int& >::type ic(icSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type dc(dcSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type detr(detrSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type ic_scale(ic_scaleSEXP);
+    Rcpp::traits::input_parameter< const double& >::type h_rs(h_rsSEXP);
+    Rcpp::traits::input_parameter< const arma::umat& >::type range(rangeSEXP);
+    rcpp_result_gen = Rcpp::wrap(adf_tests_panel_cpp_mat_out(y, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range));
+    return rcpp_result_gen;
+END_RCPP
+}
 // adf_tests_panel_cpp
-arma::mat adf_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range);
+Rcpp::List adf_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range);
 RcppExport SEXP _bootUR_adf_tests_panel_cpp(SEXP ySEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP detrSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -152,8 +176,27 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// adf_onestep_tests_panel_cpp
+Rcpp::List adf_onestep_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const bool& ic_scale, const double& h_rs, const arma::umat& range);
+RcppExport SEXP _bootUR_adf_onestep_tests_panel_cpp(SEXP ySEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const arma::mat& >::type y(ySEXP);
+    Rcpp::traits::input_parameter< const int& >::type pmin(pminSEXP);
+    Rcpp::traits::input_parameter< const int& >::type pmax(pmaxSEXP);
+    Rcpp::traits::input_parameter< const int& >::type ic(icSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type dc(dcSEXP);
+    Rcpp::traits::input_parameter< const bool& >::type ic_scale(ic_scaleSEXP);
+    Rcpp::traits::input_parameter< const double& >::type h_rs(h_rsSEXP);
+    Rcpp::traits::input_parameter< const arma::umat& >::type range(rangeSEXP);
+    rcpp_result_gen = Rcpp::wrap(adf_onestep_tests_panel_cpp(y, pmin, pmax, ic, dc, ic_scale, h_rs, range));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_bootUR_adf_tests_panel_cpp_mat_out", (DL_FUNC) &_bootUR_adf_tests_panel_cpp_mat_out, 9},
     {"_bootUR_adf_tests_panel_cpp", (DL_FUNC) &_bootUR_adf_tests_panel_cpp, 9},
     {"_bootUR_adf_panel_bootstrap_dgp_cpp", (DL_FUNC) &_bootUR_adf_panel_bootstrap_dgp_cpp, 10},
     {"_bootUR_bootstrap_cpp", (DL_FUNC) &_bootUR_bootstrap_cpp, 21},
@@ -163,6 +206,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bootUR_BSQT_cpp", (DL_FUNC) &_bootUR_BSQT_cpp, 4},
     {"_bootUR_iADF_cpp", (DL_FUNC) &_bootUR_iADF_cpp, 3},
     {"_bootUR_FDR_cpp", (DL_FUNC) &_bootUR_FDR_cpp, 3},
+    {"_bootUR_adf_onestep_tests_panel_cpp", (DL_FUNC) &_bootUR_adf_onestep_tests_panel_cpp, 8},
     {NULL, NULL, 0}
 };
 
