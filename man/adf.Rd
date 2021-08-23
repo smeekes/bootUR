@@ -5,7 +5,7 @@
 \title{Augmented Dickey-Fuller Unit Root Test}
 \usage{
 adf(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-  deterministics = "intercept", criterion_scale = TRUE)
+  deterministics = "intercept", criterion_scale = TRUE, two_step = TRUE)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -27,6 +27,8 @@ adf(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
 If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+
+\item{two_step}{Logical indicator whether to use one-step (\code{two_step = FALSE}) or two-step (\code{two_step = TRUE}) detrending. The default is two-step detrending.}
 }
 \value{
 Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.

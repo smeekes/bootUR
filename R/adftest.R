@@ -6,7 +6,14 @@
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #' @export
-#' @return Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.
+#' @return An object of class \code{htest} containing
+#' \item{\code{method}}{The name of the hypothesis test. For adf this is the standard ADF test on a single time series.;}
+#' \item{\code{data.name}}{The name of the variable on which the test is performed.;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
+#' \item{\code{statistic}}{The value of the test statistic of the ADF unit root test.;}
+#' \item{\code{p.value}}{P-value of the ADF unit root test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function provides a standard ADF test with asymptotic p-value. It does not support multiple time series}
