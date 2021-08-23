@@ -39,17 +39,17 @@ boot_panel(data, level = 0.05, bootstrap = "AWB", B = 1999,
 
 \item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{deterministics}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
+\item{deterministics}{String indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are
 
-\verb{0 } no deterministics;
+\verb{"none":} no deterministics;
 
-\verb{1 } intercept only;
+\verb{"intercept":} intercept only;
 
-\verb{2 } intercept and trend.
+\verb{"trend":} intercept and trend.
 
 If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
-\item{detrend}{String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
+\item{detrend}{String indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
@@ -62,7 +62,14 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \value{
-For the union test (\code{union = TRUE}), the test statistic and p-value are returned. If \code{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
+An object of class \code{htest} containing
+\item{\code{method}}{The name of the hypothesis test. For boot_panel this is the Panel Bootstrap Group-Mean Union Test (for \code{union = TRUE}) or the "Panel Bootstrap Group-Mean Test" (for \code{union = FALSE});}
+\item{\code{data.name}}{The name of the variable on which the test is performed.;}
+\item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+\item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+\item{\code{estimate}}{For the panel test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined.;}
+\item{\code{statistic}}{The value of the test statistic of the panel unit root test.;}
+\item{\code{p.value}}{P-value of the panel unit root test.}
 }
 \description{
 Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).

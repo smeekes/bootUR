@@ -18,16 +18,16 @@
 #' @param min_lag Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.
 #' @param max_lag Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.
 #' @param criterion String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).
-#' @param deterministics Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
+#' @param deterministics String indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are
 #'
-#' \verb{0 } no deterministics;
+#' \verb{"none":} no deterministics;
 #'
-#' \verb{1 } intercept only;
+#' \verb{"intercept":} intercept only;
 #'
-#' \verb{2 } intercept and trend.
+#' \verb{"trend":} intercept and trend.
 #'
 #' If \code{union = FALSE}, the default is adding an intercept (a warning is given).
-#' @param detrend String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
+#' @param detrend String indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
 #' @param criterion_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param verbose Logical indicator whether or not information on the outcome of the unit root test needs to be printed to the console. Default is \code{FALSE}.
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
@@ -37,10 +37,14 @@
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #'
-#' @return A list with the following components
-#' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-#' For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
+#' @return A list with N components, one for each variable, where each element of the list returns an object of class \code{htest} containing
+#' \item{\code{method}}{The name of the hypothesis test. For boot_ur these are ADF tests (for \code{union = FALSE}) or Union tests (for \code{union = TRUE}) on each individual series (no multiple testing correction).;}
+#' \item{\code{data.name}}{The name of the variable on which the ADF test is performed.;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned.;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root test.;}
+#' \item{\code{p.value}}{P-value of the unit root test.}
 #' @section Warnings:
 #' The function may give the following warnings.
 #' \describe{
@@ -83,92 +87,137 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
                                 detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
                                 show_progress = show_progress, do_parallel = do_parallel, cores = cores)
   
+  # if (!is.null(colnames(data))) {
+  #   var_names <- colnames(data)
+  # } else {
+  #   var_names <- paste0("Variable ", 1:NCOL(data))
+  # }
+  # 
+  # if (union) { # Union Tests
+  #   iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
+  #                       level = inputs$level)
+  #   rej_H0 <- (iADFout[, 2] < level)
+  #   colnames(iADFout) <- c("test statistic", "p-value")
+  #   rownames(iADFout) <- var_names
+  #   
+  #   if (verbose) {
+  #     p_hat <- sum(rej_H0)
+  #     if (NCOL(data) > 1) {
+  #       if (p_hat > 1) {
+  #         cat(paste("There are ", p_hat, " stationary time series, namely: ",
+  #                   paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
+  #       } else {
+  #         if (p_hat == 1) {
+  #           cat(paste("There is ", p_hat, " stationary time series, namely: ",
+  #                     paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
+  #         } else {
+  #           cat(paste("There are ", p_hat, " stationary time series.\n", sep = ""))
+  #         }
+  #       }
+  #       print(iADFout)
+  #     } else {
+  #       cat("Bootstrap Union Test:\n")
+  #       if (rej_H0) {
+  #         cat(paste("The null hypothesis of a unit root is rejected at a significance
+  #                   level of ", level, ".\n", sep = ""))
+  #       } else {
+  #         cat(paste("The null hypothesis of a unit root is not rejected at a significance
+  #                   level of ", level, ".\n", sep = ""))
+  #       }
+  #       print(iADFout[1, ])
+  #     }
+  #   }
+  # } else { # No Union Tests
+  #   detr_names <- rep(NA, length(inputs$detr))
+  #   detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
+  #   detr_names[inputs$detr=="QD"] <- c("detr = QD")
+  #   
+  #   dc_names <- rep(NA, length(inputs$dc))
+  #   dc_names[inputs$dc==0] <- c("dc = none")
+  #   dc_names[inputs$dc==1] <- c("dc = intercept")
+  #   dc_names[inputs$dc==2] <- c("dc = intercept and trend")
+  #   
+  #   detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
+  #                          rep(dc_names, length(inputs$detr)), sep = "")
+  #   iADFout <- array(NA, c(NCOL(data), 2, length(detr_dc_names)), dimnames =
+  #                      list(var_names, c("test statistic", "p-value"), detr_dc_names))
+  #   rej_H0 <- array(NA, c(NCOL(data), length(inputs$dc)*length(inputs$detr)), dimnames =
+  #                     list(var_names, detr_dc_names))
+  #   for(i in 1:nrow(inputs$tests_i)){
+  #     iADFout[, , i] <- iADF_cpp(test_i = matrix(inputs$tests_i[i, ], nrow = 1),
+  #                                t_star = matrix(inputs$t_star[ , i, ], nrow = B),
+  #                                level = inputs$level)
+  #     rej_H0[, i] <- (iADFout[, 2, i] < level)
+  #     
+  #     if (verbose) {
+  #       cat(paste(c(rep("-", 40), "\n"), sep = "", collapse = ""))
+  #       cat(paste("Type of unit root test performed: ", detr_dc_names[i], "\n", sep = ""))
+  #       if (NCOL(data) > 1) {
+  #         p_hat <- sum(rej_H0[, i])
+  #         if (p_hat > 1) {
+  #           cat(paste("There are ", p_hat, " stationary time series, namely: ",
+  #                     paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
+  #         } else {
+  #           if (p_hat == 1) {
+  #             cat(paste("There is ", p_hat, " stationary time series, namely: ",
+  #                       paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
+  #           } else {
+  #             cat(paste("There are ", p_hat, " stationary time series", "\n", sep = ""))
+  #           }
+  #         }
+  #         print(iADFout[, , i])
+  #       } else {
+  #         print(iADFout[, , i])
+  #       }
+  #     }
+  #   }
+  # }
+  # 
+  # return(list(rej_H0 = rej_H0, ADF_tests = iADFout))
+  # 
+  
+  #### Create output list with htest class structure ####
+  # IW: New output strucure, if ok, please remove above commented out old code 
+  
+  # Results
+  if(union){ # Union test
+    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
+    iADFout <- cbind(rep(NA, nrow(iADFout)), iADFout) # Parameter estimates, tstats and p-values. Note: Parameter Estimates not defined for union test
+   
+    if(ncol(data)==1){ # boot_union
+      method_name <- "Bootstrap Union test on a single time series"
+    }else{
+      method_name <- "Bootstrap Union tests on each individual series (no multiple testing correction)"
+    }
+     
+  }else{ # No union test
+    # IW: Note : since we only allow for one value of deterministics and detrend, tests_i will always have only 1 row, same for col-dimension of t_star
+    iADFout <- iADF_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1), t_star = matrix(inputs$t_star[ , 1, ], nrow = B),
+                        level = inputs$level)
+    iADFout <- cbind(t(inputs$param_i), iADFout) # Parameter estimates, tstats and p-values
+    
+    if(ncol(data)==1){ # boot_adf
+      method_name <- "Bootstrap ADF test on a single time series"
+    }else{
+      method_name <- "Bootstrap ADF tests on each individual series (no multiple testing correction)"
+    }
+  }
+  
+  # Organize output in a list
+  index_var <- 1:ncol(data)
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
   } else {
     var_names <- paste0("Variable ", 1:NCOL(data))
   }
   
-  if (union) { # Union Tests
-    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
-                        level = inputs$level)
-    rej_H0 <- (iADFout[, 2] < level)
-    colnames(iADFout) <- c("test statistic", "p-value")
-    rownames(iADFout) <- var_names
-    
-    if (verbose) {
-      p_hat <- sum(rej_H0)
-      if (NCOL(data) > 1) {
-        if (p_hat > 1) {
-          cat(paste("There are ", p_hat, " stationary time series, namely: ",
-                    paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
-        } else {
-          if (p_hat == 1) {
-            cat(paste("There is ", p_hat, " stationary time series, namely: ",
-                      paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
-          } else {
-            cat(paste("There are ", p_hat, " stationary time series.\n", sep = ""))
-          }
-        }
-        print(iADFout)
-      } else {
-        cat("Bootstrap Union Test:\n")
-        if (rej_H0) {
-          cat(paste("The null hypothesis of a unit root is rejected at a significance
-                    level of ", level, ".\n", sep = ""))
-        } else {
-          cat(paste("The null hypothesis of a unit root is not rejected at a significance
-                    level of ", level, ".\n", sep = ""))
-        }
-        print(iADFout[1, ])
-      }
-    }
-  } else { # No Union Tests
-    detr_names <- rep(NA, length(inputs$detr))
-    detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
-    detr_names[inputs$detr=="QD"] <- c("detr = QD")
-    
-    dc_names <- rep(NA, length(inputs$dc))
-    dc_names[inputs$dc==0] <- c("dc = none")
-    dc_names[inputs$dc==1] <- c("dc = intercept")
-    dc_names[inputs$dc==2] <- c("dc = intercept and trend")
-    
-    detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
-                           rep(dc_names, length(inputs$detr)), sep = "")
-    iADFout <- array(NA, c(NCOL(data), 2, length(detr_dc_names)), dimnames =
-                       list(var_names, c("test statistic", "p-value"), detr_dc_names))
-    rej_H0 <- array(NA, c(NCOL(data), length(inputs$dc)*length(inputs$detr)), dimnames =
-                      list(var_names, detr_dc_names))
-    for(i in 1:nrow(inputs$tests_i)){
-      iADFout[, , i] <- iADF_cpp(test_i = matrix(inputs$tests_i[i, ], nrow = 1),
-                                 t_star = matrix(inputs$t_star[ , i, ], nrow = B),
-                                 level = inputs$level)
-      rej_H0[, i] <- (iADFout[, 2, i] < level)
-      
-      if (verbose) {
-        cat(paste(c(rep("-", 40), "\n"), sep = "", collapse = ""))
-        cat(paste("Type of unit root test performed: ", detr_dc_names[i], "\n", sep = ""))
-        if (NCOL(data) > 1) {
-          p_hat <- sum(rej_H0[, i])
-          if (p_hat > 1) {
-            cat(paste("There are ", p_hat, " stationary time series, namely: ",
-                      paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
-          } else {
-            if (p_hat == 1) {
-              cat(paste("There is ", p_hat, " stationary time series, namely: ",
-                        paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
-            } else {
-              cat(paste("There are ", p_hat, " stationary time series", "\n", sep = ""))
-            }
-          }
-          print(iADFout[, , i])
-        } else {
-          print(iADFout[, , i])
-        }
-      }
-    }
+  boot_ur_output <- lapply(index_var, htest_class_for_output, var_names =  var_names, results = iADFout, method = method_name)
+  names(boot_ur_output) <- var_names
+  
+  if(verbose){ #IW: Do we still want/need verbose argument? Not much added value...
+    print(boot_ur_output)
   }
-  return(list(rej_H0 = rej_H0, ADF_tests = iADFout))
+  return(boot_ur_output)
 }
 
 
@@ -189,7 +238,14 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #' @export
-#' @return Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.
+#' @return An object of class \code{htest} containing
+#' \item{\code{method}}{The name of the hypothesis test. For boot_adf this is the ADF test on a single time series.;}
+#' \item{\code{data.name}}{The name of the variable on which the ADF test is performed.;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root test.;}
+#' \item{\code{p.value}}{P-value of the unit root test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function is a simple wrapper around \code{\link{boot_ur}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{boot_ur}} is specifically suited for that.}
@@ -226,11 +282,13 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_leng
   if (verbose) {
     cat("Bootstrap ADF Test with", bootstrap, "bootstrap method.\n")
   }
-  out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB,
+  out <- boot_ur(data = matrix(data, ncol = 1), level = level, bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB,
                  union = FALSE, min_lag = min_lag, max_lag = max_lag, criterion = criterion, deterministics = deterministics,
                  detrend = detrend, criterion_scale = criterion_scale, verbose = verbose,
                  show_progress = show_progress, do_parallel = do_parallel, cores = cores)
-  return(aperm(out$ADF_tests, 3:1)[, , 1])
+  
+  return(out[[1]])
+  # return(aperm(out$ADF_tests, 3:1)[, , 1])
 }
 
 
@@ -251,7 +309,14 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_leng
 #'
 #' Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #' @export
-#' @return Value of the union test statistic and the bootstrap p-values.
+#' @return An object of class \code{htest} containing
+#' \item{\code{method}}{The name of the hypothesis test. For boot_adf this is the Union test on a single time series.;}
+#' \item{\code{data.name}}{The name of the variable on which the union test is performed.;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined.;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root test.;}
+#' \item{\code{p.value}}{P-value of the unit root test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function is a simple wrapper around \code{\link{boot_ur}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{boot_ur}} is specifically suited for that.}
@@ -287,11 +352,13 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
     stop("Multiple time series not allowed. Switch to a multivariate method such as boot_ur,
          or change argument data to a univariate time series.")
   }
-  out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB,
+  out <- boot_ur(data = matrix(data, ncol = 1), level = level, bootstrap = bootstrap, B = B, block_length = block_length, ar_AWB = ar_AWB,
                   union = TRUE, min_lag = min_lag, max_lag = max_lag, criterion = criterion, criterion_scale = criterion_scale,
                   verbose = verbose, show_progress = show_progress,
                   do_parallel = do_parallel, cores = cores)
-  return(out$ADF_tests[1, ])
+  
+  return(out[[1]])
+  # return(out$ADF_tests[1, ])
 }
 
 #' Bootstrap Unit Root Tests with False Discovery Rate control
@@ -355,76 +422,133 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
     var_names <- paste0("Variable ", 1:NCOL(data))
   }
   
-  if (union) { # Union Tests
-    bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
-                       level = inputs$level)
-    rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
+  # if (union) { # Union Tests
+  #   bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
+  #                      level = inputs$level)
+  #   rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
+  #   FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
+  #   
+  #   rownames(rej_H0) <- var_names
+  #   rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
+  #   
+  #   colnames(rej_H0) <- "Reject H0"
+  #   colnames(FDR_seq) <- c("test statistic", "critical value")
+  #   
+  #   if (verbose) {
+  #     p_hat <- sum(rej_H0)
+  #     if (p_hat > 1){
+  #       cat(paste("There are ", p_hat, " stationary time series, namely: ",
+  #                 paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
+  #     } else if (p_hat == 1) {
+  #       cat(paste("There is ", p_hat, " stationary time series, namely: ",
+  #                 paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
+  #     } else {
+  #       cat(paste("There are ", p_hat, " stationary time series", "\n", sep = ""))
+  #     }
+  #     cat("Details of the FDR sequential tests:\n")
+  #     print(FDR_seq)
+  #   }
+  # } else { # No Union Tests
+  #   detr_names <- rep(NA, length(inputs$detr))
+  #   detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
+  #   detr_names[inputs$detr=="QD"] <- c("detr = QD")
+  #   
+  #   dc_names <- rep(NA, length(inputs$dc))
+  #   dc_names[inputs$dc==0] <- c("dc = none")
+  #   dc_names[inputs$dc==1] <- c("dc = intercept")
+  #   dc_names[inputs$dc==2] <- c("dc = intercept and trend")
+  #   
+  #   detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
+  #                          rep(dc_names, length(inputs$detr)), sep = "")
+  #   rej_H0 <- matrix(nrow = NCOL(data), ncol = length(inputs$dc)*length(inputs$detr))
+  #   rownames(rej_H0) <- var_names
+  #   colnames(rej_H0) <- detr_dc_names
+  #   FDR_seq <- vector("list", length(inputs$dc)*length(inputs$detr))
+  #   names(FDR_seq) <- detr_dc_names
+  #   for (i in 1:nrow(inputs$tests_i)) {
+  #     bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[i, ], nrow = 1),
+  #                        t_star = inputs$t_star[ , i,], level = inputs$level)
+  #     rej_H0[, i] <- bFDRout$rej_H0 == 1
+  #     FDR_seq[[i]] <- bFDRout$FDR_Tests[, -1, drop = FALSE]
+  #     rownames(FDR_seq[[i]]) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
+  #     colnames(FDR_seq[[i]]) <- c("test statistic", "critical value")
+  #     
+  #     if (verbose) {
+  #       p_hat <- sum(rej_H0[, i])
+  #       cat(paste(c(rep("-", 40), "\n"), sep = "", collapse = ""))
+  #       cat(paste("Type of unit root test performed: ", detr_dc_names[i], "\n", sep = ""))
+  #       if (p_hat > 1){
+  #         cat(paste("There are ", p_hat, " stationary time series, namely: ",
+  #                   paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
+  #       } else if (p_hat == 1) {
+  #         cat(paste("There is ", p_hat, " stationary time series, namely: ",
+  #                   paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
+  #       } else {
+  #         cat(paste("There are ", p_hat, " stationary time series.", "\n", sep = ""))
+  #       }
+  #       cat("Details of the FDR sequential tests:\n")
+  #       print(FDR_seq[[i]])
+  #     }
+  #   }
+  # }
+  # return(list(rej_H0 = rej_H0, FDR_sequence = FDR_seq))
+  
+  #### Create output list with htest class structure ####
+  # IW: New output structure, if ok, please remove above commented out old code 
+  if(union){ # Union Tests
+    bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
     FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
-    
-    rownames(rej_H0) <- var_names
     rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
+    colnames(FDR_seq) <- c("tstat", "critical value")
     
-    colnames(rej_H0) <- "Reject H0"
-    colnames(FDR_seq) <- c("test statistic", "critical value")
-    
-    if (verbose) {
-      p_hat <- sum(rej_H0)
-      if (p_hat > 1){
-        cat(paste("There are ", p_hat, " stationary time series, namely: ",
-                  paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
-      } else if (p_hat == 1) {
-        cat(paste("There is ", p_hat, " stationary time series, namely: ",
-                  paste(var_names[rej_H0], collapse = " "), "\n", sep = ""))
-      } else {
-        cat(paste("There are ", p_hat, " stationary time series", "\n", sep = ""))
-      }
-      cat("Details of the FDR sequential tests:\n")
-      print(FDR_seq)
-    }
-  } else { # No Union Tests
-    detr_names <- rep(NA, length(inputs$detr))
-    detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
-    detr_names[inputs$detr=="QD"] <- c("detr = QD")
-    
-    dc_names <- rep(NA, length(inputs$dc))
-    dc_names[inputs$dc==0] <- c("dc = none")
-    dc_names[inputs$dc==1] <- c("dc = intercept")
-    dc_names[inputs$dc==2] <- c("dc = intercept and trend")
-    
-    detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
-                           rep(dc_names, length(inputs$detr)), sep = "")
-    rej_H0 <- matrix(nrow = NCOL(data), ncol = length(inputs$dc)*length(inputs$detr))
-    rownames(rej_H0) <- var_names
-    colnames(rej_H0) <- detr_dc_names
-    FDR_seq <- vector("list", length(inputs$dc)*length(inputs$detr))
-    names(FDR_seq) <- detr_dc_names
-    for (i in 1:nrow(inputs$tests_i)) {
-      bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[i, ], nrow = 1),
-                         t_star = inputs$t_star[ , i,], level = inputs$level)
-      rej_H0[, i] <- bFDRout$rej_H0 == 1
-      FDR_seq[[i]] <- bFDRout$FDR_Tests[, -1, drop = FALSE]
-      rownames(FDR_seq[[i]]) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
-      colnames(FDR_seq[[i]]) <- c("test statistic", "critical value")
-      
-      if (verbose) {
-        p_hat <- sum(rej_H0[, i])
-        cat(paste(c(rep("-", 40), "\n"), sep = "", collapse = ""))
-        cat(paste("Type of unit root test performed: ", detr_dc_names[i], "\n", sep = ""))
-        if (p_hat > 1){
-          cat(paste("There are ", p_hat, " stationary time series, namely: ",
-                    paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
-        } else if (p_hat == 1) {
-          cat(paste("There is ", p_hat, " stationary time series, namely: ",
-                    paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
-        } else {
-          cat(paste("There are ", p_hat, " stationary time series.", "\n", sep = ""))
-        }
-        cat("Details of the FDR sequential tests:\n")
-        print(FDR_seq[[i]])
-      }
-    }
+    method_name <- "Bootstrap Union Tests with False Discovery Rate control"
+  }else{ # No Union Tests
+      bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1), t_star = inputs$t_star[ , 1,], level = inputs$level)
+      FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
+      rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
+      colnames(FDR_seq) <- c("tstat", "critical value")
+      method_name <- "Bootstrap ADF Tests with False Discovery Rate control"
   }
-  return(list(rej_H0 = rej_H0, FDR_sequence = FDR_seq))
+  
+  fdr_output <- list(method = method_name, data.name = "data", details = FDR_seq, 
+                      alternative = "less", null.value =  c("gamma" = 0))
+  class(fdr_output) <- "fdr_test"
+  
+  print.fdr_test <- function(x, prefix = "\t", ...){
+    cat("\n")
+    cat(strwrap(x$method, prefix = prefix), sep = "\n")
+    cat("\n")
+    cat("data:  ", x$data.name, "\n", sep = "")
+    
+    if(!is.null(x$alternative)) {
+      cat("alternative hypothesis: ")
+      if(!is.null(x$null.value)) {
+        if(length(x$null.value) == 1L) {
+          alt.char <-
+            switch(x$alternative,
+                   two.sided = "not equal to",
+                   less = "less than",
+                   greater = "greater than")
+          cat("true ", names(x$null.value), " is ", alt.char, " ",
+              x$null.value, "\n", sep = "")
+        }
+        else {
+          cat(x$alternative, "\nnull values:\n", sep = "")
+          print(x$null.value, digits=digits, ...)
+        }
+      }
+      else cat(x$alternative, "\n", sep = "")
+    }
+    cat("\n")
+    cat("Sequence of tests until no rejection occurs:", "\n")
+    print(x$details)
+  }
+  
+  # if(verbose){
+  #   print(fdr_output)
+  # }
+  
+  return(print(fdr_output))
 }
 
 
@@ -491,78 +615,135 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
   } else {
     var_names <- paste0("Variable ", 1:NCOL(data))
   }
+  # 
+  # if (union) { # Union Tests
+  #   BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = inputs$test_stats, t_star =
+  #                         inputs$test_stats_star, level = inputs$level)
+  #   rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
+  #   BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
+  #   
+  #   rownames(rej_H0) <- var_names
+  #   rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
+  #   colnames(rej_H0) <- "Reject H0"
+  #   colnames(BSQT_seq) <- c("Unit H0", "Unit H1", "Test statistic", "p-value")
+  #   
+  #   if (verbose) {
+  #     p_hat <- sum(rej_H0)
+  #     if (p_hat > 1) {
+  #       cat(paste("There are ", p_hat, " stationary time series, namely: ",
+  #                 paste(var_names[rej_H0], collapse = " "), ".\n", sep = ""))
+  #     } else {
+  #       if (p_hat == 1) {
+  #         cat(paste("There is ", p_hat, " stationary time series, namely: ",
+  #                   paste(var_names[rej_H0], collapse = " "), ".\n", sep = ""))
+  #       } else {
+  #         cat(paste("There are ", p_hat, " stationary time series.\n", sep = ""))
+  #       }
+  #     }
+  #     cat("Details of the BSQT sequential tests:\n")
+  #     print(BSQT_seq)
+  #   }
+  # } else { # No Union Tests
+  #   detr_names <- rep(NA, length(inputs$detr))
+  #   detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
+  #   detr_names[inputs$detr=="QD"] <- c("detr = QD")
+  #   
+  #   dc_names <- rep(NA, length(inputs$dc))
+  #   dc_names[inputs$dc==0] <- c("dc = none")
+  #   dc_names[inputs$dc==1] <- c("dc = intercept")
+  #   dc_names[inputs$dc==2] <- c("dc = intercept and trend")
+  #   
+  #   detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
+  #                          rep(dc_names, length(inputs$detr)), sep = "")
+  #   rej_H0 <- matrix(nrow = NCOL(data), ncol = length(inputs$dc)*length(inputs$detr))
+  #   rownames(rej_H0) <- var_names
+  #   colnames(rej_H0) <- detr_dc_names
+  #   BSQT_seq <- vector("list", length(inputs$dc)*length(inputs$detr))
+  #   names(BSQT_seq) <- detr_dc_names
+  #   for (i in 1:nrow(inputs$tests_i)) {
+  #     BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = matrix(inputs$tests_i[i, ], nrow = 1),
+  #                         t_star = inputs$t_star[ , i,], level = inputs$level)
+  #     rej_H0[, i] <- BSQTout$rej_H0 == 1
+  #     BSQT_seq[[i]] <- BSQTout$BSQT_steps[, -3, drop = FALSE]
+  #     rownames(BSQT_seq[[i]]) <- paste("Step", 1:nrow(BSQT_seq[[i]]))
+  #     colnames(BSQT_seq[[i]]) <- c("Unit H0", "Unit H1", "Test statistic", "p-value")
+  #     
+  #     if (verbose) {
+  #       p_hat <- sum(rej_H0[, i])
+  #       cat(paste(c(rep("-", 40), "\n"), sep = "", collapse = ""))
+  #       cat(paste("Type of unit root test performed:", detr_dc_names[i], "\n", sep = ""))
+  #       if (p_hat > 1){
+  #         cat(paste("There are ", p_hat, "stationary time series, namely:",
+  #                   paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
+  #       } else if (p_hat == 1) {
+  #         cat(paste("There is ", p_hat, "stationary time series, namely:",
+  #                   paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
+  #       } else {
+  #         cat(paste("There are ", p_hat, "stationary time series.\n", sep = ""))
+  #       }
+  #       cat("Details of the BSQT sequential tests:\n")
+  #       print(BSQT_seq[[i]])
+  #     }
+  #   }
+  # }
+  # return(list(rej_H0 = rej_H0, BSQT_sequence = BSQT_seq))
   
-  if (union) { # Union Tests
-    BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = inputs$test_stats, t_star =
-                          inputs$test_stats_star, level = inputs$level)
-    rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
+  
+  #### Create output list with htest class structure ####
+  # IW: New output structure, if ok, please remove above commented out old code 
+  if(union){ # Union Tests
+    BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
     BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
-    
-    rownames(rej_H0) <- var_names
     rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
-    colnames(rej_H0) <- "Reject H0"
-    colnames(BSQT_seq) <- c("Unit H0", "Unit H1", "Test statistic", "p-value")
+    colnames(BSQT_seq) <- c("Unit H0", "Unit H1", "tstat", "p-value")
     
-    if (verbose) {
-      p_hat <- sum(rej_H0)
-      if (p_hat > 1) {
-        cat(paste("There are ", p_hat, " stationary time series, namely: ",
-                  paste(var_names[rej_H0], collapse = " "), ".\n", sep = ""))
-      } else {
-        if (p_hat == 1) {
-          cat(paste("There is ", p_hat, " stationary time series, namely: ",
-                    paste(var_names[rej_H0], collapse = " "), ".\n", sep = ""))
-        } else {
-          cat(paste("There are ", p_hat, " stationary time series.\n", sep = ""))
-        }
-      }
-      cat("Details of the BSQT sequential tests:\n")
-      print(BSQT_seq)
-    }
-  } else { # No Union Tests
-    detr_names <- rep(NA, length(inputs$detr))
-    detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
-    detr_names[inputs$detr=="QD"] <- c("detr = QD")
-    
-    dc_names <- rep(NA, length(inputs$dc))
-    dc_names[inputs$dc==0] <- c("dc = none")
-    dc_names[inputs$dc==1] <- c("dc = intercept")
-    dc_names[inputs$dc==2] <- c("dc = intercept and trend")
-    
-    detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
-                           rep(dc_names, length(inputs$detr)), sep = "")
-    rej_H0 <- matrix(nrow = NCOL(data), ncol = length(inputs$dc)*length(inputs$detr))
-    rownames(rej_H0) <- var_names
-    colnames(rej_H0) <- detr_dc_names
-    BSQT_seq <- vector("list", length(inputs$dc)*length(inputs$detr))
-    names(BSQT_seq) <- detr_dc_names
-    for (i in 1:nrow(inputs$tests_i)) {
-      BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = matrix(inputs$tests_i[i, ], nrow = 1),
-                          t_star = inputs$t_star[ , i,], level = inputs$level)
-      rej_H0[, i] <- BSQTout$rej_H0 == 1
-      BSQT_seq[[i]] <- BSQTout$BSQT_steps[, -3, drop = FALSE]
-      rownames(BSQT_seq[[i]]) <- paste("Step", 1:nrow(BSQT_seq[[i]]))
-      colnames(BSQT_seq[[i]]) <- c("Unit H0", "Unit H1", "Test statistic", "p-value")
-      
-      if (verbose) {
-        p_hat <- sum(rej_H0[, i])
-        cat(paste(c(rep("-", 40), "\n"), sep = "", collapse = ""))
-        cat(paste("Type of unit root test performed:", detr_dc_names[i], "\n", sep = ""))
-        if (p_hat > 1){
-          cat(paste("There are ", p_hat, "stationary time series, namely:",
-                    paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
-        } else if (p_hat == 1) {
-          cat(paste("There is ", p_hat, "stationary time series, namely:",
-                    paste(var_names[rej_H0[, i]], collapse = " "), ".\n", sep = ""))
-        } else {
-          cat(paste("There are ", p_hat, "stationary time series.\n", sep = ""))
-        }
-        cat("Details of the BSQT sequential tests:\n")
-        print(BSQT_seq[[i]])
-      }
-    }
+    method_name <- "Bootstrap Sequential Quantile Union Test"
+  }else{ # No Union Tests
+    BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = matrix(inputs$tests_i[1, ], nrow = 1), t_star = inputs$t_star[ , 1,], level = inputs$level)
+    BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
+    rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq[[i]]))
+    colnames(BSQT_seq) <- c("Unit H0", "Unit H1", "tstat", "p-value")
   }
-  return(list(rej_H0 = rej_H0, BSQT_sequence = BSQT_seq))
+  
+  sqt_output <- list(method = method_name, data.name = "data", details = BSQT_seq, 
+                     alternative = "less", null.value =  c("gamma" = 0))
+  class(sqt_output) <- "sqt_test"
+  
+  print.sqt_test <- function(x, prefix = "\t", ...){
+    cat("\n")
+    cat(strwrap(x$method, prefix = prefix), sep = "\n")
+    cat("\n")
+    cat("data:  ", x$data.name, "\n", sep = "")
+    
+    if(!is.null(x$alternative)) {
+      cat("alternative hypothesis: ")
+      if(!is.null(x$null.value)) {
+        if(length(x$null.value) == 1L) {
+          alt.char <-
+            switch(x$alternative,
+                   two.sided = "not equal to",
+                   less = "less than",
+                   greater = "greater than")
+          cat("true ", names(x$null.value), " is ", alt.char, " ",
+              x$null.value, "\n", sep = "")
+        }
+        else {
+          cat(x$alternative, "\nnull values:\n", sep = "")
+          print(x$null.value, digits=digits, ...)
+        }
+      }
+      else cat(x$alternative, "\n", sep = "")
+    }
+    cat("\n")
+    cat("Sequence of tests until no rejection occurs:", "\n")
+    print(x$details)
+  }
+  
+  # if(verbose){
+  #   print(sqt_output)
+  # }
+  
+  return(print(sqt_output))
 }
 
 #' Panel Unit Root Test
@@ -578,7 +759,14 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
 #' \item{\code{Warning: Deterministic specification in argument deterministics is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 #' \item{\code{Warning: Detrending method in argument detrend is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
 #' }
-#' @return For the union test (\code{union = TRUE}), the test statistic and p-value are returned. If \code{union = FALSE}, the test statistics and p-values are reported per type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
+#' @return An object of class \code{htest} containing
+#' \item{\code{method}}{The name of the hypothesis test. For boot_panel this is the Panel Bootstrap Group-Mean Union Test (for \code{union = TRUE}) or the "Panel Bootstrap Group-Mean Test" (for \code{union = FALSE});}
+#' \item{\code{data.name}}{The name of the variable on which the test is performed.;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{For the panel test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined.;}
+#' \item{\code{statistic}}{The value of the test statistic of the panel unit root test.;}
+#' \item{\code{p.value}}{P-value of the panel unit root test.}
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
@@ -613,58 +801,86 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
                                 detrend = detrend, criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
                                 show_progress = show_progress, do_parallel = do_parallel, cores = cores)
   
-  if (union) { # Union Tests
+  # if (union) { # Union Tests
+  #   GM_test <- mean(inputs$test_stats)
+  #   t_star <- rowMeans(inputs$test_stats_star)
+  #   p_val <- mean(t_star < GM_test)
+  #   out <- cbind("test statistic" = GM_test, "p-value" = p_val)
+  #   
+  #   if (verbose) {
+  #     cat("Panel Bootstrap Group-Mean Union Test\n")
+  #     if (p_val < level){
+  #       cat(paste("The null hypothesis that all series have a unit root, is
+  #                 rejected at a significance level of ", level, ".\n", sep = ""))
+  #     } else {
+  #       cat(paste("The null hypothesis that all series have a unit root, is not
+  #                 rejected at a significance level of ", level, ".\n", sep = ""))
+  #     }
+  #     print(out)
+  #   }
+  # } else { # No Union Tests
+  #   detr_names <- rep(NA, length(inputs$detr))
+  #   detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
+  #   detr_names[inputs$detr=="QD"] <- c("detr = QD")
+  #   
+  #   dc_names <- rep(NA, length(inputs$dc))
+  #   dc_names[inputs$dc==0] <- c("dc = none")
+  #   dc_names[inputs$dc==1] <- c("dc = intercept")
+  #   dc_names[inputs$dc==2] <- c("dc = intercept and trend")
+  #   
+  #   detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
+  #                          rep(dc_names, length(inputs$detr)), sep = "")
+  #   GM_test <- rowMeans(inputs$tests_i)
+  #   t_star <- apply(inputs$t_star, 1:2, mean)
+  #   p_val <- sapply(1:length(detr_dc_names), function(i){mean(t_star[, i] < GM_test[i])})
+  #   out <- cbind("test statistic" = GM_test, "p-value" = p_val)
+  #   rownames(out) <- detr_dc_names
+  #   
+  #   if (verbose) {
+  #     if (nrow(out) == 1){
+  #       cat("Panel Bootstrap Group-Mean Test\n")
+  #     } else {
+  #       cat("Panel Bootstrap Group-Mean Tests\n")
+  #     }
+  #     for (i in 1:nrow(out)) {
+  #       if (out[i, 2] < level) {
+  #         cat(paste(rownames(out)[i], ": The null hypothesis that all series have a unit root,
+  #                   is rejected at a significance level of ", level, ".\n", sep = ""))
+  #       } else {
+  #         cat(paste(rownames(out)[i], ": The null hypothesis that all series have a unit root,
+  #                   is not rejected at a significance level of ", level, ".\n", sep = ""))
+  #       }
+  #     }
+  #     print(out)
+  #   }
+  # }
+  # 
+  # return(out)
+
+  #### Create output list with htest class structure ####
+  # IW: New output strucure, if ok, please remove above commented out old code 
+  if (union) { # Union Test
     GM_test <- mean(inputs$test_stats)
     t_star <- rowMeans(inputs$test_stats_star)
     p_val <- mean(t_star < GM_test)
-    out <- cbind("test statistic" = GM_test, "p-value" = p_val)
-    
-    if (verbose) {
-      cat("Panel Bootstrap Group-Mean Union Test\n")
-      if (p_val < level){
-        cat(paste("The null hypothesis that all series have a unit root, is
-                  rejected at a significance level of ", level, ".\n", sep = ""))
-      } else {
-        cat(paste("The null hypothesis that all series have a unit root, is not
-                  rejected at a significance level of ", level, ".\n", sep = ""))
-      }
-      print(out)
-    }
-  } else { # No Union Tests
-    detr_names <- rep(NA, length(inputs$detr))
-    detr_names[inputs$detr=="OLS"] <- c("detr = OLS")
-    detr_names[inputs$detr=="QD"] <- c("detr = QD")
-    
-    dc_names <- rep(NA, length(inputs$dc))
-    dc_names[inputs$dc==0] <- c("dc = none")
-    dc_names[inputs$dc==1] <- c("dc = intercept")
-    dc_names[inputs$dc==2] <- c("dc = intercept and trend")
-    
-    detr_dc_names <- paste(rep(detr_names, each = length(inputs$dc)), ", ",
-                           rep(dc_names, length(inputs$detr)), sep = "")
+    method_name <- "Panel Bootstrap Group-Mean Union Test"
+  } else { # No Union Test
     GM_test <- rowMeans(inputs$tests_i)
     t_star <- apply(inputs$t_star, 1:2, mean)
-    p_val <- sapply(1:length(detr_dc_names), function(i){mean(t_star[, i] < GM_test[i])})
-    out <- cbind("test statistic" = GM_test, "p-value" = p_val)
-    rownames(out) <- detr_dc_names
-    
-    if (verbose) {
-      if (nrow(out) == 1){
-        cat("Panel Bootstrap Group-Mean Test\n")
-      } else {
-        cat("Panel Bootstrap Group-Mean Tests\n")
-      }
-      for (i in 1:nrow(out)) {
-        if (out[i, 2] < level) {
-          cat(paste(rownames(out)[i], ": The null hypothesis that all series have a unit root,
-                    is rejected at a significance level of ", level, ".\n", sep = ""))
-        } else {
-          cat(paste(rownames(out)[i], ": The null hypothesis that all series have a unit root,
-                    is not rejected at a significance level of ", level, ".\n", sep = ""))
-        }
-      }
-      print(out)
-    }
+    p_val <- sapply(1, function(i){mean(t_star[, i] < GM_test[i])})
+    method_name <- "Panel Bootstrap Group-Mean Test"
   }
-  return(out)
+  
+  attr(GM_test, "names") <- "tstat"
+  gamma_hat <- NA
+  attr(gamma_hat, "names") <- "gamma"
+  panel_output <- list(method = method_name, data.name = "panel", null.value = c("gamma" = 0),
+                       alternative = "less", estimate = gamma_hat, statistic = GM_test, p.value = p_val)
+  class(panel_output) <- "htest"
+  
+  if(verbose){ #IW: Do we still want/need verbose argument? Not much added value...
+    print(panel_output)
+  }
+  
+  return(panel_output)
 }

@@ -39,17 +39,17 @@ boot_ur(data, level = 0.05, bootstrap = "AWB", B = 1999,
 
 \item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
-\item{deterministics}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of)
+\item{deterministics}{String indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are
 
-\verb{0 } no deterministics;
+\verb{"none":} no deterministics;
 
-\verb{1 } intercept only;
+\verb{"intercept":} intercept only;
 
-\verb{2 } intercept and trend.
+\verb{"trend":} intercept and trend.
 
 If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
-\item{detrend}{String vector indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} and/or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
+\item{detrend}{String indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
@@ -62,10 +62,14 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 }
 \value{
-A list with the following components
-\item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-\item{\code{ADF_tests}}{Details on the unit root tests: value of the test statistics and p-values.}
-For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
+A list with N components, one for each variable, where each element of the list returns an object of class \code{htest} containing
+\item{\code{method}}{The name of the hypothesis test. For boot_ur these are ADF tests (for \code{union = FALSE}) or Union tests (for \code{union = TRUE}) on each individual series (no multiple testing correction).;}
+\item{\code{data.name}}{The name of the variable on which the ADF test is performed.;}
+\item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+\item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+\item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned.;}
+\item{\code{statistic}}{The value of the test statistic of the unit root test.;}
+\item{\code{p.value}}{P-value of the unit root test.}
 }
 \description{
 This function performs bootstrap unit root tests on each time series individually.
@@ -86,7 +90,7 @@ The function may give the following warnings.
 }
 
 \examples{
-# boot_ur on GDP_BE and GDP_DE
+# boot_ur on GDP_BE and GDP_DE 
 two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 399,
 verbose = TRUE)
 }
