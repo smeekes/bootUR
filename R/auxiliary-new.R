@@ -69,8 +69,18 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
                           ic = ic, dc = dc, detr = detr_int, ic_scale = criterion_scale, h_rs = h_rs,
                           range = range_nonmiss, joint = joint, show_progress = show_progress,
                           do_parallel = do_parallel, nc = nc)
-  tests_i <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
-                                 ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss)
+  # tests_i <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
+  #                                ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss)
+  
+  # IW adding parameter estimates to output
+  tests_and_params <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
+                                              ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss)
+  tests_i<- tests_and_params$tests # Test statistics
+  params_i <- tests_and_params$par # Parameter estimates
+  
+  # cat("print OLD tests", tests_i, "\n")
+  # cat("print NEW tests", tests_i_NEW, "\n")
+  # cat("print NEW params", params_i, "\n")
   
   if (union) {
     scaling <- scaling_factors_cpp(t_star, level)
@@ -88,8 +98,7 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
     test_stats <- NULL
   }
   out <- list("y" = data, "p_vec" = p_vec, "t_star" = t_star, "test_stats_star" = test_stats_star,
-              "tests_i" = tests_i, "test_stats" = test_stats, "level" = level, "dc" = dc,
-              "detr" = detr)
+              "tests_i" = tests_i, "param_i" = params_i,"test_stats" = test_stats, "level" = level, "dc" = dc, "detr" = detr)
   
   return(out)
 }
@@ -169,7 +178,7 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
   if (!(bootstrap %in% c("MBB", "BWB", "DWB", "AWB", "SB", "SWB")) | length(bootstrap) > 1) {
     stop("The argument bootstrap should be equal to either MBB, BWB, DWB, AWB, SB or SWB")
   } else if (bootstrap %in% c("SB", "SWB") & !boot_ur_test) {
-    warning("SB and SWB bootstrap only recommended for iADFtest; see help for details.")
+    warning("SB and SWB bootstrap only recommended for boot_ur; see help for details.")
   }
   boot <- 1 * (bootstrap == "MBB") + 2*(bootstrap == "BWB") + 3 * (bootstrap == "DWB") +
     4 * (bootstrap == "AWB") + 5 * (bootstrap == "SB") + 6 * (bootstrap == "SWB")
@@ -196,8 +205,8 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
       #      Set deterministics to 0, 1 and/or 2, or set union to TRUE for union test.")
       stop("No deterministic specification set.
            Set deterministics to the strings none, intercept or trend, or set union to TRUE for union test.")
-    } else if (any(!is.element(deterministics, c("none", "intercept", "trend")))){
-      stop("The argument deterministics should only contain  the string none, intercept and/or trend:
+    } else if (any(!is.element(deterministics, c("none", "intercept", "trend"))) | length(deterministics) > 1){
+      stop("The argument deterministics should be equal to either none, intercept, trend:
            (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
     }
     dc <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
@@ -206,8 +215,8 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
     if (is.null(detrend)) {
       warning("No detrending specification set. Using OLS detrending.")
       detrend <- "OLS"
-    } else if(any(!is.element(detrend, c("OLS", "QD")))) {
-      stop("The argument detrend should only contain the strings OLS and/or QD")
+    } else if(any(!is.element(detrend, c("OLS", "QD")))| length(detrend) > 1) {
+      stop("The argument detrend should be equal to either OLS, QD")
     }
     detr_int <- 1*(detrend=="OLS") + 2*(detrend=="QD")
     detr_int <- sort(detr_int)
@@ -312,4 +321,23 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
               p_max = max_lag, p_vec = p_vec, range_nonmiss = range_nonmiss, joint = joint, nc = cores)
   
   return(out)
+}
+
+
+
+htest_class_for_output <- function(ivar, var_names, results, method){
+  # ivar: index looping over all N variables
+  # var_names : variable names
+  # results : matrix of dimension Nx3 with column 1 estimates, column 2 test stats, column 3 p-values
+  gamma_hat <- results[ivar, 1]
+  attr(gamma_hat, "names") <- "gamma"
+  tstat <- results[ivar, 2]
+  attr(tstat, "names") <- "tstat"
+  pvalue <- results[ivar, 3]
+  
+  boot_ur_output <- list(method = method, data.name = var_names[ivar], null.value = c("gamma" = 0),
+                         alternative = "less", estimate = gamma_hat, statistic = tstat, p.value = pvalue)
+  
+  class(boot_ur_output) <- "htest"
+  return(boot_ur_output)
 }
