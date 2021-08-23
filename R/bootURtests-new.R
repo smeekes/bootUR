@@ -514,7 +514,7 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
                       alternative = "less", null.value =  c("gamma" = 0))
   class(fdr_output) <- "fdr_test"
   
-  print.fdr_test <- function(x, prefix = "\t", ...){
+  print.fdr_test <- function(x , digits = getOption("digits"), prefix = "\t", ...){
     cat("\n")
     cat(strwrap(x$method, prefix = prefix), sep = "\n")
     cat("\n")
@@ -701,7 +701,7 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
   }else{ # No Union Tests
     BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = matrix(inputs$tests_i[1, ], nrow = 1), t_star = inputs$t_star[ , 1,], level = inputs$level)
     BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
-    rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq[[i]]))
+    rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
     colnames(BSQT_seq) <- c("Unit H0", "Unit H1", "tstat", "p-value")
   }
   
@@ -709,7 +709,7 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
                      alternative = "less", null.value =  c("gamma" = 0))
   class(sqt_output) <- "sqt_test"
   
-  print.sqt_test <- function(x, prefix = "\t", ...){
+  print.sqt_test <- function(x, digits = getOption("digits"), prefix = "\t", ...){
     cat("\n")
     cat(strwrap(x$method, prefix = prefix), sep = "\n")
     cat("\n")
