@@ -23,16 +23,16 @@
 #' GDP_BE_adf <- adf(MacroTS[, 1], deterministics = "trend")
 adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = "intercept", criterion_scale = TRUE,
                 two_step = TRUE){
-  
+
   if (NCOL(data) > 1) {
     stop("Multiple time series not allowed. Switch to a multivariate method such as boot_ur,
          or change argument data to a univariate time series.")
   }
-  
+
   #### Checking inputs ####
   y <- as.matrix(data)
   n <- nrow(y)
-  
+
   check_missing <- check_missing_insample_values(y)
   if (any(check_missing)) {
     stop("Missing values detected inside sample.")
@@ -42,12 +42,12 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
     range_nonmiss <- check_nonmiss$range - 1
     TT <- range_nonmiss[2] - range_nonmiss[1] + 1
   }
-  
+
   if (any(!is.element(criterion, c("AIC", "BIC", "MAIC", "MBIC"))) | length(criterion) > 1) {
     stop("The argument criterion should be equal to either AIC, BIC, MAIC, MBIC)")
   }
   ic <- 1*(criterion=="AIC") + 2*(criterion=="BIC") + 3*(criterion=="MAIC") + 4*(criterion=="MBIC")
-  
+
   if (is.null(deterministics)) {
     stop("No deterministic specification set.
          Set deterministics to the strings none, intercept or trend.")
@@ -57,24 +57,22 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
   }
   dc_int <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
   dc_int <- sort(dc_int)
-  
+
   detr <- "OLS"
   detr_int <- 1
   # detr_int <- 1*(detr=="OLS") + 2*(detr=="QD")
   detr_int <- sort(detr_int)
-  
-  if(is.null(max_lag)){
-    # Correction for small samples as formula doesn't work well for micropanels
-    max_lag = round(12*(n/100)^(1/4)) - 7*max(1 - n/50, 0)*(n/100)^(1/4)
-  }
-  
+
   # Get ADF test statistic: two-step detrending
-  if(two_step){
-    tests_and_params <- adf_tests_panel_cpp(y, pmin = min_lag, pmax = max_lag, ic = ic, dc = dc_int, detr = detr_int,
-                                            ic_scale = criterion_scale, h_rs = 0.1, range = range_nonmiss) 
-  }else{
-    tests_and_params <- adf_onestep_tests_panel_cpp(y, pmin = min_lag, pmax = max_lag, ic = ic, dc = dc_int,
-                                            ic_scale = criterion_scale, h_rs = 0.1, range = range_nonmiss)
+  if (two_step) {
+    tests_and_params <- adf_tests_panel_cpp(y, pmin = min_lag, pmax = max_lag, ic = ic,
+                                            dc = dc_int, detr = detr_int,
+                                            ic_scale = criterion_scale, h_rs = 0.1,
+                                            range = range_nonmiss)
+  } else {
+    tests_and_params <- adf_onestep_tests_panel_cpp(y, pmin = min_lag, pmax = max_lag,
+                                                    ic = ic, dc = dc_int, ic_scale = criterion_scale,
+                                                    h_rs = 0.1, range = range_nonmiss)
   }
 
   # Collect estimate, test statistic and pvalue ADF test
@@ -82,7 +80,7 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
   attr(tstat, "names") <- "tstat"
   param <- c(tests_and_params$par) # Parameter estimates
   attr(param, "names") <- "gamma"
-  
+
   switch(deterministics,
          "trend" = urtype <- "ct",
          "intercept" = urtype <- "c",
@@ -99,6 +97,6 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
   adf_out <- list(method = "ADF test on a single time series", data.name = var_name, null.value = c("gamma" = 0),
                          alternative = "less", estimate = param, statistic = tstat, p.value = p_val)
   class(adf_out) <- "htest"
-  
+
   return(adf_out)
 }

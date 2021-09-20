@@ -4,18 +4,18 @@
 \alias{order_integration}
 \title{Determine Order of Integration}
 \usage{
-order_integration(y, max_order = 2, test = NULL, plot_orders = FALSE, ...)
+order_integration(data, max_order = 2, test = NULL, plot_orders = FALSE, ...)
 }
 \arguments{
-\item{y}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.}
+\item{data}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.}
 
 \item{max_order}{The maximum order of integration of the time series. Default is 2.}
-
-\item{test}{The unit root tests to be used in the procedure. For multiple time series the options are "iADFtest", "BSQTtest" and "bFDRtest", with "iADFtest" the default. For single time series the options are "boot_df" and "boot_union", with the latter the default.}
 
 \item{plot_orders}{Logical indicator whether the resulting orders of integration should be plotted. Default is \code{FALSE}.}
 
 \item{...}{Optional arguments passed to the chosen unit root test function.}
+
+\item{method}{The unit root tests to be used in the procedure. For multiple time series the options are "boot_ur", "boot_sqt" and "boot_fdr", with "boot_ur" the default. For single time series the options are "adf", boot_adf", "boot_union" and "boot_ur", with the latter the default.}
 }
 \value{
 A list with the following components
@@ -28,13 +28,13 @@ Determines the order of integration for each time series in a dataset via a sequ
 \details{
 The function follows the approach laid out in Smeekes and Wijler (2020), where all series is differenced \eqn{d-1} times, where \eqn{d} is the specified maximum order, and these differenced series are tested for unit roots. The series foe which the unit root null is not rejected, are classified as \eqn{I(d)} and removed from consideration. The remaining series are integrated, and tested for unit roots again, leading to a classification of \eqn{I(d-1)} series if the null is not rejected. This is continued until a non-rejection is observed for all time series, or the series are integrated back to their original level. The series for which the null hypothesis is rejected in the final stage are classified as \eqn{I(0)}.
 
-Care must be taken when using \code{\link{BSQTtest}} when the argument \code{q} is given as a sequence of integers. As at each step series are removed, one may end up with fewer series to test than indicated in \code{q}. While integers larger than the number of series will automatically be removed - along with a warning - by the test, it is recommend to set \code{q} in the form of quantiles.
+Care must be taken when using \code{\link{boot_sqt}} when the argument \code{steps} is given as a sequence of integers. As at each step series are removed, one may end up with fewer series to test than indicated in \code{steps}. While integers larger than the number of series will automatically be removed - along with a warning - by the test, it is recommend to set \code{steps} in the form of quantiles.
 
 Plotting the orders of integration requires the \code{ggplot2} package to be installed; plot will be skipped and a warning is given if not. For plots the function \code{\link{plot_order_integration}} is called. The user may prefer to set \code{plot_orders = FALSE} and call this function directly using the returned value of \code{order_int} in order to have more control over plot settings and save the plot object.
 }
 \examples{
-# Use iADFtest to determine the order of GDP_BE and GDP_DE
-orders_iADFtest <- order_integration(MacroTS[, 1:2], test = "iADFtest", B = 199)
+# Use "boot_ur" to determine the order of GDP_BE and GDP_DE
+orders_tseries <- order_integration(MacroTS[, 1:2], test = "boot_ur", B = 199)
 }
 \references{
 Smeekes, S. and Wijler, E. (2020). Unit roots and cointegration. In P. Fuleky (Ed.) \emph{Macroeconomic Forecasting in the Era of Big Data}, Chapter 17, pp. 541-584. \emph{Advanced Studies in Theoretical and Applied Econometrics}, vol. 52. Springer.
