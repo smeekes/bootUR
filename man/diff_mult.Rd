@@ -4,10 +4,10 @@
 \alias{diff_mult}
 \title{Differences of Multiple Time Series}
 \usage{
-diff_mult(y, d, keep_NAs = TRUE)
+diff_mult(data, d, keep_NAs = TRUE)
 }
 \arguments{
-\item{y}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.}
+\item{data}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.}
 
 \item{d}{An \eqn{N}-dimensional vector containing the orders}
 

@@ -31,7 +31,14 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{two_step}{Logical indicator whether to use one-step (\code{two_step = FALSE}) or two-step (\code{two_step = TRUE}) detrending. The default is two-step detrending.}
 }
 \value{
-Values of the Dickey-Fuller test statistics and corresponding bootstrap p-values.
+An object of class \code{htest} containing
+\item{\code{method}}{The name of the hypothesis test. For adf this is the standard ADF test on a single time series.;}
+\item{\code{data.name}}{The name of the variable on which the test is performed.;}
+\item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+\item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+\item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
+\item{\code{statistic}}{The value of the test statistic of the ADF unit root test.;}
+\item{\code{p.value}}{P-value of the ADF unit root test.}
 }
 \description{
 This function performs a standard augmented Dickey-Fuller unit root test on a single time series.

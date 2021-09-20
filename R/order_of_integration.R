@@ -1,15 +1,15 @@
 #' Differences of Multiple Time Series
 #' @description Performs differencing of multiple time series, with possibly different orders for each time series.
-#' @param y A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.
+#' @param data A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.
 #' @param d An \eqn{N}-dimensional vector containing the orders
 #' @param keep_NAs Logical indicator whether or not to keep the \code{NA} values resulting from differencing at the beginning of the sample. Default is \code{TRUE}. If \code{FALSE}, the entire row containing the \code{NA} values is removed.
 #' @export
 #' @return The appropriately differenced data in the same format as the original data.
-diff_mult <- function(y, d, keep_NAs = TRUE) {
-  x <- as.matrix(y)
+diff_mult <- function(data, d, keep_NAs = TRUE) {
+  x <- as.matrix(data)
   diffed_x <- matrix(NA, nrow = nrow(x), ncol = ncol(x))
   if (length(c(d)) != ncol(x)) {
-    stop("Argument d should have length equal to columns of y.")
+    stop("Argument d should have length equal to columns of data.")
   }
   if (any(d != round(d) | d < 0 )) {
     stop("Argument d may only contain integer larger or equal to 0.")
@@ -21,24 +21,24 @@ diff_mult <- function(y, d, keep_NAs = TRUE) {
       diffed_x[, i] <- x[, i]
     }
   }
-  diffed_y <- y
-  diffed_y[] <- diffed_x
+  diffed_data <- data
+  diffed_data[] <- diffed_x
   if (!keep_NAs & (max(d) > 0)) {
-    diffed_y <- diffed_y[-(1:max(d)), ]
+    diffed_data <- diffed_data[-(1:max(d)), ]
   }
-  return(diffed_y)
+  return(diffed_data)
 }
 
 #' Determine Order of Integration
 #' @description Determines the order of integration for each time series in a dataset via a sequence of unit root tests, and differences the data accordingly to eliminate stochastic trends.
-#' @param y A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.
+#' @param data A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.
 #' @param max_order The maximum order of integration of the time series. Default is 2.
-#' @param test The unit root tests to be used in the procedure. For multiple time series the options are "iADFtest", "BSQTtest" and "bFDRtest", with "iADFtest" the default. For single time series the options are "boot_df" and "boot_union", with the latter the default.
+#' @param method The unit root tests to be used in the procedure. For multiple time series the options are "boot_ur", "boot_sqt" and "boot_fdr", with "boot_ur" the default. For single time series the options are "adf", boot_adf", "boot_union" and "boot_ur", with the latter the default.
 #' @param plot_orders Logical indicator whether the resulting orders of integration should be plotted. Default is \code{FALSE}.
 #' @param ... Optional arguments passed to the chosen unit root test function.
 #' @details The function follows the approach laid out in Smeekes and Wijler (2020), where all series is differenced \eqn{d-1} times, where \eqn{d} is the specified maximum order, and these differenced series are tested for unit roots. The series foe which the unit root null is not rejected, are classified as \eqn{I(d)} and removed from consideration. The remaining series are integrated, and tested for unit roots again, leading to a classification of \eqn{I(d-1)} series if the null is not rejected. This is continued until a non-rejection is observed for all time series, or the series are integrated back to their original level. The series for which the null hypothesis is rejected in the final stage are classified as \eqn{I(0)}.
 #'
-#' Care must be taken when using \code{\link{BSQTtest}} when the argument \code{q} is given as a sequence of integers. As at each step series are removed, one may end up with fewer series to test than indicated in \code{q}. While integers larger than the number of series will automatically be removed - along with a warning - by the test, it is recommend to set \code{q} in the form of quantiles.
+#' Care must be taken when using \code{\link{boot_sqt}} when the argument \code{steps} is given as a sequence of integers. As at each step series are removed, one may end up with fewer series to test than indicated in \code{steps}. While integers larger than the number of series will automatically be removed - along with a warning - by the test, it is recommend to set \code{steps} in the form of quantiles.
 #'
 #' Plotting the orders of integration requires the \code{ggplot2} package to be installed; plot will be skipped and a warning is given if not. For plots the function \code{\link{plot_order_integration}} is called. The user may prefer to set \code{plot_orders = FALSE} and call this function directly using the returned value of \code{order_int} in order to have more control over plot settings and save the plot object.
 #' @export
@@ -47,47 +47,54 @@ diff_mult <- function(y, d, keep_NAs = TRUE) {
 #' \item{\code{diff_data}}{The appropriately differenced data according to \code{order_int} in the same format as the original data.}
 #' @references Smeekes, S. and Wijler, E. (2020). Unit roots and cointegration. In P. Fuleky (Ed.) \emph{Macroeconomic Forecasting in the Era of Big Data}, Chapter 17, pp. 541-584. \emph{Advanced Studies in Theoretical and Applied Econometrics}, vol. 52. Springer.
 #' @examples
-#' # Use iADFtest to determine the order of GDP_BE and GDP_DE
-#' orders_iADFtest <- order_integration(MacroTS[, 1:2], test = "iADFtest", B = 199)
-order_integration <- function(y, max_order = 2, test = NULL, plot_orders = FALSE, ...) {
-  N <- NCOL(y)
-  if (is.null(test)) {
-    if (N == 1) {
-      test = "boot_union"
-    } else {
-      test = "iADFtest"
-    }
-  }
-  if (!is.null(colnames(y))) {
-    var_names <- colnames(y)
+#' # Use "boot_ur" to determine the order of GDP_BE and GDP_DE
+#' orders_tseries <- order_integration(MacroTS[, 1:2], test = "boot_ur", B = 199)
+order_integration <- function(data, max_order = 2, method = "boot_ur", plot_orders = FALSE, ...) {
+  N <- NCOL(data)
+  if (!is.null(colnames(data))) {
+    var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(y))
+    var_names <- paste0("Variable ", 1:NCOL(data))
   }
   d <- rep(NA, N)
   names(d) <- var_names
-  yd <- y
-  i_in_yd <- 1:N
+  datad <- data
+  i_in_datad <- 1:N
   for (d_i in (max_order - 1):0) {
-    yd <- diff_mult(y[, i_in_yd], rep(d_i, length(i_in_yd)), keep_NAs = FALSE)
-    if (test == "iADFtest") {
-      out <- iADFtest(yd, ...)
-    } else if (test == "bFDRtest" & N > 1) {
-      out <- bFDRtest(yd, ...)
-    } else if (test == "BSQTtest" & N > 1) {
-      out <- BSQTtest(yd, ...)
-    } else if (test == "boot_df" & N == 1) {
-      out <- boot_df(yd, ...)
-    } else if (test == "boot_union" & N == 1) {
-      out <- boot_union(yd, ...)
+    datad <- diff_mult(data[, i_in_datad], rep(d_i, length(i_in_datad)), keep_NAs = FALSE)
+    if (method == "boot_ur") {
+      out <- boot_ur(datad, ...)
+    } else if (method == "boot_fdr" & N > 1) {
+      out <- boot_fdr(datad, ...)
+    } else if (method == "boot_sqt" & N > 1) {
+      out <- boot_sqt(datad, ...)
+    } else if (method == "boot_adf" & N == 1) {
+      out <- boot_adf(datad, ...)
+    } else if (method == "boot_union" & N == 1) {
+      out <- boot_union(datad, ...)
+    } else if (method == "adf" & N == 1) {
+      out <- adf(datad, ...)
+    } else if (method == "iADFtest") {
+      stop("'iADFtest' is deprecated. Use 'boot_ur' instead.")
+#      out <- iADFtest(datad, ...)
+    } else if (method == "bFDRtest" & N > 1) {
+      stop("'bFDRtest' is deprecated. Use 'boot_fdr' instead.")
+#      out <- bFDRtest(datad, ...)
+    } else if (method == "BSQTtest" & N > 1) {
+      stop("'BSQTtest' is deprecated. Use 'boot_sqt' instead.")
+#      out <- BSQTtest(datad, ...)
+    } else if (method == "boot_df" & N == 1) {
+      stop("'boot_df' is deprecated. Use 'boot_adf' instead.")
+#      out <- boot_df(datad, ...)
     } else {
-      stop("Invalid test argument.")
+      stop("Invalid 'method' argument.")
     }
-    d[i_in_yd[!out$rej_H0]] <- d_i + 1
-    if (any(out$rej_H0)) {
+    d[i_in_datad[!out$rejections]] <- d_i + 1
+    if (any(out$rejections)) {
       if (d_i == 0) {
-        d[i_in_yd[out$rej_H0]] <- 0
+        d[i_in_datad[out$rej_H0]] <- 0
       } else {
-        i_in_yd <- i_in_yd[out$rej_H0]
+        i_in_datad <- i_in_datad[out$rej_H0]
       }
     } else {
       break
@@ -101,7 +108,7 @@ order_integration <- function(y, max_order = 2, test = NULL, plot_orders = FALSE
       print(g)
     }
   }
-  return(list(order_int = d, diff_data = diff_mult(y, d)))
+  return(list(order_int = d, diff_data = diff_mult(data, d)))
 }
 
 #' Plot Orders of Integration
@@ -158,7 +165,7 @@ plot_order_integration <- function(d, show_names = TRUE, show_legend = TRUE,
                        legend.text = ggplot2::element_text(size = legend_size),
                        axis.text.x = ggplot2::element_blank())
     }
-    
+
     if (n_g > 1) {
       g <- g + ggplot2::facet_wrap(ggplot2::vars(df$group), nrow = 1, scales = "free_y") +
         ggplot2::theme(strip.text = ggplot2::element_blank())
@@ -261,7 +268,7 @@ plot_missing_values <- function(y, show_names = FALSE, show_legend = TRUE,
     df <- data.frame(var_names = factor(rep(var_names, each = nrow(x)), levels = var_names),
                      obs = factor(rep(obs, ncol(x)), levels = rev(obs)),
                      missing_type = factor(c(x), levels = missing_type))
-    
+
     if (show_names) {
       g <- ggplot2::ggplot(data = df, ggplot2::aes(x = var_names, y = obs,
                                                    fill = missing_type)) +
