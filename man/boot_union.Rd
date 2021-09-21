@@ -71,7 +71,8 @@ Lag length selection is done automatically in the ADF regressions with the speci
 
 \examples{
 # boot_union on GDP_BE
-GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, verbose = TRUE)
+GDP_BE_df <- boot_union(MacroTS[, 1], B = 399)
+print(GDP_BE_df)
 }
 \references{
 Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.

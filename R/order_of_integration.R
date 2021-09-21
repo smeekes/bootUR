@@ -92,9 +92,9 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", plot_orde
     d[i_in_datad[!out$rejections]] <- d_i + 1
     if (any(out$rejections)) {
       if (d_i == 0) {
-        d[i_in_datad[out$rej_H0]] <- 0
+        d[i_in_datad[out$rejections]] <- 0
       } else {
-        i_in_datad <- i_in_datad[out$rej_H0]
+        i_in_datad <- i_in_datad[out$rejections]
       }
     } else {
       break

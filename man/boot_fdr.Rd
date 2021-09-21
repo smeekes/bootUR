@@ -85,7 +85,8 @@ See \code{\link{boot_ur}} for details on the bootstrap algorithm and lag selecti
 
 \examples{
 # boot_fdr on GDP_BE and GDP_DE
-two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], bootstrap = "MBB", B = 399,  verbose = TRUE)
+two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], bootstrap = "MBB", B = 399)
+print(two_series_boot_fdr)
 }
 \references{
 Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.

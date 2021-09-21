@@ -130,8 +130,9 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
 #' @param h_rs Bandwidth used in rescaled information criteria.
 #' @seealso \code{\link{boot_ur}}, \code{\link{boot_sqt}}, \code{\link{boot_fdr}}
 #' @keywords internal
-check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length, ar_AWB, union,
-                           min_lag, max_lag, criterion, deterministics, detrend, steps, do_parallel, cores){
+check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length,
+                         ar_AWB, union, min_lag, max_lag, criterion, deterministics,
+                         detrend, steps, do_parallel, cores){
 
   # Dimensions
   n <- nrow(data)

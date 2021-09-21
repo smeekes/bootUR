@@ -46,22 +46,24 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
   if (any(!is.element(criterion, c("AIC", "BIC", "MAIC", "MBIC"))) | length(criterion) > 1) {
     stop("The argument criterion should be equal to either AIC, BIC, MAIC, MBIC)")
   }
-  ic <- 1*(criterion=="AIC") + 2*(criterion=="BIC") + 3*(criterion=="MAIC") + 4*(criterion=="MBIC")
+  ic <- 1*(criterion == "AIC") + 2*(criterion == "BIC") + 3*(criterion == "MAIC")
+        + 4*(criterion == "MBIC")
 
   if (is.null(deterministics)) {
     stop("No deterministic specification set.
          Set deterministics to the strings none, intercept or trend.")
-  } else if (any(!is.element(deterministics, c("none", "intercept", "trend")))| length(deterministics) > 1){
+  } else if (any(!is.element(deterministics, c("none", "intercept", "trend"))) |
+             length(deterministics) > 1){
     stop("The argument deterministics should be equal to either none, intercept, trend:
            (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
   }
   dc_int <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
-  dc_int <- sort(dc_int)
+  # dc_int <- sort(dc_int)
 
   detr <- "OLS"
   detr_int <- 1
   # detr_int <- 1*(detr=="OLS") + 2*(detr=="QD")
-  detr_int <- sort(detr_int)
+  # detr_int <- sort(detr_int)
 
   # Get ADF test statistic: two-step detrending
   if (two_step) {

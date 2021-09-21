@@ -89,8 +89,8 @@ The function may give the following warnings.
 
 \examples{
 # boot_ur on GDP_BE and GDP_DE
-two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 399,
-verbose = TRUE)
+two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 399)
+print(two_series_boot_ur)
 }
 \references{
 Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.

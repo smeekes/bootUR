@@ -92,14 +92,14 @@ As random number generation is required to draw bootstrap samples, we first set 
 set.seed(155776)
 GDP_NL <- MacroTS[, 4]
 adf_out <- boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend", 
-                    detrend = "OLS", verbose = TRUE)
+                    detrend = "OLS")
 ```
 
 ### Union of Rejections Test
 Use `boot_union()` for a test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012). The advantage of the union test is that you don't have to specify these (rather influential) specification tests. This makes the union test a safe option for quick or automatic unit root testing where careful manual specification setup is not viable. Here we illustrate it with the sieve wild bootstrap as proposed by Smeekes and Taylor (2012).
 
 ```{r union}
-union_out <- boot_ur(GDP_NL, B = 399, bootstrap = "SWB", verbose = TRUE)
+union_out <- boot_ur(GDP_NL, B = 399, bootstrap = "SWB")
 ```
 
 ## Panel Unit Root Test
@@ -108,7 +108,7 @@ The function `boot_panel` performs a test on a multivariate (panel) time series 
 Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`bootstrap = "MBB"`). However, this resampling-based method cannot handle unbalancedness, and will therefore give an error when applied to `MacroTS`:
 
 ```{r panel-error, error = TRUE, purl = FALSE}
-panel_out <- boot_panel(MacroTS, bootstrap = "MBB", B = 399, verbose = TRUE)
+panel_out <- boot_panel(MacroTS, bootstrap = "MBB", B = 399)
 ```
 
 Therefore, you should switch to one of the wild bootstrap methods. Here we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao (2019).
@@ -118,7 +118,7 @@ By default the union test is used for each series (`union = TRUE`), if this is s
 Although the sieve bootstrap method `"SB"` and `"SWB"` can be used (historically they have been popular among practitioners), Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units. The code will give a warning to recommend using a different bootstrap method.
 
 ```{r panel}
-panel_out <- boot_panel(MacroTS, bootstrap = "DWB", B = 399, verbose = TRUE)
+panel_out <- boot_panel(MacroTS, bootstrap = "DWB", B = 399)
 ```
 
 ## Tests for Multiple Time Series
@@ -126,8 +126,8 @@ panel_out <- boot_panel(MacroTS, bootstrap = "DWB", B = 399, verbose = TRUE)
 To perform individual ADF tests on multiple time series simultaneously, the function `boot_ur()` can still be used. As the bootstrap is performed for all series simultaneously, resampling-based bootstrap methods `"MBB"` and `"SB"` cannot be used directly in case of unbalanced panels. If they are used anyway, the function will revert to splitting the bootstrap up and performing it individually per time series. In this case a warning is given to alert the user.
 
 ```{r iADF}
-ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, verbose = TRUE, union = FALSE, 
-                     deterministics = "trend", detrend = "OLS")
+ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALSE, 
+                        deterministics = "trend", detrend = "OLS")
 ```
 
 Note that `boot_ur` (intentionally) does not provide a correction for multiple testing; of course, if we perform each test with a significance level of 5%, the probability of making a mistake in all these tests becomes (much, if `N` is large) more than 5%. To explicitly account for multiple testing, use the functions `boot_sqt()` or `boot_fdrt()`.
@@ -141,9 +141,9 @@ Testing individual series consecutively is easiest for interpretation, but is on
 ```{r BSQT}
 N <- ncol(MacroTS)
 # Test each unit sequentially
-BSQT_out1 <- boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399, verbose = TRUE)
+BSQT_out1 <- boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
 # Split in four equally sized groups (motivated by the 4 series per country)
-BSQT_out2 <- boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399, verbose = TRUE)
+BSQT_out2 <- boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
 ```
 
 ### Bootstrap FDR Controlling Tests
@@ -154,7 +154,7 @@ The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wo
 We illustrate it here with the final available bootstrap method, the block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 ```{r bFDR}
 N <- ncol(MacroTS)
-FDR_out <- boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399, verbose = TRUE)
+FDR_out <- boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
 ```
 
 ## Determining Order of Integration
@@ -164,7 +164,7 @@ Generally the unit root tests above would only be used as a single step in a lar
 Starting from a maximum order \eqn{d} (by default equal to 2), it differences the data \eqn{d-1} time until there can be at most one unit root. If the test is not rejected for a particular series, we know this series if of order \eqn{d}. The series for which we do reject are integrated once (such that they are differenced \eqn{d-1} times from their original level), and the test is repeated. By doing so until we have classified all series, we obtain a full specification of the orders of all time series.
 
 ### Implementation
-The function allows us to choose which unit root test we want to use. Here we take the `bFDRtest`. We don't only get the orders out, but also the appropriately differenced data.
+The function allows us to choose which unit root test we want to use. Here we take `boot_fdr`. We don't only get the orders out, but also the appropriately differenced data.
 ```{r orders}
 out_orders <- order_integration(MacroTS[, 11:15], method = "boot_fdr", B = 399)
 # Orders

@@ -85,7 +85,8 @@ Lag length selection is done automatically in the ADF regression with the specif
 \examples{
 # boot_adf on GDP_BE
 GDP_BE_adf <- boot_adf(MacroTS[, 1], B = 399, deterministics = "trend",
-detrend = "OLS", verbose = TRUE)
+detrend = "OLS")
+print(GDP_BE_adf)
 }
 \references{
 Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.

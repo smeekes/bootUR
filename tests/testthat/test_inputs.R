@@ -34,24 +34,24 @@ test_that("Unbalanced Panels", {
 
 test_that("Panel Sieve Bootstrap", {
   y <- matrix(rnorm(20 * 5), nrow = 20, ncol = 5)
-  expect_warning(boot_fdr(y, level = 0.1, B = 19, bootstrap = "SB"), "SB and SWB bootstrap only recommended for iADFtest; see help for details.")
-  expect_warning(boot_sqt(y, level = 0.1, B = 19, bootstrap = "SB"), "SB and SWB bootstrap only recommended for iADFtest; see help for details.")
-  expect_warning(boot_panel(y, level = 0.1, B = 19, bootstrap = "SB"), "SB and SWB bootstrap only recommended for iADFtest; see help for details.")
-  expect_warning(boot_fdr(y, level = 0.1, B = 19, bootstrap = "SWB"), "SB and SWB bootstrap only recommended for iADFtest; see help for details.")
-  expect_warning(boot_sqt(y, level = 0.1, B = 19, bootstrap = "SWB"), "SB and SWB bootstrap only recommended for iADFtest; see help for details.")
-  expect_warning(boot_panel(y, level = 0.1, B = 19, bootstrap = "SWB"), "SB and SWB bootstrap only recommended for iADFtest; see help for details.")
+  expect_warning(boot_fdr(y, level = 0.1, B = 19, bootstrap = "SB"), "SB and SWB bootstrap only recommended for boot_ur; see help for details.")
+  expect_warning(boot_sqt(y, level = 0.1, B = 19, bootstrap = "SB"), "SB and SWB bootstrap only recommended for boot_ur; see help for details.")
+  expect_warning(boot_panel(y, level = 0.1, B = 19, bootstrap = "SB"), "SB and SWB bootstrap only recommended for boot_ur; see help for details.")
+  expect_warning(boot_fdr(y, level = 0.1, B = 19, bootstrap = "SWB"), "SB and SWB bootstrap only recommended for boot_ur; see help for details.")
+  expect_warning(boot_sqt(y, level = 0.1, B = 19, bootstrap = "SWB"), "SB and SWB bootstrap only recommended for boot_ur; see help for details.")
+  expect_warning(boot_panel(y, level = 0.1, B = 19, bootstrap = "SWB"), "SB and SWB bootstrap only recommended for boot_ur; see help for details.")
 })
 
 test_that("Union specs", {
   y <- matrix(rnorm(20 * 5), nrow = 20, ncol = 5)
-  expect_warning(boot_ur(y, level = 0.1, B = 19, deterministics = "intercept", bootstrap = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(boot_fdr(y, level = 0.1, B = 19, deterministics = "trend", bootstrap = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(boot_sqt(y, level = 0.1, B = 19, deterministics = "intercept", bootstrap = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(boot_panel(y, level = 0.1, B = 19, deterministics = "trend", bootstrap = "AWB"), "Deterministic specification in argument dc is ignored, as union test is applied.")
-  expect_warning(boot_ur(y, level = 0.1, B = 19, detrend = "OLS", bootstrap = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
-  expect_warning(boot_fdr(y, level = 0.1, B = 19, detrend = "QD", bootstrap = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
-  expect_warning(boot_sqt(y, level = 0.1, B = 19, detrend = "OLS", bootstrap = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
-  expect_warning(boot_panel(y, level = 0.1, B = 19, detrend = "QD", bootstrap = "AWB"), "Detrending method in argument detr is ignored, as union test is applied.")
+  expect_warning(boot_ur(y, level = 0.1, B = 19, deterministics = "intercept", bootstrap = "AWB"), "Deterministic specification in argument deterministics is ignored, as union test is applied.")
+  expect_warning(boot_fdr(y, level = 0.1, B = 19, deterministics = "trend", bootstrap = "AWB"), "Deterministic specification in argument deterministics is ignored, as union test is applied.")
+  expect_warning(boot_sqt(y, level = 0.1, B = 19, deterministics = "intercept", bootstrap = "AWB"), "Deterministic specification in argument deterministics is ignored, as union test is applied.")
+  expect_warning(boot_panel(y, level = 0.1, B = 19, deterministics = "trend", bootstrap = "AWB"), "Deterministic specification in argument deterministics is ignored, as union test is applied.")
+  expect_warning(boot_ur(y, level = 0.1, B = 19, detrend = "OLS", bootstrap = "AWB"), "Detrending method in argument detrend is ignored, as union test is applied.")
+  expect_warning(boot_fdr(y, level = 0.1, B = 19, detrend = "QD", bootstrap = "AWB"), "Detrending method in argument detrend is ignored, as union test is applied.")
+  expect_warning(boot_sqt(y, level = 0.1, B = 19, detrend = "OLS", bootstrap = "AWB"), "Detrending method in argument detrend is ignored, as union test is applied.")
+  expect_warning(boot_panel(y, level = 0.1, B = 19, detrend = "QD", bootstrap = "AWB"), "Detrending method in argument detrend is ignored, as union test is applied.")
 })
 
 test_that("BSQT q spec", {
