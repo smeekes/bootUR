@@ -1,6 +1,6 @@
 #' Augmented Dickey-Fuller Unit Root Test
 #' @description This function performs a standard augmented Dickey-Fuller unit root test on a single time series.
-#' @inheritParams boot_ur
+#' @inheritParams boot_adf
 #' @param two_step Logical indicator whether to use one-step (\code{two_step = FALSE}) or two-step (\code{two_step = TRUE}) detrending. The default is two-step detrending.
 #' @details The function encompasses the standard augmented Dickey-Fuller test. The reported p-values are MacKinnon's unit root p-values taken from the package urca.
 #'
@@ -21,8 +21,8 @@
 #' @examples
 #' # standard ADF test on GDP_BE
 #' GDP_BE_adf <- adf(MacroTS[, 1], deterministics = "trend")
-adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = "intercept", criterion_scale = TRUE,
-                two_step = TRUE){
+adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = "intercept",
+                criterion_scale = TRUE, two_step = TRUE){
 
   if (NCOL(data) > 1) {
     stop("Multiple time series not allowed. Switch to a multivariate method such as boot_ur,
@@ -94,8 +94,9 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
     var_name <- paste0("Variable ", 1)
   }
 
-  adf_out <- list(method = "ADF test on a single time series", data.name = var_name, null.value = c("gamma" = 0),
-                         alternative = "less", estimate = param, statistic = tstat, p.value = p_val)
+  adf_out <- list(method = "ADF test on a single time series", data.name = var_name,
+                  null.value = c("gamma" = 0), alternative = "less", estimate = param,
+                  statistic = tstat, p.value = p_val)
   class(adf_out) <- "htest"
 
   return(adf_out)
