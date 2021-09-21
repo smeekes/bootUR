@@ -8,7 +8,7 @@ adf(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
   deterministics = "intercept", criterion_scale = TRUE, two_step = TRUE)
 }
 \arguments{
-\item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
+\item{data}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
 
 \item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 

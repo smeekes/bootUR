@@ -4,18 +4,19 @@
 \alias{order_integration}
 \title{Determine Order of Integration}
 \usage{
-order_integration(data, max_order = 2, test = NULL, plot_orders = FALSE, ...)
+order_integration(data, max_order = 2, method = "boot_ur",
+  plot_orders = FALSE, ...)
 }
 \arguments{
 \item{data}{A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.}
 
 \item{max_order}{The maximum order of integration of the time series. Default is 2.}
 
+\item{method}{The unit root tests to be used in the procedure. For multiple time series the options are "boot_ur", "boot_sqt" and "boot_fdr", with "boot_ur" the default. For single time series the options are "adf", boot_adf", "boot_union" and "boot_ur", with the latter the default.}
+
 \item{plot_orders}{Logical indicator whether the resulting orders of integration should be plotted. Default is \code{FALSE}.}
 
 \item{...}{Optional arguments passed to the chosen unit root test function.}
-
-\item{method}{The unit root tests to be used in the procedure. For multiple time series the options are "boot_ur", "boot_sqt" and "boot_fdr", with "boot_ur" the default. For single time series the options are "adf", boot_adf", "boot_union" and "boot_ur", with the latter the default.}
 }
 \value{
 A list with the following components
