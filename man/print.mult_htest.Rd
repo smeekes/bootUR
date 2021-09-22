@@ -6,11 +6,7 @@
 \usage{
 \method{print}{mult_htest}(x, ...)
 }
-\arguments{
-\item{x}{An object of class mult_htest}
-
-\item{...}{further arguments passed to or from other methods.}
-}
 \description{
 This function prints summary output for objects of class mult_htest (for multiple hypothesis testing)
 }
+\keyword{internal}
