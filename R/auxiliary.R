@@ -327,6 +327,7 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
 #' Printing Summary Output for Objects of class mult_htest
 #' @description This function prints summary output for objects of class mult_htest (for multiple hypothesis testing)
 #' @param x An object of class mult_htest
+#' @param ... further arguments passed to or from other methods.
 #' @export
 print.mult_htest <- function(x, ...){
   cat("\n")
@@ -348,7 +349,7 @@ print.mult_htest <- function(x, ...){
       }
       else {
         cat(x$alternative, "\nnull values:\n", sep = "")
-        print(x$null.value, digits=getOption("digits"), ...)
+        print(x$null.value, digits=getOption("digits"))
       }
     }
     else cat(x$alternative, "\n", sep = "")

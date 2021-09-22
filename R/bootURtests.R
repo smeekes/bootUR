@@ -424,7 +424,7 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
 #' @examples
 #' # boot_sqt on GDP_BE and GDP_DE
 #' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
-#' print(two_series_boot_fdr)
+#' print(two_series_boot_sqt)
 #' @export
 boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB",
                      B = 1999, block_length = NULL, ar_AWB = NULL, union = TRUE,
