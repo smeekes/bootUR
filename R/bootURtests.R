@@ -77,7 +77,7 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
                     criterion = "MAIC", deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
                     show_progress = FALSE, do_parallel = FALSE, cores = NULL){
-
+  
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = TRUE,
                                    level = level, bootstrap = bootstrap, B = B,
                                    block_length = block_length, ar_AWB = ar_AWB,
@@ -133,9 +133,14 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
                        estimate = iADFout[, 1], statistic = iADFout[, 2], p.value = iADFout[, 3])
     class(boot_ur_output) <- "mult_htest"
   } else {
-    boot_ur_output <- htest_class_for_output(1, var_names, iADFout, method_name)
+    iADFtstat <- iADFout[1, 2]
+    attr(iADFtstat, "names") <- "tstat"
+    boot_ur_output <- list(method = method_name, data.name = var_names, null.value = c("gamma" = 0),
+                         alternative = "less", estimate = iADFout[1, 1], statistic = iADFtstat, p.value = iADFout[1, 3])
+    class(boot_ur_output) <- "htest"
+
   }
-  names(boot_ur_output) <- var_names
+  
   return(boot_ur_output)
 }
 
@@ -206,7 +211,7 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_leng
                  detrend = detrend, criterion_scale = criterion_scale,
                  show_progress = show_progress, do_parallel = do_parallel, cores = cores)
 
-  return(out[[1]])
+  return(out)
 }
 
 
@@ -275,7 +280,7 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
                  show_progress = show_progress, do_parallel = do_parallel,
                  cores = cores)
 
-  return(out[[1]])
+  return(out)
 }
 
 #' Bootstrap Unit Root Tests with False Discovery Rate control
@@ -369,6 +374,7 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
                      alternative = "less", null.value =  c("gamma" = 0), rejections = rej_H0,
                      estimate = NULL, statistic = NULL, p.value = NULL)
   class(fdr_output) <- "mult_htest"
+  
   return(fdr_output)
 }
 
@@ -550,9 +556,14 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
   return(panel_output)
 }
 
-print.mult_htest <- function(x, digits = getOption("digits"), prefix = "\t", ...){
+#' Printing Summary Output for Objects of class mult_htest
+#' @description This function prints summary output for objects of class mult_htest (for multiple hypothesis testing)
+#' @param x An object of class mult_htest
+#' @export
+print.mult_htest <- function(x, ...){
+# print.mult_htest <- function(x, digits = getOption("digits"), prefix = "\t", ...){
   cat("\n")
-  cat(strwrap(x$method, prefix = prefix), sep = "\n")
+  cat(strwrap(x$method, prefix = "\t"), sep = "\n")
   cat("\n")
   cat("data:  ", x$data.name, "\n", sep = "")
 
@@ -570,7 +581,7 @@ print.mult_htest <- function(x, digits = getOption("digits"), prefix = "\t", ...
       }
       else {
         cat(x$alternative, "\nnull values:\n", sep = "")
-        print(x$null.value, digits=digits, ...)
+        print(x$null.value, digits=getOption("digits"), ...)
       }
     }
     else cat(x$alternative, "\n", sep = "")
@@ -578,4 +589,5 @@ print.mult_htest <- function(x, digits = getOption("digits"), prefix = "\t", ...
   cat("\n")
   cat("Sequence of tests:", "\n")
   print(x$details)
+  invisible(x)
 }
