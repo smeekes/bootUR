@@ -519,6 +519,7 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
 #' @examples
 #' # boot_panel on GDP_BE and GDP_DE
 #' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
+#' print(two_series_boot_panel)
 #' @export
 boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL,
                        ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC",
@@ -554,40 +555,4 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
                        alternative = "less", estimate = gamma_hat, statistic = GM_test, p.value = p_val)
   class(panel_output) <- "htest"
   return(panel_output)
-}
-
-#' Printing Summary Output for Objects of class mult_htest
-#' @description This function prints summary output for objects of class mult_htest (for multiple hypothesis testing)
-#' @param x An object of class mult_htest
-#' @export
-print.mult_htest <- function(x, ...){
-# print.mult_htest <- function(x, digits = getOption("digits"), prefix = "\t", ...){
-  cat("\n")
-  cat(strwrap(x$method, prefix = "\t"), sep = "\n")
-  cat("\n")
-  cat("data:  ", x$data.name, "\n", sep = "")
-
-  if (!is.null(x$alternative)) {
-    cat("alternative hypothesis: ")
-    if (!is.null(x$null.value)) {
-      if (length(x$null.value) == 1L) {
-        alt.char <-
-          switch(x$alternative,
-                 two.sided = "not equal to",
-                 less = "less than",
-                 greater = "greater than")
-        cat("true ", names(x$null.value), " is ", alt.char, " ",
-            x$null.value, "\n", sep = "")
-      }
-      else {
-        cat(x$alternative, "\nnull values:\n", sep = "")
-        print(x$null.value, digits=getOption("digits"), ...)
-      }
-    }
-    else cat(x$alternative, "\n", sep = "")
-  }
-  cat("\n")
-  cat("Sequence of tests:", "\n")
-  print(x$details)
-  invisible(x)
 }

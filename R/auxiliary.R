@@ -324,20 +324,37 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
   return(out)
 }
 
-htest_class_for_output <- function(ivar, var_names, results, method){
-  # ivar: index looping over all N variables
-  # var_names : variable names
-  # results : matrix of dimension Nx3 with column 1 estimates, column 2 test stats, column 3 p-values
-  gamma_hat <- results[ivar, 1]
-  attr(gamma_hat, "names") <- "gamma"
-  tstat <- results[ivar, 2]
-  attr(tstat, "names") <- "tstat"
-  pvalue <- results[ivar, 3]
-#  attr(pvalue, "names") <- "pvalue"
-
-  boot_ur_output <- list(method = method, data.name = var_names[ivar], null.value = c("gamma" = 0),
-                         alternative = "less", estimate = gamma_hat, statistic = tstat, p.value = pvalue)
-
-  class(boot_ur_output) <- "htest"
-  return(boot_ur_output)
+#' Printing Summary Output for Objects of class mult_htest
+#' @description This function prints summary output for objects of class mult_htest (for multiple hypothesis testing)
+#' @param x An object of class mult_htest
+#' @export
+print.mult_htest <- function(x, ...){
+  cat("\n")
+  cat(strwrap(x$method, prefix = "\t"), sep = "\n")
+  cat("\n")
+  cat("data:  ", x$data.name, "\n", sep = "")
+  
+  if (!is.null(x$alternative)) {
+    cat("alternative hypothesis: ")
+    if (!is.null(x$null.value)) {
+      if (length(x$null.value) == 1L) {
+        alt.char <-
+          switch(x$alternative,
+                 two.sided = "not equal to",
+                 less = "less than",
+                 greater = "greater than")
+        cat("true ", names(x$null.value), " is ", alt.char, " ",
+            x$null.value, "\n", sep = "")
+      }
+      else {
+        cat(x$alternative, "\nnull values:\n", sep = "")
+        print(x$null.value, digits=getOption("digits"), ...)
+      }
+    }
+    else cat(x$alternative, "\n", sep = "")
+  }
+  cat("\n")
+  cat("Sequence of tests:", "\n")
+  print(x$details)
+  invisible(x)
 }
