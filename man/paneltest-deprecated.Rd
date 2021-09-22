@@ -81,7 +81,8 @@ See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag select
 
 \examples{
 # paneltest on GDP_BE and GDP_DE
-two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+\dontrun{two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "AWB", B = 399,  
+verbose = TRUE)}
 
 }
 \references{

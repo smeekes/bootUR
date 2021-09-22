@@ -86,7 +86,7 @@ See \code{\link{iADFtest}} for details on the bootstrap algorithm and lag select
 
 \examples{
 # bFDRtest on GDP_BE and GDP_DE
-two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+\dontrun{two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)}
 
 }
 \references{

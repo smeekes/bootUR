@@ -67,9 +67,9 @@
 #' @references Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
 #' @examples
 #' # iADFtest on GDP_BE and GDP_DE
-#' two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B = 399,
-#' verbose = TRUE)
-#' 
+#' \dontrun{two_series_iADFtest <- iADFtest(MacroTS[, 1:2], boot = "MBB", B = 399,
+#' verbose = TRUE)}
+
 #' @name iADFtest-deprecated
 #' @usage iADFtest(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL, union = TRUE, 
 #' p_min = 0, p_max = NULL, ic = "MAIC", dc = NULL, detr = NULL, ic_scale = TRUE, 
@@ -245,7 +245,7 @@ iADFtest <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL,
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # boot_df on GDP_BE
-#' GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)
+#' \dontrun{GDP_BE_df <- boot_df(MacroTS[, 1], B = 399, dc = 2, detr = "OLS", verbose = TRUE)}
 #' 
 #' @name boot_df-deprecated
 #' @usage boot_df(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
@@ -355,7 +355,7 @@ boot_df <- function(y, level = 0.05, boot = "AWB", B = 1999, l = NULL, ar_AWB = 
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # bFDRtest on GDP_BE and GDP_DE
-#' two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)
+#' \dontrun{two_series_bFDRtest <- bFDRtest(MacroTS[, 1:2], boot = "MBB", B = 399,  verbose = TRUE)}
 #' 
 #' @name bFDRtest-deprecated
 #' @usage bFDRtest(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
@@ -538,7 +538,7 @@ bFDRtest <- function(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB 
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # BSQTtest on GDP_BE and GDP_DE
-#' two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+#' \dontrun{two_series_BSQTtest <- BSQTtest(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)}
 #' 
 #' @name BSQTtest-deprecated
 #' @usage BSQTtest(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l = NULL,
@@ -711,7 +711,8 @@ BSQTtest <- function(y, q = 0:NCOL(y), level = 0.05,  boot = "AWB", B = 1999, l 
 #' @seealso \code{\link{iADFtest}}
 #' @examples
 #' # paneltest on GDP_BE and GDP_DE
-#' two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "AWB", B = 399,  verbose = TRUE)
+#' \dontrun{two_series_paneltest <- paneltest(MacroTS[, 1:2], boot = "AWB", B = 399,  
+#' verbose = TRUE)}
 #' 
 #' @name paneltest-deprecated
 #' @usage paneltest(y, level = 0.05,  boot = "AWB", B = 1999, l = NULL, ar_AWB = NULL,
