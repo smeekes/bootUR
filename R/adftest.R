@@ -43,6 +43,12 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
     TT <- range_nonmiss[2] - range_nonmiss[1] + 1
   }
 
+  
+  if(is.null(max_lag)){
+    # Correction for small samples as formula doesn't work well for micropanels
+    max_lag = round(12*(n/100)^(1/4)) - 7*max(1 - n/50, 0)*(n/100)^(1/4)
+  }
+  
   if (any(!is.element(criterion, c("AIC", "BIC", "MAIC", "MBIC"))) | length(criterion) > 1) {
     stop("The argument criterion should be equal to either AIC, BIC, MAIC, MBIC)")
   }

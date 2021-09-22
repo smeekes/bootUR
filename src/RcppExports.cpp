@@ -6,6 +6,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // adf_tests_panel_cpp_mat_out
 arma::mat adf_tests_panel_cpp_mat_out(const arma::mat& y, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range);
 RcppExport SEXP _bootUR_adf_tests_panel_cpp_mat_out(SEXP ySEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP detrSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP) {
