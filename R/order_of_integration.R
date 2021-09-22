@@ -48,7 +48,7 @@ diff_mult <- function(data, d, keep_NAs = TRUE) {
 #' @references Smeekes, S. and Wijler, E. (2020). Unit roots and cointegration. In P. Fuleky (Ed.) \emph{Macroeconomic Forecasting in the Era of Big Data}, Chapter 17, pp. 541-584. \emph{Advanced Studies in Theoretical and Applied Econometrics}, vol. 52. Springer.
 #' @examples
 #' # Use "boot_ur" to determine the order of GDP_BE and GDP_DE
-#' orders_tseries <- order_integration(MacroTS[, 1:2], test = "boot_ur", B = 199)
+#' orders_tseries <- order_integration(MacroTS[, 1:2], method = "boot_ur", B = 199)
 order_integration <- function(data, max_order = 2, method = "boot_ur", plot_orders = FALSE, ...) {
   N <- NCOL(data)
   if (!is.null(colnames(data))) {

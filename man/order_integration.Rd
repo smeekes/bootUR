@@ -35,7 +35,7 @@ Plotting the orders of integration requires the \code{ggplot2} package to be ins
 }
 \examples{
 # Use "boot_ur" to determine the order of GDP_BE and GDP_DE
-orders_tseries <- order_integration(MacroTS[, 1:2], test = "boot_ur", B = 199)
+orders_tseries <- order_integration(MacroTS[, 1:2], method = "boot_ur", B = 199)
 }
 \references{
 Smeekes, S. and Wijler, E. (2020). Unit roots and cointegration. In P. Fuleky (Ed.) \emph{Macroeconomic Forecasting in the Era of Big Data}, Chapter 17, pp. 541-584. \emph{Advanced Studies in Theoretical and Applied Econometrics}, vol. 52. Springer.
