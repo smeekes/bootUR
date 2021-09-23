@@ -25,17 +25,20 @@
 #' @param h_rs Bandwidth used in rescaled information criteria.
 #' @seealso \code{\link{boot_ur}}, \code{\link{boot_sqt}}, \code{\link{boot_fdr}}
 #' @keywords internal
-do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length, ar_AWB, union, min_lag,
-                                max_lag, criterion, deterministics, detrend, criterion_scale, steps, h_rs, show_progress,
-                                       do_parallel, cores){
+do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap,
+                                   B, block_length, ar_AWB, union, min_lag, max_lag, criterion,
+                                   deterministics, detrend, criterion_scale, steps, h_rs,
+                                   show_progress, do_parallel, cores, data_name){
 
 
   data <- as.matrix(data)
 
   # Check correctness arguments and perform initial calculations and transformations
-  inputs <- check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test = boot_ur_test, level = level, bootstrap = bootstrap,
-                             B = B, block_length = block_length, ar_AWB = ar_AWB, union = union, min_lag = min_lag, max_lag = max_lag, criterion = criterion,
-                              deterministics = deterministics, detrend = detrend, steps = steps, do_parallel = do_parallel, cores = cores)
+  inputs <- check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test = boot_ur_test,
+                         level = level, bootstrap = bootstrap, B = B, block_length = block_length,
+                         ar_AWB = ar_AWB, union = union, min_lag = min_lag, max_lag = max_lag,
+                         criterion = criterion, deterministics = deterministics, detrend = detrend,
+                         steps = steps, do_parallel = do_parallel, cores = cores, data_name = data_name)
 
   boot <- inputs$boot
   l <- inputs$l
@@ -73,8 +76,9 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   #                                ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss)
 
   # IW adding parameter estimates to output
-  tests_and_params <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
-                                              ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss)
+  tests_and_params <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic,
+                                          dc = dc, detr = detr_int, ic_scale = criterion_scale,
+                                          h_rs = h_rs, range = range_nonmiss)
   tests_i<- tests_and_params$tests # Test statistics
   params_i <- tests_and_params$par # Parameter estimates
 
@@ -98,7 +102,8 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
     test_stats <- NULL
   }
   out <- list("y" = data, "p_vec" = p_vec, "t_star" = t_star, "test_stats_star" = test_stats_star,
-              "tests_i" = tests_i, "param_i" = params_i,"test_stats" = test_stats, "level" = level, "dc" = dc, "detr" = detr)
+              "tests_i" = tests_i, "param_i" = params_i,"test_stats" = test_stats,
+              "level" = level, "dc" = dc, "detr" = detr)
 
   return(out)
 }
@@ -132,11 +137,16 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
 #' @keywords internal
 check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length,
                          ar_AWB, union, min_lag, max_lag, criterion, deterministics,
-                         detrend, steps, do_parallel, cores){
+                         detrend, steps, do_parallel, cores, data_name){
 
   # Dimensions
   n <- nrow(data)
   N <- ncol(data)
+
+  # Check if valid data_name is given
+  if (!is.character(data_name) & !is.null(data_name)) {
+    stop("Invalid argument data_name: not of type character.")
+  }
 
   # Check if sufficient bootstrap replications are done
   if (level * (B + 1) < 1) {
@@ -333,7 +343,7 @@ print.mult_htest <- function(x, ...){
   cat(strwrap(x$method, prefix = "\t"), sep = "\n")
   cat("\n")
   cat("data:  ", x$data.name, "\n", sep = "")
-  
+
   if (!is.null(x$alternative)) {
     cat("alternative hypothesis: ")
     if (!is.null(x$null.value)) {

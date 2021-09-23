@@ -1,7 +1,7 @@
 ---
 title: "Introduction to bootUR"
 author: "Stephan Smeekes and Ines Wilms"
-date: "September 21, 2021"
+date: "September 23, 2021"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Introduction to bootUR}
@@ -74,9 +74,8 @@ If you have `ggplot2` installed, you can also plot the missing data patterns in 
 plot_missing_values(MacroTS, show_names = TRUE, axis_text_size = 5, legend_size = 6)
 ```
 
-## Univariate Bootstrap Unit Root Tests
-### Augmented Dickey-Fuller Test
-To perform a standard augmented Dickey-Fuller (ADF) bootstrap unit root test on a single time series, use the `boot_adf()` function. The function allows to set many options, including the bootstrap method used (option `bootstrap`), the deterministic components included (option `deterministics`) and the type of detrending used (option `detrend`). Setting `bootstrap = "MBB"` gives the test proposed by Paparoditis and Politis (2003). While `detrend = "OLS"` gives the standard ADF test, `detrend = "QD"` provides the powerful DF-GLS test of Elliott, Rothenberg and Stock (1996). Here we use the terminology Quasi-Differencing (QD) rather than GLS as this conveys the meaning less ambiguously and is the same terminology used by Smeekes and Taylor (2012) and Smeekes (2013).
+## Augmented Dickey-Fuller Test
+As the standard test for unit roots, `bootUR` also has an implementation of the standard, non-bootstrap, augmented Dickey-Fuller (ADF) test (though its use is not recommended if sample sizes are small). For this purpose the `adf()` function can be used. The function allows to set many options. First, one can choose between the classical single-step procedure (`two_step = FALSE`), in which deterministic components are directly included in the test regression, and the more flexible and modern two-step procedure (`two_step = TRUE`) where deterministic components are first removed before applying the unit root test to detrended data. For the standard ADF test, the two specifications generally yield nearly identical results.
 
 **Lag selection**
 
@@ -84,14 +83,26 @@ Lag length selection is done automatically in the ADF regression; the default is
 
 **Implementation**
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`), and compare OLS with QD (GLS) detrending. The option `verbose = TRUE` prints easy to read output on the console. To see live progress updates on the bootstrap, set `show_progress = TRUE`. This is particularly useful for large `B`, so we leave it out here. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually.
+We illustrate the ADF test here on Dutch GDP for both the two-step and one-step specification, each time including a linear trend in the specification.
+
+```{r adf}
+GDP_NL <- MacroTS[, 4]
+adf(GDP_NL, deterministics = "trend")
+```
+
+## Univariate Bootstrap Unit Root Tests
+### Augmented Dickey-Fuller Test
+To perform a bootstrap version of the ADF unit root test on a single time series, use the `boot_adf()` function. The function allows to set many options, including the bootstrap method used (option `bootstrap`), the deterministic components included (option `deterministics`) and the type of detrending used (option `detrend`). While `detrend = "OLS"` gives the standard ADF test, `detrend = "QD"` provides the powerful DF-GLS test of Elliott, Rothenberg and Stock (1996). Here we use the terminology Quasi-Differencing (QD) rather than GLS as this conveys the meaning less ambiguously and is the same terminology used by Smeekes and Taylor (2012) and Smeekes (2013). In all cases, two-step detrending is used.
+
+**Implementation**
+
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`), and compare OLS with QD (GLS) detrending. The console gives you live updates on the bootstrap progress. To turn these off, set `show_progress = FALSE`. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually.
 
 As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
-```{r adf}
+```{r boot_adf}
 set.seed(155776)
-GDP_NL <- MacroTS[, 4]
-adf_out <- boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend", 
+boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend", 
                     detrend = "OLS")
 ```
 
@@ -99,7 +110,7 @@ adf_out <- boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend",
 Use `boot_union()` for a test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012). The advantage of the union test is that you don't have to specify these (rather influential) specification tests. This makes the union test a safe option for quick or automatic unit root testing where careful manual specification setup is not viable. Here we illustrate it with the sieve wild bootstrap as proposed by Smeekes and Taylor (2012).
 
 ```{r union}
-union_out <- boot_union(GDP_NL, B = 399, bootstrap = "SWB")
+boot_union(GDP_NL, B = 399, bootstrap = "SWB")
 ```
 
 ## Panel Unit Root Test
@@ -108,7 +119,7 @@ The function `boot_panel` performs a test on a multivariate (panel) time series 
 Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`bootstrap = "MBB"`). However, this resampling-based method cannot handle unbalancedness, and will therefore give an error when applied to `MacroTS`:
 
 ```{r panel-error, error = TRUE, purl = FALSE}
-panel_out <- boot_panel(MacroTS, bootstrap = "MBB", B = 399)
+boot_panel(MacroTS, bootstrap = "MBB", B = 399)
 ```
 
 Therefore, you should switch to one of the wild bootstrap methods. Here we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao (2019).
@@ -118,7 +129,7 @@ By default the union test is used for each series (`union = TRUE`), if this is s
 Although the sieve bootstrap method `"SB"` and `"SWB"` can be used (historically they have been popular among practitioners), Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units. The code will give a warning to recommend using a different bootstrap method.
 
 ```{r panel}
-panel_out <- boot_panel(MacroTS, bootstrap = "DWB", B = 399)
+boot_panel(MacroTS, bootstrap = "DWB", B = 399)
 ```
 
 ## Tests for Multiple Time Series
@@ -128,6 +139,7 @@ To perform individual ADF tests on multiple time series simultaneously, the func
 ```{r iADF}
 ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALSE, 
                         deterministics = "trend", detrend = "OLS")
+print(ADFtests_out)
 ```
 
 Note that `boot_ur` (intentionally) does not provide a correction for multiple testing; of course, if we perform each test with a significance level of 5%, the probability of making a mistake in all these tests becomes (much, if `N` is large) more than 5%. To explicitly account for multiple testing, use the functions `boot_sqt()` or `boot_fdrt()`.
@@ -141,9 +153,9 @@ Testing individual series consecutively is easiest for interpretation, but is on
 ```{r BSQT}
 N <- ncol(MacroTS)
 # Test each unit sequentially
-BSQT_out1 <- boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
 # Split in four equally sized groups (motivated by the 4 series per country)
-BSQT_out2 <- boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
 ```
 
 ### Bootstrap FDR Controlling Tests
@@ -154,7 +166,7 @@ The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wo
 We illustrate it here with the final available bootstrap method, the block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 ```{r bFDR}
 N <- ncol(MacroTS)
-FDR_out <- boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
+boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
 ```
 
 ## Determining Order of Integration

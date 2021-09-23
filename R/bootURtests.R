@@ -4,7 +4,7 @@
 #' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param bootstrap String for bootstrap method to be used. Options are
 #' \describe{
-#' \item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
+#' \item{\code{"MBB"}}{Moving block bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 #' \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
 #' \item{\code{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 #' \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020), this is the default;}
@@ -32,17 +32,18 @@
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
 #' @param do_parallel Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
 #' @param cores The number of cores to be used in the parallel loops. Default is to use all but one.
+#' @param data_name Optional name for the dataset, to be used in the output. The default uses the name of the 'data' argument.
 #' @details The options encompass many test proposed in the literature. \code{detrend = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{detrend = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #'
 #' @return A list with N components, one for each variable, where each element of the list returns an object of class \code{htest} containing
-#' \item{\code{method}}{The name of the hypothesis test. For boot_ur these are ADF tests (for \code{union = FALSE}) or Union tests (for \code{union = TRUE}) on each individual series (no multiple testing correction).;}
-#' \item{\code{data.name}}{The name of the variable on which the ADF test is performed.;}
+#' \item{\code{method}}{The name of the hypothesis test. For boot_ur these are ADF tests (for \code{union = FALSE}) or Union tests (for \code{union = TRUE}) on each individual series (no multiple testing correction);}
+#' \item{\code{data.name}}{The name of the variable on which the ADF test is performed;}
 #' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-#' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned.;}
-#' \item{\code{statistic}}{The value of the test statistic of the unit root test.;}
+#' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
 #' \item{\code{p.value}}{P-value of the unit root test.}
 #' @section Warnings:
 #' The function may give the following warnings.
@@ -76,8 +77,8 @@
 boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL,
                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
                     criterion = "MAIC", deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-                    show_progress = FALSE, do_parallel = FALSE, cores = NULL){
-  
+                    show_progress = TRUE, do_parallel = FALSE, cores = NULL, data_name = NULL){
+
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = TRUE,
                                    level = level, bootstrap = bootstrap, B = B,
                                    block_length = block_length, ar_AWB = ar_AWB,
@@ -85,12 +86,19 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
                                    criterion = criterion, deterministics = deterministics,
                                    detrend = detrend, criterion_scale = criterion_scale,
                                    steps = NULL, h_rs = 0.1, show_progress = show_progress,
-                                   do_parallel = do_parallel, cores = cores)
+                                   do_parallel = do_parallel, cores = cores, data_name = data_name)
 
+  if (is.null(data_name)) {
+    data_name <- deparse(substitute(data))
+  }
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(data))
+    if (NCOL(data) > 1) {
+      var_names <- paste0(data_name, " var", 1:NCOL(data))
+    } else {
+      var_names <- data_name
+    }
   }
 
   # Results
@@ -98,7 +106,8 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
     iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
     iADFout <- cbind(rep(NA, nrow(iADFout)), iADFout)
     if (NCOL(data) > 1) {
-      colnames(iADFout) <- c("gamma", "tstat", "pvalue")
+      rownames(iADFout) <- var_names
+      colnames(iADFout) <- c("gamma", "tstat", "p-value")
     }
     # Parameter estimates, tstats and p-values. Note: Parameter Estimates not defined for union test
 
@@ -112,6 +121,10 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
     iADFout <- iADF_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1),
                         t_star = matrix(inputs$t_star[ , 1, ], nrow = B), level = inputs$level)
     iADFout <- cbind(t(inputs$param_i), iADFout) # Parameter estimates, tstats and p-values
+    if (NCOL(data) > 1) {
+      rownames(iADFout) <- var_names
+      colnames(iADFout) <- c("gamma", "tstat", "p-value")
+    }
 
     if (NCOL(data) == 1){ # boot_adf
       method_name <- "Bootstrap ADF test on a single time series"
@@ -121,14 +134,9 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
   }
 
   rej_H0 <- (iADFout[, 3] < level)
-  if (!is.null(colnames(data))) {
-    var_names <- colnames(data)
-  } else {
-    var_names <- paste0("Variable ", 1:NCOL(data))
-  }
 
   if (NCOL(data) > 1) {
-    boot_ur_output <- list(method = method_name, data.name = "data", details = iADFout,
+    boot_ur_output <- list(method = method_name, data.name = data_name, details = iADFout,
                        alternative = "less", null.value =  c("gamma" = 0), rejections = rej_H0,
                        estimate = iADFout[, 1], statistic = iADFout[, 2], p.value = iADFout[, 3])
     class(boot_ur_output) <- "mult_htest"
@@ -136,11 +144,12 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
     iADFtstat <- iADFout[1, 2]
     attr(iADFtstat, "names") <- "tstat"
     boot_ur_output <- list(method = method_name, data.name = var_names, null.value = c("gamma" = 0),
-                         alternative = "less", estimate = iADFout[1, 1], statistic = iADFtstat, p.value = iADFout[1, 3])
+                         alternative = "less", estimate = iADFout[1, 1], statistic = iADFtstat,
+                         p.value = iADFout[1, 3])
     class(boot_ur_output) <- "htest"
 
   }
-  
+
   return(boot_ur_output)
 }
 
@@ -197,19 +206,22 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
 #' print(GDP_BE_adf)
 boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL, ar_AWB = NULL,
                      min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = "intercept",
-                     detrend = "OLS", criterion_scale = TRUE, show_progress = FALSE,
-                     do_parallel = FALSE, cores = NULL){
+                     detrend = "OLS", criterion_scale = TRUE, show_progress = TRUE,
+                     do_parallel = FALSE, cores = NULL, data_name = NULL){
 
   if (NCOL(data) > 1) {
     stop("Multiple time series not allowed. Switch to a multivariate method such as boot_ur,
          or change argument data to a univariate time series.")
   }
-
-  out <- boot_ur(data = matrix(data, ncol = 1), level = level, bootstrap = bootstrap, B = B,
+  if (is.null(data_name)) {
+    data_name <- deparse(substitute(data))
+  }
+  out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B,
                  block_length = block_length, ar_AWB = ar_AWB, union = FALSE, min_lag = min_lag,
                  max_lag = max_lag, criterion = criterion, deterministics = deterministics,
                  detrend = detrend, criterion_scale = criterion_scale,
-                 show_progress = show_progress, do_parallel = do_parallel, cores = cores)
+                 show_progress = show_progress, do_parallel = do_parallel, cores = cores,
+                 data_name = data_name)
 
   return(out)
 }
@@ -267,18 +279,21 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_leng
 #' print(GDP_BE_df)
 boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL,
                        ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-                       criterion_scale = TRUE, show_progress = FALSE, do_parallel = FALSE,
-                       cores = NULL){
+                       criterion_scale = TRUE, show_progress = TRUE, do_parallel = FALSE,
+                       cores = NULL, data_name = NULL){
 
   if (NCOL(data) > 1) {
     stop("Multiple time series not allowed. Switch to a multivariate method such as boot_ur,
          or change argument data to a univariate time series.")
   }
+  if (is.null(data_name)) {
+    data_name <- deparse(substitute(data))
+  }
   out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B,
                  block_length = block_length, ar_AWB = ar_AWB, union = TRUE, min_lag = min_lag,
                  max_lag = max_lag, criterion = criterion, criterion_scale = criterion_scale,
                  show_progress = show_progress, do_parallel = do_parallel,
-                 cores = cores)
+                 cores = cores, data_name = data_name)
 
   return(out)
 }
@@ -331,7 +346,8 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
 boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL,
                      ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC",
                      deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-                     show_progress = FALSE, do_parallel = FALSE, cores = NULL){
+                     show_progress = TRUE, do_parallel = FALSE, cores = NULL,
+                     data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
                                    level = level, bootstrap = bootstrap, B = B,
@@ -340,12 +356,19 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
                                    deterministics = deterministics, detrend = detrend,
                                    criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel,
-                                   cores = cores)
+                                   cores = cores, data_name = data_name)
 
+  if (is.null(data_name)) {
+    data_name <- deparse(substitute(data))
+  }
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(data))
+    if (NCOL(data) > 1) {
+      var_names <- paste0(data_name, " var", 1:NCOL(data))
+    } else {
+      var_names <- data_name
+    }
   }
 
   if (union) { # Union Tests
@@ -370,11 +393,11 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
       method_name <- "Bootstrap ADF Tests with False Discovery Rate control"
   }
 
-  fdr_output <- list(method = method_name, data.name = "data", details = FDR_seq,
+  fdr_output <- list(method = method_name, data.name = data_name, details = FDR_seq,
                      alternative = "less", null.value =  c("gamma" = 0), rejections = rej_H0,
                      estimate = NULL, statistic = NULL, p.value = NULL)
   class(fdr_output) <- "mult_htest"
-  
+
   return(fdr_output)
 }
 
@@ -429,8 +452,8 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
 boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB",
                      B = 1999, block_length = NULL, ar_AWB = NULL, union = TRUE,
                      min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL,
-                     detrend = NULL, criterion_scale = TRUE, show_progress = FALSE,
-                     do_parallel = FALSE, cores = NULL){
+                     detrend = NULL, criterion_scale = TRUE, show_progress = TRUE,
+                     do_parallel = FALSE, cores = NULL, data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = TRUE, boot_ur_test = FALSE,
                                    level = level, bootstrap = bootstrap, B = B,
@@ -439,12 +462,19 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
                                    deterministics = deterministics, detrend = detrend,
                                    criterion_scale = criterion_scale, steps = steps, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel,
-                                   cores = cores)
+                                   cores = cores, data_name = data_name)
 
+  if (is.null(data_name)) {
+    data_name <- deparse(substitute(data))
+  }
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
   } else {
-    var_names <- paste0("Variable ", 1:NCOL(data))
+    if (NCOL(data) > 1) {
+      var_names <- paste0(data_name, " var", 1:NCOL(data))
+    } else {
+      var_names <- data_name
+    }
   }
 
   if (union) { # Union Tests
@@ -452,10 +482,10 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
                         t_star = inputs$test_stats_star, level = inputs$level)
     rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
     rownames(rej_H0) <- var_names
-    colnames(rej_H0) <- "Reject H0"
+    colnames(rej_H0) <- "Reject null"
     BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
     rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
-    colnames(BSQT_seq) <- c("Unit H0", "Unit H1", "tstat", "p-value")
+    colnames(BSQT_seq) <- c("H0: # I(0) units", "H1: # I(0) units", "tstat", "p-value")
 
     method_name <- "Bootstrap Sequential Quantile Union Test"
   } else { # No Union Tests
@@ -466,10 +496,10 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
     colnames(rej_H0) <- "Reject null"
     BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
     rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
-    colnames(BSQT_seq) <- c("Unit H0", "Unit H1", "tstat", "p-value")
+    colnames(BSQT_seq) <- c("H0: # I(0) units", "H1: # I(0) units", "tstat", "p-value")
   }
 
-  sqt_output <- list(method = method_name, data.name = "data", details = BSQT_seq,
+  sqt_output <- list(method = method_name, data.name = data_name, details = BSQT_seq,
                      alternative = "less", null.value =  c("gamma" = 0), rejections = rej_H0,
                      estimate = NULL, statistic = NULL, p.value = NULL)
   class(sqt_output) <- "mult_htest"
@@ -524,7 +554,7 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
 boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL,
                        ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC",
                        deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-                       show_progress = FALSE, do_parallel = FALSE, cores = NULL){
+                       show_progress = TRUE, do_parallel = FALSE, cores = NULL, data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
                                    level = level, bootstrap = bootstrap, B = B,
@@ -533,9 +563,12 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
                                    deterministics = deterministics, detrend = detrend,
                                    criterion_scale = criterion_scale, steps = NULL, h_rs = 0.1,
                                    show_progress = show_progress, do_parallel = do_parallel,
-                                   cores = cores)
+                                   cores = cores, data_name = data_name)
 
 
+  if (is.null(data_name)) {
+    data_name <- deparse(substitute(data))
+  }
   if (union) { # Union Test
     GM_test <- mean(inputs$test_stats)
     t_star <- rowMeans(inputs$test_stats_star)
@@ -551,8 +584,9 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
   attr(GM_test, "names") <- "tstat"
   gamma_hat <- NA
   attr(gamma_hat, "names") <- "gamma"
-  panel_output <- list(method = method_name, data.name = "panel", null.value = c("gamma" = 0),
-                       alternative = "less", estimate = gamma_hat, statistic = GM_test, p.value = p_val)
+  panel_output <- list(method = method_name, data.name = data_name,
+                       null.value = c("gamma" = 0), alternative = "less", estimate = gamma_hat,
+                       statistic = GM_test, p.value = p_val)
   class(panel_output) <- "htest"
   return(panel_output)
 }
