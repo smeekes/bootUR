@@ -67,7 +67,7 @@ The bootstrap tests in `bootUR` do not work with missing data, although
 multivariate time series with different start and end dates (unbalanced
 panels) are allowed. `bootUR` provides a simple function to check if
 your data contain missing values. We will illustrate this on the
-`MacroTS` dataset of macreconomic time series that comes with the
+`MacroTS` dataset of macroeconomic time series that comes with the
 package.
 
 ``` r
@@ -146,9 +146,8 @@ length, simply set both the minimum `min_lag` and maximum lag length
 
 **Implementation**
 
-We illustrate the ADF test here on Dutch GDP for both the two-step and
-one-step specification, each time including a linear trend in the
-specification.
+We illustrate the ADF test here on Dutch GDP for the two-step
+specification, including a linear trend in the specification.
 
 ``` r
 GDP_NL <- MacroTS[, 4]
@@ -156,7 +155,7 @@ adf(GDP_NL, deterministics = "trend")
 #> 
 #>  ADF test on a single time series
 #> 
-#> data:  Variable 1
+#> data:  GDP_NL
 #> tstat = -2.5153, p-value = 0.3202
 #> alternative hypothesis: true gamma is less than 0
 #> sample estimates:
@@ -188,13 +187,13 @@ Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test
 proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We
 set only 399 bootstrap replications (`B = 399`) to prevent the code from
 running too long. We add an intercept and a trend
-(`deterministics = "trend"`), and compare OLS with QD (GLS) detrending.
-The console gives you live updates on the bootstrap progress. To turn
-these off, set `show_progress = FALSE`. The bootstrap loop can also be
-run in parallel by setting `do_parallel = TRUE`. Note that
-parallelization requires OpenMP to be available on your system, which is
-typically not the case on macOS; see <https://mac.r-project.org/openmp/>
-for ways to set it up manually.
+(`deterministics = "trend"`) and OLS detrending. The console gives you
+live updates on the bootstrap progress. To turn these off, set
+`show_progress = FALSE`. The bootstrap loop can also be run in parallel
+by setting `do_parallel = TRUE`. Note that parallelization requires
+OpenMP to be available on your system, which is typically not the case
+on macOS; see <https://mac.r-project.org/openmp/> for ways to set it up
+manually.
 
 As random number generation is required to draw bootstrap samples, we
 first set the seed of the random number generator to obtain replicable
@@ -323,7 +322,7 @@ Note that `boot_ur` (intentionally) does not provide a correction for
 multiple testing; of course, if we perform each test with a significance
 level of 5%, the probability of making a mistake in all these tests
 becomes (much, if `N` is large) more than 5%. To explicitly account for
-multiple testing, use the functions `boot_sqt()` or `boot_fdrt()`.
+multiple testing, use the functions `boot_sqt()` or `boot_fdr()`.
 
 ### Bootstrap Sequential Tests
 
@@ -370,9 +369,9 @@ boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
 #> alternative hypothesis: true gamma is less than 0
 #> 
 #> Sequence of tests: 
-#>        H0: # I(0) units H1: # I(0) units     tstat    p-value
-#> Step 1                0                1 -1.660881 0.02255639
-#> Step 2                1                2 -1.413109 0.12280702
+#>        H0: # I(0) H1: # I(0)     tstat    p-value
+#> Step 1          0          1 -1.660881 0.02255639
+#> Step 2          1          2 -1.413109 0.12280702
 # Split in four equally sized groups (motivated by the 4 series per country)
 boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
 #> 
@@ -382,8 +381,8 @@ boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
 #> alternative hypothesis: true gamma is less than 0
 #> 
 #> Sequence of tests: 
-#>        H0: # I(0) units H1: # I(0) units     tstat    p-value
-#> Step 1                0                5 -1.051598 0.05012531
+#>        H0: # I(0) H1: # I(0)     tstat    p-value
+#> Step 1          0          5 -1.051598 0.05012531
 ```
 
 ### Bootstrap FDR Controlling Tests

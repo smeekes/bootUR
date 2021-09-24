@@ -49,7 +49,7 @@ library(bootUR)
 `bootUR` provides a few simple tools to check if your data are suitable to be bootstrapped.
 
 ### Inspect Data for Missing Values
-The bootstrap tests in `bootUR` do not work with missing data, although multivariate time series with different start and end dates (unbalanced panels) are allowed. `bootUR` provides a simple function to check if your data contain missing values. We will illustrate this on the `MacroTS` dataset of macreconomic time series that comes with the package.
+The bootstrap tests in `bootUR` do not work with missing data, although multivariate time series with different start and end dates (unbalanced panels) are allowed. `bootUR` provides a simple function to check if your data contain missing values. We will illustrate this on the `MacroTS` dataset of macroeconomic time series that comes with the package.
 
 ```{r missing}
 data("MacroTS")
@@ -83,7 +83,7 @@ Lag length selection is done automatically in the ADF regression; the default is
 
 **Implementation**
 
-We illustrate the ADF test here on Dutch GDP for both the two-step and one-step specification, each time including a linear trend in the specification.
+We illustrate the ADF test here on Dutch GDP for the two-step specification, including a linear trend in the specification.
 
 ```{r adf}
 GDP_NL <- MacroTS[, 4]
@@ -96,7 +96,7 @@ To perform a bootstrap version of the ADF unit root test on a single time series
 
 **Implementation**
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`), and compare OLS with QD (GLS) detrending. The console gives you live updates on the bootstrap progress. To turn these off, set `show_progress = FALSE`. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually.
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`) and OLS detrending. The console gives you live updates on the bootstrap progress. To turn these off, set `show_progress = FALSE`. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually.
 
 As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
@@ -142,7 +142,7 @@ ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALS
 print(ADFtests_out)
 ```
 
-Note that `boot_ur` (intentionally) does not provide a correction for multiple testing; of course, if we perform each test with a significance level of 5%, the probability of making a mistake in all these tests becomes (much, if `N` is large) more than 5%. To explicitly account for multiple testing, use the functions `boot_sqt()` or `boot_fdrt()`.
+Note that `boot_ur` (intentionally) does not provide a correction for multiple testing; of course, if we perform each test with a significance level of 5%, the probability of making a mistake in all these tests becomes (much, if `N` is large) more than 5%. To explicitly account for multiple testing, use the functions `boot_sqt()` or `boot_fdr()`.
 
 ### Bootstrap Sequential Tests
 The function `boot_sqt()` performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015). Here we split the series in groups which are consecutively tested for unit roots, starting with the group most likely to be stationary (having the smallest ADF statistics). If the unit root hypothesis cannot be rejected for the first group, the algorithm stops; if there is a rejection, the second group is tested, and so on.
