@@ -32,19 +32,21 @@
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
 #' @param do_parallel Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
 #' @param cores The number of cores to be used in the parallel loops. Default is to use all but one.
-#' @param data_name Optional name for the dataset, to be used in the output. The default uses the name of the 'data' argument.
+#' @param data_name Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.
 #' @details The options encompass many test proposed in the literature. \code{detrend = "OLS"} gives the standard augmented Dickey-Fuller test, while \code{detrend = "QD"} provides the DF-GLS test of Elliott, Rothenberg and Stock (1996). The bootstrap algorithm is always based on a residual bootstrap (under the alternative) to obtain residuals rather than a difference-based bootstrap (under the null), see e.g. Palm, Smeekes and Urbain (2008).
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #'
-#' @return A list with N components, one for each variable, where each element of the list returns an object of class \code{htest} containing
-#' \item{\code{method}}{The name of the hypothesis test. For boot_ur these are ADF tests (for \code{union = FALSE}) or Union tests (for \code{union = TRUE}) on each individual series (no multiple testing correction);}
-#' \item{\code{data.name}}{The name of the variable on which the ADF test is performed;}
+#' @return An object of class \code{"bootUR"}, \code{"\*"}, where \code{"\*"} is \code{"mult_htest"} for multiple time series or \code{"htest"} for single time series, with the following components:
+#' \item{\code{method}}{The name of the hypothesis test method;}
+#' \item{\code{data.name}}{The name of the data on which the method is performed;}
 #' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-#' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
-#' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
-#' \item{\code{p.value}}{P-value of the unit root test.}
+#' \item{\code{estimate}}{The estimated value(s) of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+#' \item{\code{statistic}}{The value(s) of the test statistic of the unit root test(s);}
+#' \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
+#' \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
+#' \item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
 #' @section Warnings:
 #' The function may give the following warnings.
 #' \describe{
@@ -136,17 +138,18 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
   rej_H0 <- (iADFout[, 3] < level)
 
   if (NCOL(data) > 1) {
-    boot_ur_output <- list(method = method_name, data.name = data_name, details = iADFout,
-                       alternative = "less", null.value =  c("gamma" = 0), rejections = rej_H0,
-                       estimate = iADFout[, 1], statistic = iADFout[, 2], p.value = iADFout[, 3])
-    class(boot_ur_output) <- "mult_htest"
+    boot_ur_output <- list(method = method_name, data.name = data_name,
+                           null.value =  c("gamma" = 0), alternative = "less",
+                           estimate = iADFout[, 1], statistic = iADFout[, 2], p.value = iADFout[, 3],
+                           rejections = rej_H0, details = iADFout)
+    class(boot_ur_output) <- c("bootUR", "mult_htest")
   } else {
     iADFtstat <- iADFout[1, 2]
     attr(iADFtstat, "names") <- "tstat"
-    boot_ur_output <- list(method = method_name, data.name = var_names, null.value = c("gamma" = 0),
-                         alternative = "less", estimate = iADFout[1, 1], statistic = iADFtstat,
-                         p.value = iADFout[1, 3])
-    class(boot_ur_output) <- "htest"
+    boot_ur_output <- list(method = method_name, data.name = var_names,
+                           null.value = c("gamma" = 0), alternative = "less",
+                           estimate = iADFout[1, 1], statistic = iADFtstat, p.value = iADFout[1, 3])
+    class(boot_ur_output) <- c("bootUR", "htest")
 
   }
 
@@ -171,14 +174,14 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
 #'
 #' Lag length selection is done automatically in the ADF regression with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. For very short time series (fewer than 50 time points) the maximum lag length is adjusted downward to avoid potential multicollinearity issues in the bootstrap. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #' @export
-#' @return An object of class \code{htest} containing
-#' \item{\code{method}}{The name of the hypothesis test. For boot_adf this is the ADF test on a single time series.;}
-#' \item{\code{data.name}}{The name of the variable on which the ADF test is performed.;}
+#' @return An object of class \code{"bootUR"}, \code{"htest"} with the following components:
+#' \item{\code{method}}{The name of the hypothesis test method;}
+#' \item{\code{data.name}}{The name of the data on which the method is performed;}
 #' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
 #' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
-#' \item{\code{statistic}}{The value of the test statistic of the unit root test.;}
-#' \item{\code{p.value}}{P-value of the unit root test.}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
+#' \item{\code{p.value}}{The p-value of the unit root test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function is a simple wrapper around \code{\link{boot_ur}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{boot_ur}} is specifically suited for that.}
@@ -214,7 +217,11 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_leng
          or change argument data to a univariate time series.")
   }
   if (is.null(data_name)) {
-    data_name <- deparse(substitute(data))
+    if (is.null(colnames(data))) {
+      data_name <- deparse(substitute(data))
+    } else {
+      data_name <- colnames(data)[1]
+    }
   }
   out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B,
                  block_length = block_length, ar_AWB = ar_AWB, union = FALSE, min_lag = min_lag,
@@ -244,14 +251,14 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_leng
 #'
 #' Lag length selection is done automatically in the ADF regressions with the specified information criterion. If one of the modified criteria of Ng and Perron (2001) is used, the correction of Perron and Qu (2008) is applied. To overwrite data-driven lag length selection with a pre-specified lag length, simply set both the minimum `min_lag` and maximum lag length `max_lag` for the selection algorithm equal to the desired lag length.
 #' @export
-#' @return An object of class \code{htest} containing
-#' \item{\code{method}}{The name of the hypothesis test. For boot_adf this is the Union test on a single time series.;}
-#' \item{\code{data.name}}{The name of the variable on which the union test is performed.;}
+#' @return An object of class \code{"bootUR"}, \code{"htest"} with the following components:
+#' \item{\code{method}}{The name of the hypothesis test method;}
+#' \item{\code{data.name}}{The name of the variable on which the method is performed;}
 #' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-#' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined.;}
-#' \item{\code{statistic}}{The value of the test statistic of the unit root test.;}
-#' \item{\code{p.value}}{P-value of the unit root test.}
+#' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
+#' \item{\code{p.value}}{The p-value of the unit root test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function is a simple wrapper around \code{\link{boot_ur}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{boot_ur}} is specifically suited for that.}
@@ -287,7 +294,11 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
          or change argument data to a univariate time series.")
   }
   if (is.null(data_name)) {
-    data_name <- deparse(substitute(data))
+    if (is.null(colnames(data))) {
+      data_name <- deparse(substitute(data))
+    } else {
+      data_name <- colnames(data)[1]
+    }
   }
   out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B,
                  block_length = block_length, ar_AWB = ar_AWB, union = TRUE, min_lag = min_lag,
@@ -306,10 +317,16 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
 #' @details The false discovery rate FDR is defined as the expected proportion of false rejections relative to the total number of rejections.
 #'
 #' See \code{\link{boot_ur}} for details on the bootstrap algorithm and lag selection.
-#' @return A list with the following components
-#' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{FDR_sequence}}{Details on the unit root tests: value of the test statistics and critical values.}
-#' For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
+#' @return An object of class \code{"bootUR"}, \code{"mult_htest"} with the following components:
+#' \item{\code{method}}{The name of the hypothesis test method;}
+#' \item{\code{data.name}}{The name of the data on which the method is performed;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{The estimated values of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root tests;}
+#' \item{\code{p.value}}{A vector with \code{NA} values, as p-values are not available for the FDR method;}
+#' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
+#' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the test statistics and critical value, up to non-rejection.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
@@ -373,30 +390,28 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
 
   if (union) { # Union Tests
     bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
-    rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
-    rownames(rej_H0) <- var_names
-    colnames(rej_H0) <- "Reject null"
-    FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
-    rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
-    colnames(FDR_seq) <- c("tstat", "critical value")
-
+    estimates <- rep(NA, NCOL(data))
+    tstats <- inputs$test_stats
     method_name <- "Bootstrap Union Tests with False Discovery Rate control"
   } else { # No Union Tests
       bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1), t_star = inputs$t_star[ , 1,],
                          level = inputs$level)
-      rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
-      rownames(rej_H0) <- var_names
-      colnames(rej_H0) <- "Reject null"
-      FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
-      rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
-      colnames(FDR_seq) <- c("tstat", "critical value")
+      estimates <- t(inputs$param_i)
+      tstats <- inputs$tests_i[1, ]
       method_name <- "Bootstrap ADF Tests with False Discovery Rate control"
   }
+  rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
+  rownames(rej_H0) <- var_names
+  colnames(rej_H0) <- "Reject null"
+  FDR_seq <- bFDRout$FDR_Tests[, -1, drop = FALSE]
+  rownames(FDR_seq) <- var_names[bFDRout$FDR_Tests[, 1, drop = FALSE]]
+  colnames(FDR_seq) <- c("tstat", "critical value")
 
-  fdr_output <- list(method = method_name, data.name = data_name, details = FDR_seq,
-                     alternative = "less", null.value =  c("gamma" = 0), rejections = rej_H0,
-                     estimate = NULL, statistic = NULL, p.value = NULL)
-  class(fdr_output) <- "mult_htest"
+  fdr_output <- list(method = method_name, data.name = data_name,
+                     null.value =  c("gamma" = 0), alternative = "less",
+                     estimate = estimates, statistic = tstats, p.value = rep(NA, NCOL(data)),
+                     rejections = rej_H0, details = FDR_seq)
+  class(fdr_output) <- c("bootUR", "mult_htest")
 
   return(fdr_output)
 }
@@ -411,10 +426,16 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
 #' By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. If the initial \code{0} or final value (\code{1} or \code{N}) are omitted, they are automatically added by the function.
 #'
 #' See \code{\link{boot_ur}} for details on the bootstrap algorithm and lag selection.
-#' @return A list with the following components
-#' \item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{BSQT_sequence}}{Details on the unit root tests: outcome of the sequential steps, value of the test statistics and p-values.}
-#' For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
+#' @return An object of class \code{"bootUR"}, \code{"mult_htest"} with the following components:
+#' \item{\code{method}}{The name of the hypothesis test method;}
+#' \item{\code{data.name}}{The name of the data on which the method is performed;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{The estimated values of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root tests;}
+#' \item{\code{p.value}}{A vector with \code{NA} values, as p-values per inidividual series are not available.The p-value for each test in the sequence can be found in \code{details};}
+#' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
+#' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
@@ -480,29 +501,28 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
   if (union) { # Union Tests
     BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = inputs$test_stats,
                         t_star = inputs$test_stats_star, level = inputs$level)
-    rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
-    rownames(rej_H0) <- var_names
-    colnames(rej_H0) <- "Reject null"
-    BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
-    rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
-    colnames(BSQT_seq) <- c("H0: # I(0) units", "H1: # I(0) units", "tstat", "p-value")
-
+    estimates <- rep(NA, NCOL(data))
+    tstats <- inputs$test_stats
     method_name <- "Bootstrap Sequential Quantile Union Test"
   } else { # No Union Tests
     BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = matrix(inputs$tests_i[1, ], nrow = 1),
                         t_star = inputs$t_star[ , 1,], level = inputs$level)
-    rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
-    rownames(rej_H0) <- var_names
-    colnames(rej_H0) <- "Reject null"
-    BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
-    rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
-    colnames(BSQT_seq) <- c("H0: # I(0) units", "H1: # I(0) units", "tstat", "p-value")
+    estimates <- t(inputs$param_i)
+    tstats <- inputs$tests_i[1, ]
+    method_name <- "Bootstrap Sequential Quantile ADF Test"
   }
+  rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
+  rownames(rej_H0) <- var_names
+  colnames(rej_H0) <- "Reject null"
+  BSQT_seq <- BSQTout$BSQT_steps[, -3, drop = FALSE]
+  rownames(BSQT_seq) <- paste("Step", 1:nrow(BSQT_seq))
+  colnames(BSQT_seq) <- c("H0: # I(0)", "H1: # I(0)", "tstat", "p-value")
 
-  sqt_output <- list(method = method_name, data.name = data_name, details = BSQT_seq,
-                     alternative = "less", null.value =  c("gamma" = 0), rejections = rej_H0,
-                     estimate = NULL, statistic = NULL, p.value = NULL)
-  class(sqt_output) <- "mult_htest"
+  sqt_output <- list(method = method_name, data.name = data_name,
+                     null.value =  c("gamma" = 0), alternative = "less",
+                     estimate = estimates, statistic = tstats, p.value = rep(NA, NCOL(data)),
+                     rejections = rej_H0, details = BSQT_seq)
+  class(sqt_output) <- c("bootUR", "mult_htest")
   return(sqt_output)
 }
 
@@ -511,7 +531,14 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
 #' @inheritParams boot_ur
 #' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
 #' @details See \code{\link{boot_ur}} for details on the bootstrap algorithm and lag selection.
-#'
+#' @return An object of class \code{"bootUR"}, \code{"htest"} with the following components:
+#' \item{\code{method}}{The name of the hypothesis test method;}
+#' \item{\code{data.name}}{The name of the variable on which the method is performed;}
+#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+#' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
+#' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
+#' \item{\code{p.value}}{The p-value of the unit root test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
@@ -519,14 +546,6 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
 #' \item{\code{Warning: Deterministic specification in argument deterministics is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting deterministic components manually therefore has no effect.}
 #' \item{\code{Warning: Detrending method in argument detrend is ignored, as union test is applied.}}{The union test calculates the union of all four combinations of deterministic components (intercept or intercept and trend) and detrending methods (OLS or QD). Setting detrending methods manually therefore has no effect.}
 #' }
-#' @return An object of class \code{htest} containing
-#' \item{\code{method}}{The name of the hypothesis test. For boot_panel this is the Panel Bootstrap Group-Mean Union Test (for \code{union = TRUE}) or the "Panel Bootstrap Group-Mean Test" (for \code{union = FALSE});}
-#' \item{\code{data.name}}{The name of the variable on which the test is performed.;}
-#' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
-#' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-#' \item{\code{estimate}}{For the panel test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined.;}
-#' \item{\code{statistic}}{The value of the test statistic of the panel unit root test.;}
-#' \item{\code{p.value}}{P-value of the panel unit root test.}
 #' @references Chang, Y. and Park, J. (2003). A sieve bootstrap for the test of a unit root. \emph{Journal of Time Series Analysis}, 24(4), 379-400.
 #' @references Cavaliere, G. and Taylor, A.M.R (2009). Heteroskedastic time series with a unit root. \emph{Econometric Theory}, 25, 1228–1276.
 #' @references Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
@@ -565,7 +584,6 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
                                    show_progress = show_progress, do_parallel = do_parallel,
                                    cores = cores, data_name = data_name)
 
-
   if (is.null(data_name)) {
     data_name <- deparse(substitute(data))
   }
@@ -585,8 +603,8 @@ boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_l
   gamma_hat <- NA
   attr(gamma_hat, "names") <- "gamma"
   panel_output <- list(method = method_name, data.name = data_name,
-                       null.value = c("gamma" = 0), alternative = "less", estimate = gamma_hat,
-                       statistic = GM_test, p.value = p_val)
-  class(panel_output) <- "htest"
+                       null.value = c("gamma" = 0), alternative = "less",
+                       estimate = gamma_hat, statistic = GM_test, p.value = p_val)
+  class(panel_output) <- c("bootUR", "htest")
   return(panel_output)
 }

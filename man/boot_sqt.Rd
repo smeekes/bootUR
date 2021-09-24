@@ -8,7 +8,8 @@ boot_sqt(data, steps = 0:NCOL(data), level = 0.05, bootstrap = "AWB",
   B = 1999, block_length = NULL, ar_AWB = NULL, union = TRUE,
   min_lag = 0, max_lag = NULL, criterion = "MAIC",
   deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-  show_progress = FALSE, do_parallel = FALSE, cores = NULL)
+  show_progress = TRUE, do_parallel = FALSE, cores = NULL,
+  data_name = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -19,7 +20,7 @@ boot_sqt(data, steps = 0:NCOL(data), level = 0.05, bootstrap = "AWB",
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
-\item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
+\item{\code{"MBB"}}{Moving block bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
 \item{\code{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020), this is the default;}
@@ -60,12 +61,20 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
 
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
+
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 }
 \value{
-A list with the following components
-\item{\code{rej_H0}}{Logical indicator whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-\item{\code{BSQT_sequence}}{Details on the unit root tests: outcome of the sequential steps, value of the test statistics and p-values.}
-For the union test (\code{union = TRUE}), the output is arranged per time series. If \code{union = FALSE}, the output is arranged per time series, type of deterministic component (\code{deterministics}) and detrending method (\code{detrend}).
+An object of class \code{"bootUR"}, \code{"mult_htest"} with the following components:
+\item{\code{method}}{The name of the hypothesis test method;}
+\item{\code{data.name}}{The name of the data on which the method is performed;}
+\item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
+\item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
+\item{\code{estimate}}{The estimated values of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+\item{\code{statistic}}{The value of the test statistic of the unit root tests;}
+\item{\code{p.value}}{A vector with \code{NA} values, as p-values per inidividual series are not available.The p-value for each test in the sequence can be found in \code{details};}
+\item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
+\item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value.}
 }
 \description{
 Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).

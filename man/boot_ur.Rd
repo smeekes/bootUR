@@ -7,8 +7,8 @@
 boot_ur(data, level = 0.05, bootstrap = "AWB", B = 1999,
   block_length = NULL, ar_AWB = NULL, union = TRUE, min_lag = 0,
   max_lag = NULL, criterion = "MAIC", deterministics = NULL,
-  detrend = NULL, criterion_scale = TRUE, show_progress = FALSE,
-  do_parallel = FALSE, cores = NULL)
+  detrend = NULL, criterion_scale = TRUE, show_progress = TRUE,
+  do_parallel = FALSE, cores = NULL, data_name = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -17,7 +17,7 @@ boot_ur(data, level = 0.05, bootstrap = "AWB", B = 1999,
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
-\item{\code{"MBB"}}{Moving blocks bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
+\item{\code{"MBB"}}{Moving block bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
 \item{\code{"BWB"}}{Block wild bootstrap (Shao, 2011; Smeekes and Urbain, 2014a);}
 \item{\code{"DWB"}}{Dependent wild bootstrap (Shao, 2010; Smeekes and Urbain, 2014a; Rho and Shao, 2019);}
 \item{\code{"AWB"}}{Autoregressive wild bootstrap (Smeekes and Urbain, 2014a; Friedrich, Smeekes and Urbain, 2020), this is the default;}
@@ -58,16 +58,20 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
 
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
+
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 }
 \value{
-A list with N components, one for each variable, where each element of the list returns an object of class \code{htest} containing
-\item{\code{method}}{The name of the hypothesis test. For boot_ur these are ADF tests (for \code{union = FALSE}) or Union tests (for \code{union = TRUE}) on each individual series (no multiple testing correction).;}
-\item{\code{data.name}}{The name of the variable on which the ADF test is performed.;}
+An object of class \code{"bootUR"}, \code{"\*"}, where \code{"\*"} is \code{"mult_htest"} for multiple time series or \code{"htest"} for single time series, with the following components:
+\item{\code{method}}{The name of the hypothesis test method;}
+\item{\code{data.name}}{The name of the data on which the method is performed;}
 \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-\item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned.;}
-\item{\code{statistic}}{The value of the test statistic of the unit root test.;}
-\item{\code{p.value}}{P-value of the unit root test.}
+\item{\code{estimate}}{The estimated value(s) of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+\item{\code{statistic}}{The value(s) of the test statistic of the unit root test(s);}
+\item{\code{p.value}}{The p-value(s) of the unit root test(s);}
+\item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
+\item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
 }
 \description{
 This function performs bootstrap unit root tests on each time series individually.

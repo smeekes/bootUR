@@ -6,7 +6,7 @@
 \usage{
 check_inputs(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
   block_length, ar_AWB, union, min_lag, max_lag, criterion, deterministics,
-  detrend, steps, do_parallel, cores)
+  detrend, steps, do_parallel, cores, data_name)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
@@ -50,6 +50,8 @@ check_inputs(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
 \item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
 
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
+
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 
 \item{h_rs}{Bandwidth used in rescaled information criteria.}
 }

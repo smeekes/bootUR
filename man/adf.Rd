@@ -5,7 +5,8 @@
 \title{Augmented Dickey-Fuller Unit Root Test}
 \usage{
 adf(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-  deterministics = "intercept", criterion_scale = TRUE, two_step = TRUE)
+  deterministics = "intercept", criterion_scale = TRUE, two_step = TRUE,
+  data_name = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
@@ -29,16 +30,18 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{two_step}{Logical indicator whether to use one-step (\code{two_step = FALSE}) or two-step (\code{two_step = TRUE}) detrending. The default is two-step detrending.}
+
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 }
 \value{
-An object of class \code{htest} containing
-\item{\code{method}}{The name of the hypothesis test. For adf this is the standard ADF test on a single time series.;}
-\item{\code{data.name}}{The name of the variable on which the test is performed.;}
+An object of class \code{"bootUR"}, \code{"htest"} with the following components:
+\item{\code{method}}{The name of the hypothesis test method;}
+\item{\code{data.name}}{The name of the variable on which the method is performed;}
 \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-\item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
-\item{\code{statistic}}{The value of the test statistic of the ADF unit root test.;}
-\item{\code{p.value}}{P-value of the ADF unit root test.}
+\item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression;}
+\item{\code{statistic}}{The value of the test statistic of the ADF unit root test;}
+\item{\code{p.value}}{The p-value of the ADF unit root test.}
 }
 \description{
 This function performs a standard augmented Dickey-Fuller unit root test on a single time series.

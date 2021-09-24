@@ -72,19 +72,12 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
                           ic = ic, dc = dc, detr = detr_int, ic_scale = criterion_scale, h_rs = h_rs,
                           range = range_nonmiss, joint = joint, show_progress = show_progress,
                           do_parallel = do_parallel, nc = nc)
-  # tests_i <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
-  #                                ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss)
 
-  # IW adding parameter estimates to output
   tests_and_params <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic,
                                           dc = dc, detr = detr_int, ic_scale = criterion_scale,
                                           h_rs = h_rs, range = range_nonmiss)
   tests_i<- tests_and_params$tests # Test statistics
   params_i <- tests_and_params$par # Parameter estimates
-
-  # cat("print OLD tests", tests_i, "\n")
-  # cat("print NEW tests", tests_i_NEW, "\n")
-  # cat("print NEW params", params_i, "\n")
 
   if (union) {
     scaling <- scaling_factors_cpp(t_star, level)
