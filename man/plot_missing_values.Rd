@@ -18,7 +18,7 @@ plot_missing_values(y, show_names = FALSE, show_legend = TRUE,
 
 \item{legend_size}{Size of the text in the legend if \code{show_legend = TRUE}. Default takes \code{ggplot2} defaults.}
 
-\item{cols}{Vector with colours for displaying the different types of data. If the default is overwriten, four colours must be supplied.}
+\item{cols}{Vector with colours for displaying the different types of data. If the default is overwritten, four colours must be supplied.}
 }
 \value{
 A \code{ggplot2} object containing the missing values plot.

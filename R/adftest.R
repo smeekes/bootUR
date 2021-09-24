@@ -71,12 +71,9 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", determini
            (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
   }
   dc_int <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
-  # dc_int <- sort(dc_int)
 
   detr <- "OLS"
   detr_int <- 1
-  # detr_int <- 1*(detr=="OLS") + 2*(detr=="QD")
-  # detr_int <- sort(detr_int)
 
   # Get ADF test statistic: two-step detrending
   if (two_step) {

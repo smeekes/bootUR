@@ -25,12 +25,12 @@ do_tests_and_bootstrap(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
 \item{\verb{"DWB"}}{Dependent wild bootstrap;}
 \item{\verb{"AWB"}}{Autoregressive wild bootstrap;}
 \item{\verb{"SB"}}{Sieve bootstrap;}
-\item{\verb{"SWB"}}{Sieve wild boostrap.}
+\item{\verb{"SWB"}}{Sieve wild bootstrap.}
 }}
 
 \item{B}{Number of bootstrap replications. Default is 1999.}
 
-\item{block_length}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB boostrap, this is a genuine block length. For the AWB boostrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/block_length)}; this can be overwritten by setting \verb{ar_AWB} directly. If NULL, sets the block length as a function of the time series length T, via the rule \eqn{block_length = 1.75 T^(1/3)}.}
+\item{block_length}{Desired 'block length' in the bootstrap. For the MBB, BWB and DWB bootstrap, this is a genuine block length. For the AWB bootstrap, the block length is transformed into an autoregressive parameter via the formula \eqn{0.01^(1/block_length)}; this can be overwritten by setting \verb{ar_AWB} directly. If NULL, sets the block length as a function of the time series length T, via the rule \eqn{block_length = 1.75 T^(1/3)}.}
 
 \item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\verb{bootstrap = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length.}
 
@@ -42,7 +42,7 @@ do_tests_and_bootstrap(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
 
 \item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \verb{"AIC"}, \verb{"BIC"}, \verb{"MAIC"}, \verb{"MBIC}.}
 
-\item{deterministics}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of): \code{0} - no deterministics; \code{1} - intercept only; \code{2} - intercept and trend. If \code{union = FALSE} and \code{NULL}, an intercpet is added.}
+\item{deterministics}{Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of): \code{0} - no deterministics; \code{1} - intercept only; \code{2} - intercept and trend. If \code{union = FALSE} and \code{deterministics = NULL}, an intercept is added.}
 
 \item{detrend}{String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS). If NULL, set to \verb{"OLS"}.}
 
