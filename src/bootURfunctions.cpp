@@ -278,7 +278,7 @@ arma::mat adf_tests_all_units_cpp(const arma::mat& y, const int& pmin, const int
 
 adf_param_mout adf_tests_and_params_all_units_cpp(const arma::mat& y, const int& pmin, const int& pmax, icFun ic_type,
                                                   const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range){
-  
+
   const int dclength = dc.size();
   const int N = y.n_cols;
   adfvout adf_OLS, adf_QD;
@@ -286,11 +286,11 @@ adf_param_mout adf_tests_and_params_all_units_cpp(const arma::mat& y, const int&
   arma::mat tests_OLS = zeros(dclength, N);
   arma::mat tests_QD = zeros(dclength, N);
   arma::mat adftests;
-  
+
   arma::mat params_OLS = zeros(dclength, N); //IW adding parameter estimates to output
   arma::mat params_QD = zeros(dclength, N); //IW adding parameter estimates to output
   arma::mat adfparams; //IW adding parameter estimates to output
-  
+
   if (any(detr == 1)) {
     for (int iN = 0; iN < N; iN++) {
       for (int idc = 0; idc < dclength; idc++) {
@@ -302,7 +302,7 @@ adf_param_mout adf_tests_and_params_all_units_cpp(const arma::mat& y, const int&
     }
     adftests = tests_OLS;
     adfparams = params_OLS; //IW adding parameter estimates to output
-    
+
     if (any(detr == 2)) {
       for (int iN = 0; iN < N; iN++) {
         for (int idc = 0; idc < dclength; idc++) {
@@ -327,12 +327,12 @@ adf_param_mout adf_tests_and_params_all_units_cpp(const arma::mat& y, const int&
       adfparams = params_QD; //IW adding parameter estimates to output
     }
   }
-  
-  
+
+
   adf_param_mout adf_tests_param;
   adf_tests_param.tests = adftests;
   adf_tests_param.par = adfparams;
-  
+
   return adf_tests_param;
 }
 
@@ -350,7 +350,7 @@ Rcpp::List adf_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& p
   icFun ic_type = ic_function(ic);
   adf_param_mout adf_out = adf_tests_and_params_all_units_cpp(y, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
   //IW adding parameter estimates to output
-  
+
   return Rcpp::List::create(
     Rcpp::Named ("tests") = adf_out.tests,
     Rcpp::Named ("par") = adf_out.par);
@@ -834,11 +834,11 @@ adfvout adf_onestep_cpp(const arma::vec& z, const int& p, const int& dc = 1,
   arma::vec y_ls;
   arma::mat x_ls;
   const int n = z.n_elem;
-  
+
   const arma::vec y = de_trend(z, 0, false); // no-de-trending so dc = 0
   const arma::mat y_lag = lag_matrix(y, 1, false);
   const arma::vec y_dif = y - y_lag;
-  
+
   // Deterministic components
   arma::mat d;
   if (dc > 0) {
@@ -847,19 +847,19 @@ adfvout adf_onestep_cpp(const arma::vec& z, const int& p, const int& dc = 1,
       d.col(i) = arma::pow(arma::linspace(1, n, n), i);
     }
   }
-  
+
   if (p > 0) {
     const arma::mat y_dif_lags = lag_matrix(y_dif, p, false);
     x = arma::join_rows(y_lag, y_dif_lags);
   } else {
     x = y_lag;
   }
-  
+
   // Include deterministic components in x if any
   if(dc > 0){
     x = arma::join_rows(x, d);
   }
-  
+
   const int trim_t = (trim_ic == 0) * p + trim_ic;
   if (trim) {
     x_ls = x.rows(trim_t + 1, n - 1);
@@ -871,18 +871,18 @@ adfvout adf_onestep_cpp(const arma::vec& z, const int& p, const int& dc = 1,
   const arma::mat xxi = arma::inv_sympd(x_ls.t() * x_ls);
   const arma::vec b = xxi * x_ls.t() * y_ls;
   const arma::vec e = y_dif - x * b;
-  // const arma::vec e_b = y_dif - y_lag * b(0); // Don't need this for asymptotic test 
+  // const arma::vec e_b = y_dif - y_lag * b(0); // Don't need this for asymptotic test
   const arma::vec e_ls = e.subvec(trim_t + 1, n - 1);
   const double s2 = arma::dot(e_ls, e_ls) / e_ls.n_elem;
   const double t_adf = b(0) / std::sqrt(s2 * xxi(0, 0));
   const double c_adf = n * b(0) / (1 - arma::sum(b) + b(0));
-  
+
   adfvout adf_out;
   adf_out.tests = {t_adf, c_adf};
   adf_out.par = b;
   adf_out.res = e;
   return adf_out;
-  
+
 }
 
 
@@ -908,26 +908,26 @@ adfvout adf_onestep_selectlags_cpp(const arma::vec& y, const int& pmin, const in
   arma::vec icvalue = zeros(pmax - pmin + 1);
   adfvout adfp;
   for(int ip = pmin; ip < (pmax + 1); ip++){
-    adfp = adf_onestep_cpp(ys, ip, dc, trim, pmax); //IW Uses new adf with one-step function 
+    adfp = adf_onestep_cpp(ys, ip, dc, trim, pmax); //IW Uses new adf with one-step function
     icvalue(ip - pmin) = ic_type(adfp.res.tail(n - pmax - 1), ip, n - pmax - 1, adfp.par(0), ylag);
   }
-  
+
   const int p_opt = icvalue.index_min() + pmin;
-  adfvout ADFp = adf_onestep_cpp(y, p_opt, dc, trim, 0); //IW Uses new adf with one-step function 
+  adfvout ADFp = adf_onestep_cpp(y, p_opt, dc, trim, 0); //IW Uses new adf with one-step function
   return ADFp;
-  
+
 }
 
 adf_param_mout adf_onestep_tests_and_params_all_units_cpp(const arma::mat& y, const int& pmin, const int& pmax, icFun ic_type,
                                                           const arma::vec& dc, const bool& ic_scale, const double& h_rs, const arma::umat& range){
-  
+
   const int dclength = dc.size();
   const int N = y.n_cols;
   adfvout adf_OLS;
   arma::mat OLS_p = zeros(N, dclength);
   arma::mat tests_OLS = zeros(dclength, N);
-  
-  arma::mat params_OLS = zeros(dclength, N); 
+
+  arma::mat params_OLS = zeros(dclength, N);
 
   for (int iN = 0; iN < N; iN++) {
     for (int idc = 0; idc < dclength; idc++) {
@@ -937,11 +937,11 @@ adf_param_mout adf_onestep_tests_and_params_all_units_cpp(const arma::mat& y, co
       OLS_p(iN, idc) = adf_OLS.par.n_elem - 1;
     }
   }
-  
+
   adf_param_mout adf_tests_param;
   adf_tests_param.tests = tests_OLS;
   adf_tests_param.par = params_OLS;
-  
+
   return adf_tests_param;
 }
 
