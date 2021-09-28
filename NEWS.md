@@ -1,3 +1,14 @@
+## Version 0.3.0
+
+### New Functionality
+* Added new functions  boot_adf(), boot_ur(), boot_frd(), boot_sqt() and 
+boot_panel() that replace the old functions boot_df(),  iADFtest(), bFDRtest(),
+BQSTtest() and paneltest(). The old functions are still available in the package
+as deprecated functions.
+* For additional clarity, new arguments names are used in the new functions.
+* New adf() function added which implements the standard, non-bootstrap, augmented Dickey-Fuller (ADF) test 
+
+
 ## Version 0.2.0
 
 ### New Functionality
