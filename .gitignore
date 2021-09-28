@@ -5,7 +5,5 @@
 src/*.o
 src/*.so
 src/*.dll
-README.html
-.DS_Store
 bootUR.Rproj
-inst/doc
+.DS_Store
