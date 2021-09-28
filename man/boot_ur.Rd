@@ -72,6 +72,7 @@ An object of class \code{"bootUR"}, \code{"\*"}, where \code{"\*"} is \code{"mul
 \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
 \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 \item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
+\item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on.}
 }
 \description{
 This function performs bootstrap unit root tests on each time series individually.

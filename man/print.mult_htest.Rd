@@ -4,7 +4,7 @@
 \alias{print.mult_htest}
 \title{Printing Summary Output for Objects of class mult_htest}
 \usage{
-\method{print}{mult_htest}(x, ...)
+\method{print}{mult_htest}(x, digits = max(3, getOption("digits") - 3), ...)
 }
 \description{
 This function prints summary output for objects of class mult_htest (for multiple hypothesis testing)

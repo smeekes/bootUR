@@ -47,6 +47,7 @@
 #' \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
 #' \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
+#' \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on.}
 #' @section Warnings:
 #' The function may give the following warnings.
 #' \describe{
@@ -78,8 +79,9 @@
 #' @export
 boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL,
                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
-                    criterion = "MAIC", deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-                    show_progress = TRUE, do_parallel = FALSE, cores = NULL, data_name = NULL){
+                    criterion = "MAIC", deterministics = NULL, detrend = NULL,
+                    criterion_scale = TRUE, show_progress = TRUE, do_parallel = FALSE,
+                    cores = NULL, data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = TRUE,
                                    level = level, bootstrap = bootstrap, B = B,
@@ -88,7 +90,8 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
                                    criterion = criterion, deterministics = deterministics,
                                    detrend = detrend, criterion_scale = criterion_scale,
                                    steps = NULL, h_rs = 0.1, show_progress = show_progress,
-                                   do_parallel = do_parallel, cores = cores, data_name = data_name)
+                                   do_parallel = do_parallel, cores = cores,
+                                   data_name = data_name)
 
   if (is.null(data_name)) {
     data_name <- deparse(substitute(data))
@@ -140,17 +143,18 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
   if (NCOL(data) > 1) {
     boot_ur_output <- list(method = method_name, data.name = data_name,
                            null.value =  c("gamma" = 0), alternative = "less",
-                           estimate = iADFout[, 1], statistic = iADFout[, 2], p.value = iADFout[, 3],
-                           rejections = rej_H0, details = iADFout)
+                           estimate = iADFout[, 1], statistic = iADFout[, 2],
+                           p.value = iADFout[, 3], rejections = rej_H0,
+                           details = NULL, series.names = var_names)
     class(boot_ur_output) <- c("bootUR", "mult_htest")
   } else {
     iADFtstat <- iADFout[1, 2]
     attr(iADFtstat, "names") <- "tstat"
     boot_ur_output <- list(method = method_name, data.name = var_names,
                            null.value = c("gamma" = 0), alternative = "less",
-                           estimate = iADFout[1, 1], statistic = iADFtstat, p.value = iADFout[1, 3])
+                           estimate = iADFout[1, 1], statistic = iADFtstat,
+                           p.value = iADFout[1, 3])
     class(boot_ur_output) <- c("bootUR", "htest")
-
   }
 
   return(boot_ur_output)
@@ -207,8 +211,9 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
 #' GDP_BE_adf <- boot_adf(MacroTS[, 1], B = 399, deterministics = "trend",
 #' detrend = "OLS")
 #' print(GDP_BE_adf)
-boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL, ar_AWB = NULL,
-                     min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = "intercept",
+boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999,
+                     block_length = NULL, ar_AWB = NULL, min_lag = 0, max_lag = NULL,
+                     criterion = "MAIC", deterministics = "intercept",
                      detrend = "OLS", criterion_scale = TRUE, show_progress = TRUE,
                      do_parallel = FALSE, cores = NULL, data_name = NULL){
 
@@ -224,11 +229,11 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_leng
     }
   }
   out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B,
-                 block_length = block_length, ar_AWB = ar_AWB, union = FALSE, min_lag = min_lag,
-                 max_lag = max_lag, criterion = criterion, deterministics = deterministics,
-                 detrend = detrend, criterion_scale = criterion_scale,
-                 show_progress = show_progress, do_parallel = do_parallel, cores = cores,
-                 data_name = data_name)
+                 block_length = block_length, ar_AWB = ar_AWB, union = FALSE,
+                 min_lag = min_lag, max_lag = max_lag, criterion = criterion,
+                 deterministics = deterministics, detrend = detrend,
+                 criterion_scale = criterion_scale, show_progress = show_progress,
+                 do_parallel = do_parallel, cores = cores, data_name = data_name)
 
   return(out)
 }
@@ -327,6 +332,7 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
 #' \item{\code{p.value}}{A vector with \code{NA} values, as p-values are not available for the FDR method;}
 #' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the test statistics and critical value, up to non-rejection.}
+#' \item{\code{series.names}}{The names of the series that the tests are performed on.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
@@ -361,10 +367,10 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
 #' print(two_series_boot_fdr)
 #' @export
 boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL,
-                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-                     deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-                     show_progress = TRUE, do_parallel = FALSE, cores = NULL,
-                     data_name = NULL){
+                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
+                     criterion = "MAIC", deterministics = NULL, detrend = NULL,
+                     criterion_scale = TRUE, show_progress = TRUE, do_parallel = FALSE,
+                     cores = NULL, data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
                                    level = level, bootstrap = bootstrap, B = B,
@@ -389,13 +395,14 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
   }
 
   if (union) { # Union Tests
-    bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
+    bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
+                       level = inputs$level)
     estimates <- rep(NA, NCOL(data))
     tstats <- inputs$test_stats
     method_name <- "Bootstrap Union Tests with False Discovery Rate control"
   } else { # No Union Tests
-      bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1), t_star = inputs$t_star[ , 1,],
-                         level = inputs$level)
+      bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1),
+                         t_star = inputs$t_star[ , 1,], level = inputs$level)
       estimates <- t(inputs$param_i)
       tstats <- inputs$tests_i[1, ]
       method_name <- "Bootstrap ADF Tests with False Discovery Rate control"
@@ -410,7 +417,7 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
   fdr_output <- list(method = method_name, data.name = data_name,
                      null.value =  c("gamma" = 0), alternative = "less",
                      estimate = estimates, statistic = tstats, p.value = rep(NA, NCOL(data)),
-                     rejections = rej_H0, details = FDR_seq)
+                     rejections = rej_H0, details = FDR_seq, series.names = var_names)
   class(fdr_output) <- c("bootUR", "mult_htest")
 
   return(fdr_output)
@@ -436,6 +443,7 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
 #' \item{\code{p.value}}{A vector with \code{NA} values, as p-values per inidividual series are not available.The p-value for each test in the sequence can be found in \code{details};}
 #' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value.}
+#' \item{\code{series.names}}{The names of the series that the tests are performed on.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
@@ -521,7 +529,7 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
   sqt_output <- list(method = method_name, data.name = data_name,
                      null.value =  c("gamma" = 0), alternative = "less",
                      estimate = estimates, statistic = tstats, p.value = rep(NA, NCOL(data)),
-                     rejections = rej_H0, details = BSQT_seq)
+                     rejections = rej_H0, details = BSQT_seq, series.names = var_names)
   class(sqt_output) <- c("bootUR", "mult_htest")
   return(sqt_output)
 }
@@ -570,10 +578,12 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
 #' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
 #' print(two_series_boot_panel)
 #' @export
-boot_panel <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL,
-                       ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL, criterion = "MAIC",
+boot_panel <- function(data, level = 0.05, bootstrap = "AWB", B = 1999,
+                       block_length = NULL, ar_AWB = NULL, union = TRUE,
+                       min_lag = 0, max_lag = NULL, criterion = "MAIC",
                        deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-                       show_progress = TRUE, do_parallel = FALSE, cores = NULL, data_name = NULL){
+                       show_progress = TRUE, do_parallel = FALSE, cores = NULL,
+                       data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
                                    level = level, bootstrap = bootstrap, B = B,

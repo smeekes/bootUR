@@ -331,33 +331,51 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
 #' @description This function prints summary output for objects of class mult_htest (for multiple hypothesis testing)
 #' @export
 #' @keywords internal
-print.mult_htest <- function(x, ...){
+print.mult_htest <- function(x, digits = max(3, getOption("digits") - 3), ...){
   cat("\n")
   cat(strwrap(x$method, prefix = "\t"), sep = "\n")
   cat("\n")
-  cat("data:  ", x$data.name, "\n", sep = "")
+  cat("data: ", x$data.name, "\n", sep = "")
 
   if (!is.null(x$alternative)) {
     cat("alternative hypothesis: ")
     if (!is.null(x$null.value)) {
-      if (length(x$null.value) == 1L) {
-        alt.char <-
-          switch(x$alternative,
-                 two.sided = "not equal to",
-                 less = "less than",
-                 greater = "greater than")
-        cat("true ", names(x$null.value), " is ", alt.char, " ",
-            x$null.value, "\n", sep = "")
-      }
-      else {
-        cat(x$alternative, "\nnull values:\n", sep = "")
-        print(x$null.value, digits=getOption("digits"))
-      }
+      alt.char <- switch(x$alternative,
+                         two.sided = "not equal to",
+                         less = "less than",
+                         greater = "greater than")
+      cat("true ", names(x$null.value), " is ", alt.char, " ", x$null.value, "\n", sep = "")
+    } else {
+      cat(x$alternative, "\n", sep = "")
     }
-    else cat(x$alternative, "\n", sep = "")
   }
   cat("\n")
-  cat("Sequence of tests:", "\n")
-  print(x$details)
+  if (is.null(x$details)) {
+    N <- NROW(x$statistic)
+    out_matrix <- matrix(nrow = N, ncol = 3)
+    colnames(out_matrix) <- c("estimate", "statistic", "p-value")
+    rownames(out_matrix) <- x$series.names
+    if (!is.null(x$estimate)) {
+      out_matrix[, 1] <- x$estimate
+    } else{
+      out_matrix[, 1] <- NA
+    }
+    if (!is.null(x$statistic)) {
+      out_matrix[, 2] <- x$statistic
+    } else{
+      out_matrix[, 2] <- NA
+    }
+    if (!is.null(x$p.value)) {
+      out_matrix[, 3] <- x$p.value
+    } else{
+      out_matrix[, 3] <- NA
+    }
+    cat("Tests performed on each series:", "\n")
+    print(out_matrix, digits = digits, ...)
+  } else {
+    cat("Sequence of tests:", "\n")
+    print(x$details, digits = digits, ...)
+  }
+  cat("\n")
   invisible(x)
 }
