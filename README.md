@@ -306,16 +306,16 @@ print(ADFtests_out)
 #>  Bootstrap ADF tests on each individual series (no multiple testing
 #>  correction)
 #> 
-#> data:  MacroTS[, 1:5]
+#> data: MacroTS[, 1:5]
 #> alternative hypothesis: true gamma is less than 0
 #> 
-#> Sequence of tests: 
-#>              gamma     tstat   p-value
-#> GDP_BE -0.06958435 -2.792169 0.1954887
-#> GDP_DE -0.10894606 -2.774320 0.1002506
-#> GDP_FR -0.03451153 -2.048760 0.5112782
-#> GDP_NL -0.05286343 -2.515285 0.1929825
-#> GDP_UK -0.03996287 -2.449065 0.2882206
+#> Tests performed on each series: 
+#>        estimate statistic p-value
+#> GDP_BE -0.06958    -2.792  0.1955
+#> GDP_DE -0.10895    -2.774  0.1003
+#> GDP_FR -0.03451    -2.049  0.5113
+#> GDP_NL -0.05286    -2.515  0.1930
+#> GDP_UK -0.03996    -2.449  0.2882
 ```
 
 Note that `boot_ur` (intentionally) does not provide a correction for
@@ -365,24 +365,24 @@ boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
 #> 
 #>  Bootstrap Sequential Quantile Union Test
 #> 
-#> data:  MacroTS
+#> data: MacroTS
 #> alternative hypothesis: true gamma is less than 0
 #> 
 #> Sequence of tests: 
-#>        H0: # I(0) H1: # I(0)     tstat    p-value
-#> Step 1          0          1 -1.660881 0.02255639
-#> Step 2          1          2 -1.413109 0.12280702
+#>        H0: # I(0) H1: # I(0)  tstat p-value
+#> Step 1          0          1 -1.661 0.02256
+#> Step 2          1          2 -1.413 0.12281
 # Split in four equally sized groups (motivated by the 4 series per country)
 boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
 #> 
 #>  Bootstrap Sequential Quantile Union Test
 #> 
-#> data:  MacroTS
+#> data: MacroTS
 #> alternative hypothesis: true gamma is less than 0
 #> 
 #> Sequence of tests: 
-#>        H0: # I(0) H1: # I(0)     tstat    p-value
-#> Step 1          0          5 -1.051598 0.05012531
+#>        H0: # I(0) H1: # I(0)  tstat p-value
+#> Step 1          0          5 -1.052 0.05013
 ```
 
 ### Bootstrap FDR Controlling Tests
@@ -413,12 +413,12 @@ boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
 #> 
 #>  Bootstrap Union Tests with False Discovery Rate control
 #> 
-#> data:  MacroTS[, 1:10]
+#> data: MacroTS[, 1:10]
 #> alternative hypothesis: true gamma is less than 0
 #> 
 #> Sequence of tests: 
-#>            tstat critical value
-#> GDP_DE -1.077041      -1.581184
+#>         tstat critical value
+#> GDP_DE -1.077         -1.581
 ```
 
 ## Determining Order of Integration
