@@ -23,7 +23,7 @@ struct adfvout {
   arma::vec b_res;
 };
 
-struct adf_param_mout { //IW adding parameter estimates to output
+struct adf_param_mout {
   arma::mat tests;
   arma::mat par;
 };
@@ -287,32 +287,32 @@ adf_param_mout adf_tests_and_params_all_units_cpp(const arma::mat& y, const int&
   arma::mat tests_QD = zeros(dclength, N);
   arma::mat adftests;
 
-  arma::mat params_OLS = zeros(dclength, N); //IW adding parameter estimates to output
-  arma::mat params_QD = zeros(dclength, N); //IW adding parameter estimates to output
-  arma::mat adfparams; //IW adding parameter estimates to output
+  arma::mat params_OLS = zeros(dclength, N);
+  arma::mat params_QD = zeros(dclength, N);
+  arma::mat adfparams;
 
   if (any(detr == 1)) {
     for (int iN = 0; iN < N; iN++) {
       for (int idc = 0; idc < dclength; idc++) {
         adf_OLS = adf_selectlags_cpp(y(span(range(0, iN), range(1, iN)), iN), pmin, pmax, ic_type, dc[idc], false, ic_scale, h_rs, 0, true);
         tests_OLS(idc, iN) = adf_OLS.tests(0);
-        params_OLS(idc, iN) = adf_OLS.par(0); //IW adding parameter estimates to output
+        params_OLS(idc, iN) = adf_OLS.par(0);
         OLS_p(iN, idc) = adf_OLS.par.n_elem - 1;
       }
     }
     adftests = tests_OLS;
-    adfparams = params_OLS; //IW adding parameter estimates to output
+    adfparams = params_OLS;
 
     if (any(detr == 2)) {
       for (int iN = 0; iN < N; iN++) {
         for (int idc = 0; idc < dclength; idc++) {
           adf_QD = adf_cpp(y(span(range(0, iN), range(1, iN)), iN), OLS_p(iN, idc), dc[idc], true, true, 0);
           tests_QD(idc, iN) = adf_QD.tests(0);
-          params_QD(idc, iN) = adf_QD.par(0); //IW adding parameter estimates to output
+          params_QD(idc, iN) = adf_QD.par(0);
         }
       }
       adftests = join_cols(adftests, tests_QD);
-      adfparams = join_cols(adfparams, params_QD); //IW adding parameter estimates to output
+      adfparams = join_cols(adfparams, params_QD);
     }
   } else {
     if (any(detr == 2)) {
@@ -320,11 +320,11 @@ adf_param_mout adf_tests_and_params_all_units_cpp(const arma::mat& y, const int&
         for (int idc = 0; idc < dclength; idc++) {
           adf_QD = adf_selectlags_cpp(y(span(range(0, iN), range(1, iN)), iN), pmin, pmax, ic_type, dc[idc], true, ic_scale, h_rs, 0, true);
           tests_QD(idc, iN) = adf_QD.tests(0);
-          params_QD(idc, iN) = adf_QD.par(0); //IW adding parameter estimates to output
+          params_QD(idc, iN) = adf_QD.par(0);
         }
       }
       adftests = tests_QD;
-      adfparams = params_QD; //IW adding parameter estimates to output
+      adfparams = params_QD;
     }
   }
 
@@ -349,7 +349,6 @@ Rcpp::List adf_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& p
                               const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range){
   icFun ic_type = ic_function(ic);
   adf_param_mout adf_out = adf_tests_and_params_all_units_cpp(y, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
-  //IW adding parameter estimates to output
 
   return Rcpp::List::create(
     Rcpp::Named ("tests") = adf_out.tests,
@@ -902,18 +901,18 @@ adfvout adf_onestep_selectlags_cpp(const arma::vec& y, const int& pmin, const in
   const int n = y.n_elem;
   arma::vec ys = y;
   if (ic_scale) {
-    ys = rescale_onestep_cpp(y, h_rs, p_rs, dc, true, 0); //IW New re-scaling function that uses adf_onestep_cpp
+    ys = rescale_onestep_cpp(y, h_rs, p_rs, dc, true, 0);
   }
-  arma::vec ylag = de_trend(ys, 0, false).subvec(pmax + 1, n - 2); //IW No detrending so dc=0
+  arma::vec ylag = de_trend(ys, 0, false).subvec(pmax + 1, n - 2);
   arma::vec icvalue = zeros(pmax - pmin + 1);
   adfvout adfp;
   for(int ip = pmin; ip < (pmax + 1); ip++){
-    adfp = adf_onestep_cpp(ys, ip, dc, trim, pmax); //IW Uses new adf with one-step function
+    adfp = adf_onestep_cpp(ys, ip, dc, trim, pmax);
     icvalue(ip - pmin) = ic_type(adfp.res.tail(n - pmax - 1), ip, n - pmax - 1, adfp.par(0), ylag);
   }
 
   const int p_opt = icvalue.index_min() + pmin;
-  adfvout ADFp = adf_onestep_cpp(y, p_opt, dc, trim, 0); //IW Uses new adf with one-step function
+  adfvout ADFp = adf_onestep_cpp(y, p_opt, dc, trim, 0);
   return ADFp;
 
 }
