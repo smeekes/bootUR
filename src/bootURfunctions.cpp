@@ -1,13 +1,49 @@
-// [[Rcpp::depends(RcppArmadillo)]]
 #include <RcppArmadillo.h>
 #include <RcppArmadilloExtensions/sample.h>
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-// [[Rcpp::depends(RcppProgress)]]
-#include <progress.hpp>
-#include <progress_bar.hpp>
+#include <RcppParallel.h>
+#include <RcppThread.h>
 using namespace arma;
+
+struct progress {
+private:
+  const int max;
+  const bool show_progress;
+  int counter;
+  int step_counter;
+  std::thread::id main_id;
+  tthread::mutex m;
+  arma::uvec steps = arma::linspace<arma::uvec>(0, max, 21);
+
+public:
+  progress(const int max, const bool show_progress) : max(max), show_progress(show_progress),
+  counter(0), step_counter(0), main_id(std::this_thread::get_id())
+  {
+    if (show_progress) {
+      RcppThread::Rcout << "Progress: |------------------| \n";
+      RcppThread::Rcout << "          ";
+    }
+  };
+
+  void increment() {
+    tthread::lock_guard<tthread::mutex> guard(m);
+    counter++;
+    if (show_progress) {
+      if (std::this_thread::get_id() == main_id) {
+        RcppThread::checkUserInterrupt();
+        if (counter > steps(step_counter + 1)) {
+          RcppThread::Rcout << "*";
+          step_counter++;
+        }
+      }
+    }
+  }
+
+  ~progress() {
+    if (show_progress) {
+      RcppThread::Rcout << "*\n";
+    }
+  }
+};
 
 struct adfmout {
   arma::mat tests;
@@ -549,54 +585,37 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
   const arma::umat i = reshape(i_vec, T, B);
   arma::cube output = zeros(B, dclength * detrlength, N);
 
-  #ifdef _OPENMP
-    omp_set_num_threads(nc);
-  #endif
-  Progress prog(B, show_progress);
-  bool break_flag = false;
+  progress prog(B, show_progress);
   if (do_parallel) {
     if (joint) {
       #pragma omp parallel for schedule(static)
       for (int iB = 0; iB < B; iB++) {
-        if ( ! Progress::check_abort() ) {
-          output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
-          prog.increment();
-        }
+        output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+        prog.increment();
       }
     } else {
       #pragma omp parallel for schedule(static)
       for (int iB = 0; iB < B; iB++) {
-        if ( ! Progress::check_abort() ) {
-          for (int iN = 0; iN < N; iN++) {
-            output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
-          }
-          prog.increment();
+        for (int iN = 0; iN < N; iN++) {
+          output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
         }
+        prog.increment();
       }
     }
   } else {
     if (joint) {
       for (int iB = 0; iB < B; iB++) {
-        if ( ! Progress::check_abort() ) {
-          output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
-          prog.increment();
-        } else {
-          break_flag = true;
-        }
+        output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+        prog.increment();
       }
     } else {
       for (int iB = 0; iB < B; iB++) {
-        if ( ! Progress::check_abort() ) {
-          for (int iN = 0; iN < N; iN++) {
-            output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
-          }
-          prog.increment();
+        for (int iN = 0; iN < N; iN++) {
+          output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
         }
+        prog.increment();
       }
     }
-  }
-  if (break_flag) {
-    Rcpp::stop("Bootstrap loop aborted.");
   }
   return(output);
 }

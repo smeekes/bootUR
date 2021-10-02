@@ -1,8 +1,7 @@
 #' @useDynLib bootUR, .registration = TRUE
 #' @importFrom Rcpp sourceCpp
+#' @importFrom RcppParallel RcppParallelLibs
 NULL
-
-#' @import Rcpp
 
 .onUnload <- function (libpath) {
   library.dynam.unload("bootUR", libpath)

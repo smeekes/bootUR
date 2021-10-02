@@ -21,9 +21,10 @@ LazyData: true
 Roxygen: list(old_usage = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
-    Rcpp, stats, urca
-LinkingTo: Rcpp, RcppArmadillo, RcppProgress
+    Rcpp, stats, urca, RcppParallel
+LinkingTo: Rcpp, RcppArmadillo, RcppParallel, RcppThread
 URL: https://github.com/smeekes/bootUR
 Suggests: 
     knitr, rmarkdown, testthat, ggplot2
 VignetteBuilder: knitr
+SystemRequirements: GNU make
