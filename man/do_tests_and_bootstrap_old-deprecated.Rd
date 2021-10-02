@@ -4,7 +4,7 @@
 \alias{do_tests_and_bootstrap_old-deprecated}
 \title{Auxiliary Function (not accessible to users) to create all bootstrap statistics used to perform the unit root tests.}
 \usage{
-do_tests_and_bootstrap_old(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, 
+do_tests_and_bootstrap_old(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB,
 union, p_min, p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress, do_parallel, nc)
 }
 \arguments{

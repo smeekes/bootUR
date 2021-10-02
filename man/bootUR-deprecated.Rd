@@ -52,7 +52,7 @@ The functions listed below are deprecated and will be defunct in
   available at \code{help("<function>-deprecated")}.
 }
 \section{\code{do_tests_and_bootstrap_old}}{
- 
+
 For \code{do_tests_and_bootstrap_old}, use \code{\link{do_tests_and_bootstrap}}.
 }
 

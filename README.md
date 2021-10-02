@@ -190,10 +190,8 @@ running too long. We add an intercept and a trend
 (`deterministics = "trend"`) and OLS detrending. The console gives you
 live updates on the bootstrap progress. To turn these off, set
 `show_progress = FALSE`. The bootstrap loop can also be run in parallel
-by setting `do_parallel = TRUE`. Note that parallelization requires
-OpenMP to be available on your system, which is typically not the case
-on macOS; see <https://mac.r-project.org/openmp/> for ways to set it up
-manually.
+by setting `do_parallel = TRUE`.
+<!-- Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually. -->
 
 As random number generation is required to draw bootstrap samples, we
 first set the seed of the random number generator to obtain replicable
@@ -203,6 +201,8 @@ results.
 set.seed(155776)
 boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend", 
                     detrend = "OLS")
+#> Progress: |------------------| 
+#>           ********************
 #> 
 #>  Bootstrap ADF test on a single time series
 #> 
@@ -226,6 +226,8 @@ proposed by Smeekes and Taylor (2012).
 
 ``` r
 boot_union(GDP_NL, B = 399, bootstrap = "SWB")
+#> Progress: |------------------| 
+#>           ********************
 #> 
 #>  Bootstrap Union test on a single time series
 #> 
@@ -272,6 +274,8 @@ using a different bootstrap method.
 
 ``` r
 boot_panel(MacroTS, bootstrap = "DWB", B = 399)
+#> Progress: |------------------| 
+#>           ********************
 #> 
 #>  Panel Bootstrap Group-Mean Union Test
 #> 
@@ -301,6 +305,8 @@ ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALS
 #> Warning in check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test
 #> = boot_ur_test, : Missing values cause resampling bootstrap to be executed for
 #> each time series individually.
+#> Progress: |------------------| 
+#>           ********************
 print(ADFtests_out)
 #> 
 #>  Bootstrap ADF tests on each individual series (no multiple testing
@@ -362,6 +368,8 @@ Urbain (2020).
 N <- ncol(MacroTS)
 # Test each unit sequentially
 boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
+#> Progress: |------------------| 
+#>           ********************
 #> 
 #>  Bootstrap Sequential Quantile Union Test
 #> 
@@ -374,6 +382,8 @@ boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
 #> Step 2          1          2 -1.413 0.12281
 # Split in four equally sized groups (motivated by the 4 series per country)
 boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
+#> Progress: |------------------| 
+#>           ********************
 #> 
 #>  Bootstrap Sequential Quantile Union Test
 #> 
@@ -410,6 +420,8 @@ block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 ``` r
 N <- ncol(MacroTS)
 boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
+#> Progress: |------------------| 
+#>           ********************
 #> 
 #>  Bootstrap Union Tests with False Discovery Rate control
 #> 
@@ -450,6 +462,10 @@ appropriately differenced data.
 
 ``` r
 out_orders <- order_integration(MacroTS[, 11:15], method = "boot_fdr", B = 399)
+#> Progress: |------------------| 
+#>           ********************
+#> Progress: |------------------| 
+#>           ********************
 # Orders
 out_orders$order_int
 #> HICP_BE HICP_DE HICP_FR HICP_NL HICP_UK 

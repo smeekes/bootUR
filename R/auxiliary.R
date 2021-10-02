@@ -37,8 +37,9 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   inputs <- check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test = boot_ur_test,
                          level = level, bootstrap = bootstrap, B = B, block_length = block_length,
                          ar_AWB = ar_AWB, union = union, min_lag = min_lag, max_lag = max_lag,
-                         criterion = criterion, deterministics = deterministics, detrend = detrend,
-                         steps = steps, do_parallel = do_parallel, cores = cores, data_name = data_name)
+                         criterion = criterion, deterministics = deterministics,
+                         detrend = detrend, steps = steps, do_parallel = do_parallel,
+                         cores = cores, data_name = data_name)
 
   boot <- inputs$boot
   l <- inputs$l
@@ -53,7 +54,6 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   p_vec <- inputs$p_vec
   range_nonmiss <- inputs$range_nonmiss
   joint <- inputs$joint
-  nc <- inputs$nc
 
   # Dimensions
   n <- nrow(data)
@@ -62,16 +62,18 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   # ADF tests
   panel_est <- adf_panel_bootstrap_dgp_cpp(y = data, pmin = min_lag, pmax = max_lag, ic = ic,
                                            dc = dc_boot, QD = FALSE, trim = FALSE,
-                                           ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss)
+                                           ic_scale = criterion_scale, h_rs = h_rs,
+                                           range = range_nonmiss)
   u_boot <- panel_est$b_res
   u_boot[is.nan(u_boot)] <- NA
   res <- panel_est$res
   ar_est <- panel_est$par[-1, , drop = FALSE]
   t_star <- bootstrap_cpp(B = B, boot = boot, u = u_boot, e = res, l = l, s = s_DWB, ar = ar_AWB,
-                          ar_est = ar_est, y0 = matrix(0, ncol = N), pmin = min_lag, pmax = max_lag,
-                          ic = ic, dc = dc, detr = detr_int, ic_scale = criterion_scale, h_rs = h_rs,
+                          ar_est = ar_est, y0 = matrix(0, ncol = N), pmin = min_lag,
+                          pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
+                          ic_scale = criterion_scale, h_rs = h_rs,
                           range = range_nonmiss, joint = joint, show_progress = show_progress,
-                          do_parallel = do_parallel, nc = nc)
+                          do_parallel = do_parallel)
 
   tests_and_params <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic,
                                           dc = dc, detr = detr_int, ic_scale = criterion_scale,
@@ -156,6 +158,7 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
   if ((cores != round(cores)) | (cores < 1)) {
     stop("Invalid value for argument cores")
   }
+  RcppParallel::setThreadOptions(numThreads = cores)
 
   # Check for missing values or unbalanced panels (MBB, SB)
   check_missing <- check_missing_insample_values(data)
@@ -322,7 +325,7 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
   }
   out <- list(boot = boot, l = block_length, s_DWB = s_DWB, ar_AWB = ar_AWB, dc = dc,
               dc_boot = dc_boot, detr = detrend, detr_int = detr_int, ic = ic,
-              p_max = max_lag, p_vec = p_vec, range_nonmiss = range_nonmiss, joint = joint, nc = cores)
+              p_max = max_lag, p_vec = p_vec, range_nonmiss = range_nonmiss, joint = joint)
 
   return(out)
 }

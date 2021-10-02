@@ -29,24 +29,24 @@
 #' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
-#' 
+#'
 #' @name do_tests_and_bootstrap_old-deprecated
-#' @usage do_tests_and_bootstrap_old(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, 
+#' @usage do_tests_and_bootstrap_old(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB,
 #' union, p_min, p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress, do_parallel, nc)
 #' @seealso \code{\link{bootUR-deprecated}}
 #' @keywords internal
 NULL
 #' @rdname bootUR-deprecated
-#' @section \code{do_tests_and_bootstrap_old}: 
+#' @section \code{do_tests_and_bootstrap_old}:
 #' For \code{do_tests_and_bootstrap_old}, use \code{\link{do_tests_and_bootstrap}}.
 #'
 do_tests_and_bootstrap_old <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union, p_min,
                                    p_max, ic, dc, detr, ic_scale, q, h_rs, show_progress,
                                    do_parallel, nc){
-  
+
   .Deprecated("do_tests_and_bootstrap")
   y <- as.matrix(y)
-  
+
   # Check correctness arguments and perform initial calculations and transformations
   inputs <- check_inputs_old(y = y, BSQT_test = BSQT_test, iADF_test = iADF_test, level = level, boot = boot,
                B = B, l = l, ar_AWB = ar_AWB, union = union, p_min = p_min, p_max = p_max, ic = ic,
@@ -83,7 +83,7 @@ do_tests_and_bootstrap_old <- function(y, BSQT_test, iADF_test, level, boot, B, 
                           ar_est = ar_est, y0 = matrix(0, ncol = N), pmin = p_min, pmax = p_max,
                           ic = ic, dc = dc, detr = detr_int, ic_scale = ic_scale, h_rs = h_rs,
                           range = range_nonmiss, joint = joint, show_progress = show_progress,
-                          do_parallel = do_parallel, nc = nc)
+                          do_parallel = do_parallel)
   tests_i <- adf_tests_panel_cpp_mat_out(y, pmin = p_min, pmax = p_max, ic = ic, dc = dc, detr = detr_int,
                                   ic_scale = ic_scale, h_rs = h_rs, range = range_nonmiss)
 
@@ -138,7 +138,7 @@ do_tests_and_bootstrap_old <- function(y, BSQT_test, iADF_test, level, boot, B, 
 #' @param nc The number of cores to be used in the parallel loops. Default is to use all but one.
 #' @seealso \code{\link{iADFtest}}, \code{\link{BSQTtest}}, \code{\link{bFDRtest}}
 #' @keywords internal
-#' 
+#'
 #' @name check_inputs_old-deprecated
 #' @usage check_inputs_old(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB, union,
 #' p_min, p_max, ic, dc, detr, q, do_parallel, nc)
@@ -153,7 +153,7 @@ check_inputs_old <- function(y, BSQT_test, iADF_test, level, boot, B, l, ar_AWB,
                          p_min, p_max, ic, dc, detr, q, do_parallel, nc){
 
   .Deprecated("check_inputs")
-  
+
   # Dimensions
   n <- nrow(y)
   N <- ncol(y)

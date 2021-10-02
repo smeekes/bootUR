@@ -96,7 +96,8 @@ To perform a bootstrap version of the ADF unit root test on a single time series
 
 **Implementation**
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`) and OLS detrending. The console gives you live updates on the bootstrap progress. To turn these off, set `show_progress = FALSE`. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually.
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`) and OLS detrending. The console gives you live updates on the bootstrap progress. To turn these off, set `show_progress = FALSE`. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`.
+<!-- Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually. -->
 
 As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 

@@ -530,20 +530,14 @@ arma::mat SWB_cpp(const arma::mat& u, const arma::mat& e, const arma::vec& z, co
 typedef arma::mat (*bFun) (const arma::mat&, const arma::mat&, const arma::vec&, const arma::uvec&, const int&, const arma::mat&, const double&, const arma::mat&, const arma::rowvec&);
 
 bFun boot_func(const int& boot) {
-  if (boot == 1) {
-    return MBB_cpp;
-  } else if (boot == 2) {
-    return BWB_cpp;
-  } else if (boot == 3) {
-    return DWB_cpp;
-  } else if (boot == 4) {
-    return AWB_cpp;
-  } else if (boot == 5) {
-    return SB_cpp;
-  } else if (boot == 6) {
-    return SWB_cpp;
-  } else {
-    return NULL;
+  switch(boot) {
+  case 1: return MBB_cpp;
+  case 2: return BWB_cpp;
+  case 3: return DWB_cpp;
+  case 4: return AWB_cpp;
+  case 5 :return SB_cpp;
+  case 6: return SWB_cpp;
+  default: return NULL;
   }
 }
 
@@ -555,18 +549,61 @@ arma::mat bootstrap_tests_cpp(const arma::mat& u, const arma::mat& e, bFun boot_
   return adf_btests;
 }
 
-// [[Rcpp::export]]
-arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s,
-                         const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc,
-                         const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint = true,
-                         const bool& do_parallel = false, const int& nc = 1, const bool& show_progress = false){
-
+struct boot_par : public RcppParallel::Worker
+{
+  // inputs
+  const arma::umat& i; const arma::mat& z; const arma::mat& u0; const arma::mat& e0;
+  const bFun& boot_f; const int& l; const arma::mat& s; const double& ar;
+  const arma::mat& ar_est; const arma::mat& y0; const int& pmin; const int& pmax;
+  const icFun& ic_type; const arma::vec& dc; const arma::vec& detr; const bool& ic_scale;
+  const double& h_rs; const arma::umat& range; const bool& joint;
+  const int N = u0.n_cols;
   const int detrlength = detr.size();
   const int dclength = dc.size();
+
+  // Output
+  arma::cube& output;
+  progress& prog;
+
+  // initialize with source and destination
+  boot_par(const arma::umat& i, const arma::mat& z, const arma::mat& u0,
+           const arma::mat& e0, const bFun& boot_f, const int& l,
+           const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0,
+           const int& pmin, const int& pmax, const icFun& ic_type, const arma::vec& dc,
+           const arma::vec& detr, const bool& ic_scale, const double& h_rs,
+           const arma::umat& range, const bool& joint, arma::cube& output, progress& prog)
+    : i(i), z(z), u0(u0), e0(e0), boot_f(boot_f), l(l), s(s), ar(ar), ar_est(ar_est), y0(y0),
+      pmin(pmin), pmax(pmax), ic_type(ic_type), dc(dc), detr(detr), ic_scale(ic_scale),
+      h_rs(h_rs), range(range), joint(joint), output(output), prog(prog) {}
+
+  // Bootstrap
+  void operator()(std::size_t begin, std::size_t end) {
+    if (joint) {
+      for (std::size_t iB = begin; iB < end; iB++) {
+        output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+        prog.increment();
+      }
+    } else {
+      for (std::size_t iB = begin; iB < end; iB++) {
+        for (int iN = 0; iN < N; iN++) {
+          output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
+        }
+        prog.increment();
+      }
+    }
+  }
+};
+
+// [[Rcpp::export]]
+arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, const int& boot,
+                         const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est,
+                         const arma::mat& y0, const int& pmin, const int& pmax, const int& ic,
+                         const arma::vec& dc, const arma::vec& detr, const bool& ic_scale,
+                         const double& h_rs, const arma::umat& range, const bool& joint = true,
+                         const bool& do_parallel = false, const bool& show_progress = false){
+
   const int N = u.n_cols;
   const int T = u.n_rows;
-  int ub;
-
   const bFun boot_f = boot_func(boot);
   const icFun ic_type = ic_function(ic);
   arma::mat u0 = u, e0 = e;
@@ -575,6 +612,7 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
   const arma::vec z_vec = Rcpp::rnorm(T * B, 0, 1);
   const arma::mat z = reshape(z_vec, T, B);
 
+  int ub;
   if (boot == 6) {
     ub = 1;
   } else {
@@ -583,25 +621,16 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
 
   const arma::uvec i_vec = Rcpp::RcppArmadillo::sample(linspace<arma::uvec>(0, T - ub, T - ub + 1), T * B, true);
   const arma::umat i = reshape(i_vec, T, B);
-  arma::cube output = zeros(B, dclength * detrlength, N);
+
+  const int detrlength = detr.size();
+  const int dclength = dc.size();
+  arma::cube output(B, dclength * detrlength, N);
 
   progress prog(B, show_progress);
   if (do_parallel) {
-    if (joint) {
-      #pragma omp parallel for schedule(static)
-      for (int iB = 0; iB < B; iB++) {
-        output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
-        prog.increment();
-      }
-    } else {
-      #pragma omp parallel for schedule(static)
-      for (int iB = 0; iB < B; iB++) {
-        for (int iN = 0; iN < N; iN++) {
-          output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
-        }
-        prog.increment();
-      }
-    }
+    boot_par boot_loops(i, z, u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type,
+                        dc, detr, ic_scale, h_rs, range, joint, output, prog);
+    RcppParallel::parallelFor(0, B, boot_loops);
   } else {
     if (joint) {
       for (int iB = 0; iB < B; iB++) {
