@@ -21,7 +21,8 @@
 #' @examples
 #' # standard ADF test on GDP_BE
 #' GDP_BE_adf <- adf(MacroTS[, 1], deterministics = "trend")
-adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = "intercept",
+adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
+                deterministics = "intercept",
                 criterion_scale = TRUE, two_step = TRUE, data_name = NULL){
 
   if (NCOL(data) > 1) {

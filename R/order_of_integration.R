@@ -24,7 +24,11 @@ diff_mult <- function(data, d, keep_NAs = TRUE) {
   diffed_data <- data
   diffed_data[] <- diffed_x
   if (!keep_NAs & (max(d) > 0)) {
-    diffed_data <- diffed_data[-(1:max(d)), ]
+    if (NCOL(diffed_data) > 1) {
+      diffed_data <- diffed_data[-(1:max(d)), ]
+    } else if (NCOL(diffed_data) == 1) {
+      diffed_data <- diffed_data[-(1:max(d))]
+    }
   }
   return(diffed_data)
 }
@@ -34,7 +38,9 @@ diff_mult <- function(data, d, keep_NAs = TRUE) {
 #' @param data A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.
 #' @param max_order The maximum order of integration of the time series. Default is 2.
 #' @param method The unit root tests to be used in the procedure. For multiple time series the options are "boot_ur", "boot_sqt" and "boot_fdr", with "boot_ur" the default. For single time series the options are "adf", boot_adf", "boot_union" and "boot_ur", with the latter the default.
+#' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param plot_orders Logical indicator whether the resulting orders of integration should be plotted. Default is \code{FALSE}.
+#' @param data_name Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.
 #' @param ... Optional arguments passed to the chosen unit root test function.
 #' @details The function follows the approach laid out in Smeekes and Wijler (2020), where all series is differenced \eqn{d-1} times, where \eqn{d} is the specified maximum order, and these differenced series are tested for unit roots. The series for which the unit root null is not rejected, are classified as \eqn{I(d)} and removed from consideration. The remaining series are integrated, and tested for unit roots again, leading to a classification of \eqn{I(d-1)} series if the null is not rejected. This is continued until a non-rejection is observed for all time series, or the series are integrated back to their original level. The series for which the null hypothesis is rejected in the final stage are classified as \eqn{I(0)}.
 #'
@@ -49,7 +55,8 @@ diff_mult <- function(data, d, keep_NAs = TRUE) {
 #' @examples
 #' # Use "boot_ur" to determine the order of GDP_BE and GDP_DE
 #' orders_tseries <- order_integration(MacroTS[, 1:2], method = "boot_ur", B = 199)
-order_integration <- function(data, max_order = 2, method = "boot_ur", plot_orders = FALSE, ...) {
+order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0.05,
+                              plot_orders = FALSE, data_name = NULL, ...) {
   N <- NCOL(data)
   if (!is.null(colnames(data))) {
     var_names <- colnames(data)
@@ -58,23 +65,32 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", plot_orde
   }
   d <- rep(NA, N)
   names(d) <- var_names
-  datad <- data
+  data_mat <- as.matrix(data)
+  datad <- data_mat
   i_in_datad <- 1:N
   for (d_i in (max_order - 1):0) {
-    datad <- diff_mult(data[, i_in_datad], rep(d_i, length(i_in_datad)), keep_NAs = FALSE)
+    datad <- diff_mult(data_mat[, i_in_datad], rep(d_i, length(i_in_datad)), keep_NAs = FALSE)
     if (method == "boot_ur") {
-      out <- boot_ur(datad, ...)
+      out <- boot_ur(datad, level = level, ...)
     } else if (method == "boot_fdr" & N > 1) {
-      out <- boot_fdr(datad, ...)
+      out <- boot_fdr(datad, level = level, ...)
     } else if (method == "boot_sqt" & N > 1) {
-      out <- boot_sqt(datad, ...)
+      out <- boot_sqt(datad, level = level, ...)
     } else if (method == "boot_adf" & N == 1) {
-      out <- boot_adf(datad, ...)
+      test_out <- boot_adf(datad, level = level, ...)
+      out <- list("rejections" = test_out$p.value < level)
     } else if (method == "boot_union" & N == 1) {
-      out <- boot_union(datad, ...)
+      test_out <- boot_union(datad, level = level, ...)
+      out <- list("rejections" = test_out$p.value < level)
     } else if (method == "adf" & N == 1) {
-      out <- adf(datad, ...)
-    } else if (method == "iADFtest") {
+      test_out <- adf(datad, ...)
+      out <- list("rejections" = test_out$p.value < level)
+    } else if (method == "adf" & N > 1) {
+        rejections <- apply(datad, 2, function(x){
+          return(adf(x, ...)$p.value < level)
+        })
+        out <- list("rejections" = rejections)
+      } else if (method == "iADFtest") {
       stop("'iADFtest' is deprecated. Use 'boot_ur' instead.")
 #      out <- iADFtest(datad, ...)
     } else if (method == "bFDRtest" & N > 1) {
