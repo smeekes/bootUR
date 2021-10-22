@@ -1,7 +1,6 @@
 #' Individual Unit Root Tests without multiple testing control
 #' @description This function performs bootstrap unit root tests on each time series individually.
 #' @param data A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.
-#' @param level Desired significance level of the unit root test. Default is 0.05.
 #' @param bootstrap String for bootstrap method to be used. Options are
 #' \describe{
 #' \item{\code{"MBB"}}{Moving block bootstrap (Paparoditis and Politis, 2003; Palm, Smeekes and Urbain, 2011);}
@@ -29,6 +28,8 @@
 #' If \code{union = FALSE}, the default is adding an intercept (a warning is given).
 #' @param detrend String indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.
 #' @param criterion_scale Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
+#' @param union_quantile The quantile of the bootstrap distribution used for scaling the individual statistics in the union. Ideally this should equal the desired significance level of the test. Default is 0.05. This parameter is overwritten when a significance level is provided in the argument \code{level}.
+#' @param level The desired significance level of the test (optional). This is only used for multivariate series to be able to provide a boolean vector with rejections of the null hypothesis or not for easy post-processing. Default is \code{NULL}, in which case no such vector is given.
 #' @param show_progress Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.
 #' @param do_parallel Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.
 #' @param cores The number of cores to be used in the parallel loops. Default is to use all but one.
@@ -42,10 +43,10 @@
 #' \item{\code{data.name}}{The name of the data on which the method is performed;}
 #' \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-#' \item{\code{estimate}}{The estimated value(s) of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+#' \item{\code{estimate}}{The estimated value(s) of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence \code{NA} is returned;}
 #' \item{\code{statistic}}{The value(s) of the test statistic of the unit root test(s);}
 #' \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
-#' \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
+#' \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE}). This is only supplied when an optional significance level is given, otherwise \code{NULL} is returned;}
 #' \item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
 #' \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on.}
 #' @section Warnings:
@@ -77,14 +78,17 @@
 #' two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 399)
 #' print(two_series_boot_ur)
 #' @export
-boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL,
+boot_ur <- function(data, level = NULL, bootstrap = "AWB", B = 1999, block_length = NULL,
                     ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
                     criterion = "MAIC", deterministics = NULL, detrend = NULL,
-                    criterion_scale = TRUE, show_progress = TRUE, do_parallel = FALSE,
-                    cores = NULL, data_name = NULL){
+                    criterion_scale = TRUE, union_quantile = 0.05, show_progress = TRUE,
+                    do_parallel = FALSE, cores = NULL, data_name = NULL){
 
+  if (!is.null(level)) {
+    union_quantile <- level
+  }
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = TRUE,
-                                   level = level, bootstrap = bootstrap, B = B,
+                                   level = union_quantile, bootstrap = bootstrap, B = B,
                                    block_length = block_length, ar_AWB = ar_AWB,
                                    union = union, min_lag = min_lag, max_lag = max_lag,
                                    criterion = criterion, deterministics = deterministics,
@@ -128,7 +132,7 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
     iADFout <- cbind(t(inputs$param_i), iADFout) # Parameter estimates, tstats and p-values
     if (NCOL(data) > 1) {
       rownames(iADFout) <- var_names
-      colnames(iADFout) <- c("gamma", "tstat", "p-value")
+      colnames(iADFout) <- c("gamma", "statistic", "p.value")
     }
 
     if (NCOL(data) == 1){ # boot_adf
@@ -138,7 +142,11 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
     }
   }
 
-  rej_H0 <- (iADFout[, 3] < level)
+  if (!is.null(level)) {
+    rej_H0 <- (iADFout[, 3] < level)
+  } else {
+    rej_H0 <- NULL
+  }
 
   if (NCOL(data) > 1) {
     boot_ur_output <- list(method = method_name, data.name = data_name,
@@ -211,7 +219,7 @@ boot_ur <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_lengt
 #' GDP_BE_adf <- boot_adf(MacroTS[, 1], B = 399, deterministics = "trend",
 #' detrend = "OLS")
 #' print(GDP_BE_adf)
-boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999,
+boot_adf <- function(data, bootstrap = "AWB", B = 1999,
                      block_length = NULL, ar_AWB = NULL, min_lag = 0, max_lag = NULL,
                      criterion = "MAIC", deterministics = "intercept",
                      detrend = "OLS", criterion_scale = TRUE, show_progress = TRUE,
@@ -228,7 +236,7 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999,
       data_name <- colnames(data)[1]
     }
   }
-  out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B,
+  out <- boot_ur(data = data, bootstrap = bootstrap, B = B,
                  block_length = block_length, ar_AWB = ar_AWB, union = FALSE,
                  min_lag = min_lag, max_lag = max_lag, criterion = criterion,
                  deterministics = deterministics, detrend = detrend,
@@ -289,10 +297,10 @@ boot_adf <- function(data, level = 0.05, bootstrap = "AWB", B = 1999,
 #' # boot_union on GDP_BE
 #' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399)
 #' print(GDP_BE_df)
-boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL,
+boot_union <- function(data, bootstrap = "AWB", B = 1999, block_length = NULL,
                        ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-                       criterion_scale = TRUE, show_progress = TRUE, do_parallel = FALSE,
-                       cores = NULL, data_name = NULL){
+                       criterion_scale = TRUE, union_quantile = 0.05, show_progress = TRUE,
+                       do_parallel = FALSE, cores = NULL, data_name = NULL){
 
   if (NCOL(data) > 1) {
     stop("Multiple time series not allowed. Switch to a multivariate method such as boot_ur,
@@ -305,7 +313,7 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
       data_name <- colnames(data)[1]
     }
   }
-  out <- boot_ur(data = data, level = level, bootstrap = bootstrap, B = B,
+  out <- boot_ur(data = data, union_quantile = union_quantile, bootstrap = bootstrap, B = B,
                  block_length = block_length, ar_AWB = ar_AWB, union = TRUE, min_lag = min_lag,
                  max_lag = max_lag, criterion = criterion, criterion_scale = criterion_scale,
                  show_progress = show_progress, do_parallel = do_parallel,
@@ -317,7 +325,7 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
 #' Bootstrap Unit Root Tests with False Discovery Rate control
 #' @description Controls for multiple testing by controlling the false discovery rate (FDR), see Moon and Perron (2012) and Romano, Shaikh and Wolf (2008).
 #' @inheritParams boot_ur
-#' @param level Desired False Discovery Rate level of the unit root tests. Default is 0.05.
+#' @param FDR_level Desired False Discovery Rate level of the unit root tests. Default is 0.05.
 #' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
 #' @details The false discovery rate FDR is defined as the expected proportion of false rejections relative to the total number of rejections.
 #'
@@ -366,14 +374,14 @@ boot_union <- function(data, level = 0.05, bootstrap = "AWB", B = 1999, block_le
 #' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], bootstrap = "MBB", B = 399)
 #' print(two_series_boot_fdr)
 #' @export
-boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_length = NULL,
+boot_fdr <- function(data, FDR_level = 0.05, bootstrap = "AWB", B = 1999, block_length = NULL,
                      ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
                      criterion = "MAIC", deterministics = NULL, detrend = NULL,
                      criterion_scale = TRUE, show_progress = TRUE, do_parallel = FALSE,
                      cores = NULL, data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
-                                   level = level, bootstrap = bootstrap, B = B,
+                                   level = FDR_level, bootstrap = bootstrap, B = B,
                                    block_length = block_length, ar_AWB = ar_AWB, union = union,
                                    min_lag = min_lag, max_lag = max_lag, criterion = criterion,
                                    deterministics = deterministics, detrend = detrend,
@@ -426,6 +434,7 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
 #' Bootstrap Sequential Quantile Test
 #' @description Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).
 #' @inheritParams boot_ur
+#' @param SQT_level Desired significance level of the sequential tests performed. Default is 0.05.
 #' @param steps Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.
 #' @param union Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.
 #' @details The parameter \code{steps} can either be set as an increasing sequence of integers smaller or equal to the number of series \code{N}, or fractions of the total number of series (quantiles). For \code{N} time series, setting \code{steps = 0:N} means each unit should be tested sequentially. In this case the method is equivalent to the StepM method of Romano and Wolf (2005), and therefore controls the familywise error rate. To split the series in \code{K} equally sized groups, use \code{steps = 0:K / K}.
@@ -478,14 +487,14 @@ boot_fdr <- function(data, level = 0.05,  bootstrap = "AWB", B = 1999, block_len
 #' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
 #' print(two_series_boot_sqt)
 #' @export
-boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB",
+boot_sqt <- function(data, steps = 0:NCOL(data), SQT_level = 0.05, bootstrap = "AWB",
                      B = 1999, block_length = NULL, ar_AWB = NULL, union = TRUE,
                      min_lag = 0, max_lag = NULL, criterion = "MAIC", deterministics = NULL,
                      detrend = NULL, criterion_scale = TRUE, show_progress = TRUE,
                      do_parallel = FALSE, cores = NULL, data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = TRUE, boot_ur_test = FALSE,
-                                   level = level, bootstrap = bootstrap, B = B,
+                                   level = SQT_level, bootstrap = bootstrap, B = B,
                                    block_length = block_length, ar_AWB = ar_AWB, union = union,
                                    min_lag = min_lag, max_lag = max_lag, criterion = criterion,
                                    deterministics = deterministics, detrend = detrend,
@@ -578,15 +587,15 @@ boot_sqt <- function(data, steps = 0:NCOL(data), level = 0.05,  bootstrap = "AWB
 #' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
 #' print(two_series_boot_panel)
 #' @export
-boot_panel <- function(data, level = 0.05, bootstrap = "AWB", B = 1999,
+boot_panel <- function(data, bootstrap = "AWB", B = 1999,
                        block_length = NULL, ar_AWB = NULL, union = TRUE,
                        min_lag = 0, max_lag = NULL, criterion = "MAIC",
                        deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
-                       show_progress = TRUE, do_parallel = FALSE, cores = NULL,
-                       data_name = NULL){
+                       union_quantile = 0.05, show_progress = TRUE,
+                       do_parallel = FALSE, cores = NULL, data_name = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
-                                   level = level, bootstrap = bootstrap, B = B,
+                                   level = union_quantile, bootstrap = bootstrap, B = B,
                                    block_length = block_length, ar_AWB = ar_AWB, union = union,
                                    min_lag = min_lag, max_lag = max_lag, criterion = criterion,
                                    deterministics = deterministics, detrend = detrend,

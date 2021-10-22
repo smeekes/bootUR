@@ -71,7 +71,8 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
     stop("The argument deterministics should be equal to either none, intercept, trend:
            (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
   }
-  dc_int <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
+  dc_int <- 0*(deterministics=="none") + 1*(deterministics=="intercept") +
+    2*(deterministics=="trend")
 
   detr <- "OLS"
   detr_int <- 1
@@ -84,7 +85,8 @@ adf <- function(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
                                             range = range_nonmiss)
   } else {
     tests_and_params <- adf_onestep_tests_panel_cpp(y, pmin = min_lag, pmax = max_lag,
-                                                    ic = ic, dc = dc_int, ic_scale = criterion_scale,
+                                                    ic = ic, dc = dc_int,
+                                                    ic_scale = criterion_scale,
                                                     h_rs = 0.1, range = range_nonmiss)
   }
 

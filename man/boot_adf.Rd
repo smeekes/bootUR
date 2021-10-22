@@ -4,16 +4,14 @@
 \alias{boot_adf}
 \title{Bootstrap augmented Dickey-Fuller Unit Root Test}
 \usage{
-boot_adf(data, level = 0.05, bootstrap = "AWB", B = 1999,
-  block_length = NULL, ar_AWB = NULL, min_lag = 0, max_lag = NULL,
-  criterion = "MAIC", deterministics = "intercept", detrend = "OLS",
-  criterion_scale = TRUE, show_progress = TRUE, do_parallel = FALSE,
-  cores = NULL, data_name = NULL)
+boot_adf(data, bootstrap = "AWB", B = 1999, block_length = NULL,
+  ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
+  deterministics = "intercept", detrend = "OLS", criterion_scale = TRUE,
+  show_progress = TRUE, do_parallel = FALSE, cores = NULL,
+  data_name = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
-
-\item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{

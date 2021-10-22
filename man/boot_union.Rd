@@ -4,15 +4,13 @@
 \alias{boot_union}
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
-boot_union(data, level = 0.05, bootstrap = "AWB", B = 1999,
-  block_length = NULL, ar_AWB = NULL, min_lag = 0, max_lag = NULL,
-  criterion = "MAIC", criterion_scale = TRUE, show_progress = TRUE,
+boot_union(data, bootstrap = "AWB", B = 1999, block_length = NULL,
+  ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
+  criterion_scale = TRUE, union_quantile = 0.05, show_progress = TRUE,
   do_parallel = FALSE, cores = NULL, data_name = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
-
-\item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
@@ -37,6 +35,8 @@ boot_union(data, level = 0.05, bootstrap = "AWB", B = 1999,
 \item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+
+\item{union_quantile}{The quantile of the bootstrap distribution used for scaling the individual statistics in the union. Ideally this should equal the desired significance level of the test. Default is 0.05. This parameter is overwritten when a significance level is provided in the argument \code{level}.}
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 

@@ -4,16 +4,14 @@
 \alias{boot_panel}
 \title{Panel Unit Root Test}
 \usage{
-boot_panel(data, level = 0.05, bootstrap = "AWB", B = 1999,
-  block_length = NULL, ar_AWB = NULL, union = TRUE, min_lag = 0,
-  max_lag = NULL, criterion = "MAIC", deterministics = NULL,
-  detrend = NULL, criterion_scale = TRUE, show_progress = TRUE,
+boot_panel(data, bootstrap = "AWB", B = 1999, block_length = NULL,
+  ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
+  criterion = "MAIC", deterministics = NULL, detrend = NULL,
+  criterion_scale = TRUE, union_quantile = 0.05, show_progress = TRUE,
   do_parallel = FALSE, cores = NULL, data_name = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
-
-\item{level}{Desired significance level of the unit root test. Default is 0.05.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
@@ -52,6 +50,8 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 \item{detrend}{String indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+
+\item{union_quantile}{The quantile of the bootstrap distribution used for scaling the individual statistics in the union. Ideally this should equal the desired significance level of the test. Default is 0.05. This parameter is overwritten when a significance level is provided in the argument \code{level}.}
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 

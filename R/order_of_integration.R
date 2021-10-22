@@ -73,14 +73,14 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
     if (method == "boot_ur") {
       out <- boot_ur(datad, level = level, ...)
     } else if (method == "boot_fdr" & N > 1) {
-      out <- boot_fdr(datad, level = level, ...)
+      out <- boot_fdr(datad, FDR_level = level, ...)
     } else if (method == "boot_sqt" & N > 1) {
-      out <- boot_sqt(datad, level = level, ...)
+      out <- boot_sqt(datad, SQT_level = level, ...)
     } else if (method == "boot_adf" & N == 1) {
-      test_out <- boot_adf(datad, level = level, ...)
+      test_out <- boot_adf(datad, ...)
       out <- list("rejections" = test_out$p.value < level)
     } else if (method == "boot_union" & N == 1) {
-      test_out <- boot_union(datad, level = level, ...)
+      test_out <- boot_union(datad, union_quantile = level, ...)
       out <- list("rejections" = test_out$p.value < level)
     } else if (method == "adf" & N == 1) {
       test_out <- adf(datad, ...)

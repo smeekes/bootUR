@@ -148,26 +148,26 @@ Note that `boot_ur` (intentionally) does not provide a correction for multiple t
 ### Bootstrap Sequential Tests
 The function `boot_sqt()` performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015). Here we split the series in groups which are consecutively tested for unit roots, starting with the group most likely to be stationary (having the smallest ADF statistics). If the unit root hypothesis cannot be rejected for the first group, the algorithm stops; if there is a rejection, the second group is tested, and so on.
 
-Most options are the same as for `boot_panel`. The most important new parameter to set here is the group sizes. These can either be set in units, or in fractions of the total number of series (i.e. quantiles, hence the name) via the parameter `steps`. If we have `N` time series, setting `steps = 0:N` means each unit should be tested sequentially. To split the series in four equally sized groups (regardless of many series there are), use `steps = 0:4 / 4`. By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. However, if the initial zero is accidentally omitted, it is automatically added by the function. Similarly, if the final value is not equal to `1` (in case of quantiles) or `N` to end the last group, this is added by the function.
+Most options are the same as for `boot_panel`. The most important new parameter to set here is the group sizes. These can either be set in units, or in fractions of the total number of series (i.e. quantiles, hence the name) via the parameter `steps`. If we have `N` time series, setting `steps = 0:N` means each unit should be tested sequentially. To split the series in four equally sized groups (regardless of many series there are), use `steps = 0:4 / 4`. By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. However, if the initial zero is accidentally omitted, it is automatically added by the function. Similarly, if the final value is not equal to `1` (in case of quantiles) or `N` to end the last group, this is added by the function. The option `SQT_level` allows to set the desired significance level of the individual tests done in the sequence.
 
 Testing individual series consecutively is easiest for interpretation, but is only meaningful if `N` is small. In this case the method is equivalent to the bootstrap StepM method of Romano and Wolf (2005), which controls the familywise error rate, that is the probability of making at least one false rejection. This can get very conservative if `N` is large, and you would typically end up not rejecting any null hypothesis. The method is illustrated with the autoregressive wild bootstrap of Smeekes and Urbain (2014a) and Friedrich, Smeekes and Urbain (2020).
 ```{r BSQT}
 N <- ncol(MacroTS)
 # Test each unit sequentially
-boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, SQT_level = 0.05, steps = 0:N, bootstrap = "AWB", B = 399)
 # Split in four equally sized groups (motivated by the 4 series per country)
-boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, SQT_level = 0.05, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
 ```
 
 ### Bootstrap FDR Controlling Tests
 The function `boot_fdr()` controls for multiple testing by controlling the false discovery rate (FDR), which is defined as the expected proportion of false rejections relative to the total number of rejections. This scales with the total number of tests, making it more suitable for large `N` than the familywise error rate.
 
-The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wolf (2008), who showed that, unlike the classical way to control FDR, the bootstrap is appropriate under general forms of dependence between series. Moon and Perron (2012) applied this method to unit root testing; it is essentially their method which is implemented in `boot_fdr()` though again with the option to change the bootstrap used (their suggestion was MBB). The arguments to be set are the same as for the other multivariate unit root tests, though the meaning of `level` changes from regular significance level to FDR level. As BSQT, the method only report those tests until no rejection occurs. 
+The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wolf (2008), who showed that, unlike the classical way to control FDR, the bootstrap is appropriate under general forms of dependence between series. Moon and Perron (2012) applied this method to unit root testing; it is essentially their method which is implemented in `boot_fdr()` though again with the option to change the bootstrap used (their suggestion was MBB). The arguments to be set are the same as for the other multivariate unit root tests. The argument `FDR_level` indicates the desired false discovery rate (loosely interpreted as `significance level'). As BSQT, the method only report those tests until no rejection occurs. 
 
 We illustrate it here with the final available bootstrap method, the block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 ```{r bFDR}
 N <- ncol(MacroTS)
-boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
+boot_fdr(MacroTS[, 1:10], FDR_level = 0.1, bootstrap = "BWB", B = 399)
 ```
 
 ## Determining Order of Integration

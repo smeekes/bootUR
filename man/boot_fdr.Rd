@@ -4,7 +4,7 @@
 \alias{boot_fdr}
 \title{Bootstrap Unit Root Tests with False Discovery Rate control}
 \usage{
-boot_fdr(data, level = 0.05, bootstrap = "AWB", B = 1999,
+boot_fdr(data, FDR_level = 0.05, bootstrap = "AWB", B = 1999,
   block_length = NULL, ar_AWB = NULL, union = TRUE, min_lag = 0,
   max_lag = NULL, criterion = "MAIC", deterministics = NULL,
   detrend = NULL, criterion_scale = TRUE, show_progress = TRUE,
@@ -13,7 +13,7 @@ boot_fdr(data, level = 0.05, bootstrap = "AWB", B = 1999,
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
-\item{level}{Desired False Discovery Rate level of the unit root tests. Default is 0.05.}
+\item{FDR_level}{Desired False Discovery Rate level of the unit root tests. Default is 0.05.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{

@@ -4,16 +4,17 @@
 \alias{boot_ur}
 \title{Individual Unit Root Tests without multiple testing control}
 \usage{
-boot_ur(data, level = 0.05, bootstrap = "AWB", B = 1999,
+boot_ur(data, level = NULL, bootstrap = "AWB", B = 1999,
   block_length = NULL, ar_AWB = NULL, union = TRUE, min_lag = 0,
   max_lag = NULL, criterion = "MAIC", deterministics = NULL,
-  detrend = NULL, criterion_scale = TRUE, show_progress = TRUE,
-  do_parallel = FALSE, cores = NULL, data_name = NULL)
+  detrend = NULL, criterion_scale = TRUE, union_quantile = 0.05,
+  show_progress = TRUE, do_parallel = FALSE, cores = NULL,
+  data_name = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
 
-\item{level}{Desired significance level of the unit root test. Default is 0.05.}
+\item{level}{The desired significance level of the test (optional). This is only used for multivariate series to be able to provide a boolean vector with rejections of the null hypothesis or not for easy post-processing. Default is \code{NULL}, in which case no such vector is given.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
@@ -53,6 +54,8 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
+\item{union_quantile}{The quantile of the bootstrap distribution used for scaling the individual statistics in the union. Ideally this should equal the desired significance level of the test. Default is 0.05. This parameter is overwritten when a significance level is provided in the argument \code{level}.}
+
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 
 \item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
@@ -67,10 +70,10 @@ An object of class \code{"bootUR"}, \code{"\*"}, where \code{"\*"} is \code{"mul
 \item{\code{data.name}}{The name of the data on which the method is performed;}
 \item{\code{null.value}}{The value of the (gamma) parameter of the lagged dependent variable in the ADF regression under the null hypothesis. Under the null, the series has a unit root. Testing the null of a unit root then boils down to testing the significance of the gamma parameter;}
 \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
-\item{\code{estimate}}{The estimated value(s) of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence NA is returned;}
+\item{\code{estimate}}{The estimated value(s) of the (gamma) parameter of the lagged dependent variable in the ADF regressions. Note that for the union test (\code{union = TRUE}), this estimate is not defined, hence \code{NA} is returned;}
 \item{\code{statistic}}{The value(s) of the test statistic of the unit root test(s);}
 \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
-\item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
+\item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE}). This is only supplied when an optional significance level is given, otherwise \code{NULL} is returned;}
 \item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
 \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on.}
 }

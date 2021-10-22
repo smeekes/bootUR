@@ -4,7 +4,7 @@
 \alias{boot_sqt}
 \title{Bootstrap Sequential Quantile Test}
 \usage{
-boot_sqt(data, steps = 0:NCOL(data), level = 0.05, bootstrap = "AWB",
+boot_sqt(data, steps = 0:NCOL(data), SQT_level = 0.05, bootstrap = "AWB",
   B = 1999, block_length = NULL, ar_AWB = NULL, union = TRUE,
   min_lag = 0, max_lag = NULL, criterion = "MAIC",
   deterministics = NULL, detrend = NULL, criterion_scale = TRUE,
@@ -16,7 +16,7 @@ boot_sqt(data, steps = 0:NCOL(data), level = 0.05, bootstrap = "AWB",
 
 \item{steps}{Numeric vector of quantiles or units to be tested. Default is to test each unit sequentially.}
 
-\item{level}{Desired significance level of the unit root test. Default is 0.05.}
+\item{SQT_level}{Desired significance level of the sequential tests performed. Default is 0.05.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
