@@ -4,14 +4,17 @@
 \alias{boot_panel}
 \title{Panel Unit Root Test}
 \usage{
-boot_panel(data, bootstrap = "AWB", B = 1999, block_length = NULL,
-  ar_AWB = NULL, union = TRUE, min_lag = 0, max_lag = NULL,
-  criterion = "MAIC", deterministics = NULL, detrend = NULL,
-  criterion_scale = TRUE, union_quantile = 0.05, show_progress = TRUE,
-  do_parallel = FALSE, cores = NULL, data_name = NULL)
+boot_panel(data, data_name = NULL, bootstrap = "AWB", B = 1999,
+  block_length = NULL, ar_AWB = NULL, union = TRUE,
+  union_quantile = 0.05, deterministics = NULL, detrend = NULL,
+  min_lag = 0, max_lag = NULL, criterion = "MAIC",
+  criterion_scale = TRUE, show_progress = TRUE, do_parallel = TRUE,
+  cores = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector or a (\eqn{T} x \eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame, as long as each column represents a single time series.}
+
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
@@ -31,11 +34,7 @@ boot_panel(data, bootstrap = "AWB", B = 1999, block_length = NULL,
 
 \item{union}{Logical indicator whether or not to use bootstrap union tests (\code{TRUE}) or not (\code{FALSE}), see Smeekes and Taylor (2012). Default is \code{TRUE}.}
 
-\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
-
-\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
-
-\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
+\item{union_quantile}{The quantile of the bootstrap distribution used for scaling the individual statistics in the union. Ideally this should equal the desired significance level of the test. Default is 0.05. This parameter is overwritten when a significance level is provided in the argument \code{level}.}
 
 \item{deterministics}{String indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are
 
@@ -49,17 +48,19 @@ If \code{union = FALSE}, the default is adding an intercept (a warning is given)
 
 \item{detrend}{String indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
-\item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
+\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
 
-\item{union_quantile}{The quantile of the bootstrap distribution used for scaling the individual statistics in the union. Ideally this should equal the desired significance level of the test. Default is 0.05. This parameter is overwritten when a significance level is provided in the argument \code{level}.}
+\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+
+\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
+
+\item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 
-\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Default is TRUE.}
 
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
-
-\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 }
 \value{
 An object of class \code{"bootUR"}, \code{"htest"} with the following components:

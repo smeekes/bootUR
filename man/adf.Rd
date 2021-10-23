@@ -4,18 +4,14 @@
 \alias{adf}
 \title{Augmented Dickey-Fuller Unit Root Test}
 \usage{
-adf(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-  deterministics = "intercept", criterion_scale = TRUE, two_step = TRUE,
-  data_name = NULL)
+adf(data, data_name = NULL, deterministics = "intercept", min_lag = 0,
+  max_lag = NULL, criterion = "MAIC", criterion_scale = TRUE,
+  two_step = TRUE)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
 
-\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
-
-\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
-
-\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 
 \item{deterministics}{String indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are
 
@@ -27,11 +23,15 @@ adf(data, min_lag = 0, max_lag = NULL, criterion = "MAIC",
 
 If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
+\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+
+\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+
+\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
+
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{two_step}{Logical indicator whether to use one-step (\code{two_step = FALSE}) or two-step (\code{two_step = TRUE}) detrending. The default is two-step detrending.}
-
-\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 }
 \value{
 An object of class \code{"bootUR"}, \code{"htest"} with the following components:

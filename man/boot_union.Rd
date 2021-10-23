@@ -4,13 +4,15 @@
 \alias{boot_union}
 \title{Bootstrap Union Test for Unit Roots}
 \usage{
-boot_union(data, bootstrap = "AWB", B = 1999, block_length = NULL,
-  ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-  criterion_scale = TRUE, union_quantile = 0.05, show_progress = TRUE,
-  do_parallel = FALSE, cores = NULL, data_name = NULL)
+boot_union(data, data_name = NULL, bootstrap = "AWB", B = 1999,
+  block_length = NULL, ar_AWB = NULL, min_lag = 0, max_lag = NULL,
+  criterion = "MAIC", criterion_scale = TRUE, union_quantile = 0.05,
+  show_progress = TRUE, do_parallel = TRUE, cores = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
+
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
@@ -40,11 +42,9 @@ boot_union(data, bootstrap = "AWB", B = 1999, block_length = NULL,
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 
-\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Default is TRUE.}
 
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
-
-\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 }
 \value{
 An object of class \code{"bootUR"}, \code{"htest"} with the following components:

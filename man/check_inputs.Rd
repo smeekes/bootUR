@@ -47,7 +47,7 @@ check_inputs(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
 
 \item{steps}{Numeric vector of quantiles to be tested. Default is to test each unit sequentially.}
 
-\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Default is TRUE.}
 
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 

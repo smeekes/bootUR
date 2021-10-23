@@ -4,14 +4,16 @@
 \alias{boot_adf}
 \title{Bootstrap augmented Dickey-Fuller Unit Root Test}
 \usage{
-boot_adf(data, bootstrap = "AWB", B = 1999, block_length = NULL,
-  ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-  deterministics = "intercept", detrend = "OLS", criterion_scale = TRUE,
-  show_progress = TRUE, do_parallel = FALSE, cores = NULL,
-  data_name = NULL)
+boot_adf(data, data_name = NULL, bootstrap = "AWB", B = 1999,
+  block_length = NULL, ar_AWB = NULL, deterministics = "intercept",
+  min_lag = 0, max_lag = NULL, criterion = "MAIC", detrend = "OLS",
+  criterion_scale = TRUE, show_progress = TRUE, do_parallel = TRUE,
+  cores = NULL)
 }
 \arguments{
 \item{data}{A \eqn{T}-dimensional vector to be tested for unit roots. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}), or a data frame.}
+
+\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 
 \item{bootstrap}{String for bootstrap method to be used. Options are
 \describe{
@@ -29,12 +31,6 @@ boot_adf(data, bootstrap = "AWB", B = 1999, block_length = NULL,
 
 \item{ar_AWB}{Autoregressive parameter used in the AWB bootstrap method (\code{bootstrap = "AWB"}). Can be used to set the parameter directly rather than via the default link to the block length.}
 
-\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
-
-\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
-
-\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
-
 \item{deterministics}{String indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are
 
 \verb{"none":} no deterministics;
@@ -45,17 +41,21 @@ boot_adf(data, bootstrap = "AWB", B = 1999, block_length = NULL,
 
 If \code{union = FALSE}, the default is adding an intercept (a warning is given).}
 
+\item{min_lag}{Minimum lag length in the augmented Dickey-Fuller regression. Default is 0.}
+
+\item{max_lag}{Maximum lag length in the augmented Dickey-Fuller regression. Default uses the sample size-based rule \eqn{12(T/100)^{1/4}}.}
+
+\item{criterion}{String for information criterion used to select the lag length in the augmented Dickey-Fuller regression. Options are: \code{"AIC"}, \code{"BIC"}, \code{"MAIC"}, \code{"MBIC"}. Default is \code{"MAIC"} (Ng and Perron, 2001).}
+
 \item{detrend}{String indicating the type of detrending to be performed. Only relevant if \code{union = FALSE}. Options are: \code{"OLS"} or \code{"QD"} (typically also called GLS, see Elliott, Rothenberg and Stock, 1996). The default is \code{"OLS"}.}
 
 \item{criterion_scale}{Logical indicator whether or not to use the rescaled information criteria of Cavaliere et al. (2015) (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
 \item{show_progress}{Logical indicator whether a bootstrap progress update should be printed to the console. Default is FALSE.}
 
-\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Parallel computing is only available if OpenMP can be used, if not this option is ignored. Default is FALSE.}
+\item{do_parallel}{Logical indicator whether bootstrap loop should be executed in parallel. Default is TRUE.}
 
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
-
-\item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
 }
 \value{
 An object of class \code{"bootUR"}, \code{"htest"} with the following components:
