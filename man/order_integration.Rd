@@ -23,7 +23,7 @@ order_integration(data, max_order = 2, method = "boot_ur", level = 0.05,
 \item{...}{Optional arguments passed to the chosen unit root test function.}
 }
 \value{
-A list with the following components
+An object of class \code{"bootUR", "order_integration"} with the following components
 \item{\code{order_int}}{A vector with the found orders of integration of each time series.}
 \item{\code{diff_data}}{The appropriately differenced data according to \code{order_int} in the same format as the original data.}
 }

@@ -495,8 +495,9 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
 #' @export
 boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "AWB",
                      B = 1999, block_length = NULL, ar_AWB = NULL, SQT_level = 0.05, union = TRUE,
-                     deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-                     criterion_scale = TRUE, show_progress = TRUE, do_parallel = TRUE, cores = NULL){
+                     deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL,
+                     criterion = "MAIC", criterion_scale = TRUE, show_progress = TRUE,
+                     do_parallel = TRUE, cores = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = TRUE, boot_ur_test = FALSE,
                                    level = SQT_level, bootstrap = bootstrap, B = B,
@@ -597,8 +598,9 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
 #' @export
 boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
                        block_length = NULL, ar_AWB = NULL, union = TRUE, union_quantile = 0.05,
-                       deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
-                       criterion_scale = TRUE, show_progress = TRUE, do_parallel = TRUE, cores = NULL){
+                       deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL,
+                       criterion = "MAIC", criterion_scale = TRUE, show_progress = TRUE,
+                       do_parallel = TRUE, cores = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
                                    level = union_quantile, bootstrap = bootstrap, B = B,

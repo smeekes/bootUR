@@ -150,7 +150,7 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
   # Set up parallel computing
   if (is.null(cores)) {
     if (do_parallel) {
-      cores <- parallel::detectCores() - 1
+      cores <- max(parallel::detectCores() - 2, 1)
     } else {
       cores <- 1
     }

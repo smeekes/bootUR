@@ -191,7 +191,7 @@ stationary_data <- out_orders$diff_data
 ```
 To achieve the differencing, `order_integration()` uses the function `diff_mult()` which is also available as stand-alone function in the package. Finally, a function is provided to plot the found orders (not run):
 ```{r plot_orders, fig.width = 7, fig.height = 4, eval = FALSE}
-plot_order_integration(out_orders$order_int)
+plot_order_integration(out_orders)
 ```
 
 ## References

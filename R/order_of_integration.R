@@ -48,7 +48,7 @@ diff_mult <- function(data, d, keep_NAs = TRUE) {
 #'
 #' Plotting the orders of integration requires the \code{ggplot2} package to be installed; plot will be skipped and a warning is given if not. For plots the function \code{\link{plot_order_integration}} is called. The user may prefer to set \code{plot_orders = FALSE} and call this function directly using the returned value of \code{order_int} in order to have more control over plot settings and save the plot object.
 #' @export
-#' @return A list with the following components
+#' @return An object of class \code{"bootUR", "order_integration"} with the following components
 #' \item{\code{order_int}}{A vector with the found orders of integration of each time series.}
 #' \item{\code{diff_data}}{The appropriately differenced data according to \code{order_int} in the same format as the original data.}
 #' @references Smeekes, S. and Wijler, E. (2020). Unit roots and cointegration. In P. Fuleky (Ed.) \emph{Macroeconomic Forecasting in the Era of Big Data}, Chapter 17, pp. 541-584. \emph{Advanced Studies in Theoretical and Applied Econometrics}, vol. 52. Springer.
@@ -74,15 +74,39 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
     if (method == "boot_ur") {
       out <- boot_ur(datad, level = level, ...)
     } else if (method == "boot_fdr" & N > 1) {
-      out <- boot_fdr(datad, FDR_level = level, ...)
+      user_arguments <- list(...)
+      if ("FDR_level" %in% names(user_arguments)) {
+        warning(paste0("Argument 'FDR_level' overwritten by 'level' with value ", level, "."))
+        user_arguments$FDR_level <- level
+        user_arguments$data <- datad
+        out <- do.call(boot_fdr, user_arguments)
+      } else {
+        out <- boot_fdr(datad, FDR_level = level, ...)
+      }
+    } else if (method == "boot_fdr" & N == 1) {
+      stop("Invalid 'method' argument: 'boot_fdr' not designed for single time series.")
     } else if (method == "boot_sqt" & N > 1) {
-      out <- boot_sqt(datad, SQT_level = level, ...)
+      user_arguments <- list(...)
+      if ("SQT_level" %in% names(user_arguments)) {
+        warning(paste0("Argument 'SQT_level' overwritten by 'level' with value ", level, "."))
+        user_arguments$SQT_level <- level
+        user_arguments$data <- datad
+        out <- do.call(boot_sqt, user_arguments)
+      } else {
+        out <- boot_sqt(datad, SQT_level = level, ...)
+      }
+    } else if (method == "boot_sqt" & N == 1) {
+      stop("Invalid 'method' argument: 'boot_sqt' not designed for single time series.")
     } else if (method == "boot_adf" & N == 1) {
       test_out <- boot_adf(datad, ...)
       out <- list("rejections" = test_out$p.value < level)
+    } else if (method == "boot_adf" & N > 1) {
+      stop("Invalid 'method' argument: 'boot_adf' not designed for multipe time series; use 'boot_ur' instead.")
     } else if (method == "boot_union" & N == 1) {
       test_out <- boot_union(datad, union_quantile = level, ...)
       out <- list("rejections" = test_out$p.value < level)
+    } else if (method == "boot_union" & N > 1) {
+      stop("Invalid 'method' argument: 'boot_union' not designed for multipe time series; use 'boot_ur' instead.")
     } else if (method == "adf" & N == 1) {
       test_out <- adf(datad, ...)
       out <- list("rejections" = test_out$p.value < level)
@@ -93,16 +117,12 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
         out <- list("rejections" = rejections)
       } else if (method == "iADFtest") {
       stop("'iADFtest' is deprecated. Use 'boot_ur' instead.")
-#      out <- iADFtest(datad, ...)
     } else if (method == "bFDRtest" & N > 1) {
       stop("'bFDRtest' is deprecated. Use 'boot_fdr' instead.")
-#      out <- bFDRtest(datad, ...)
     } else if (method == "BSQTtest" & N > 1) {
       stop("'BSQTtest' is deprecated. Use 'boot_sqt' instead.")
-#      out <- BSQTtest(datad, ...)
     } else if (method == "boot_df" & N == 1) {
       stop("'boot_df' is deprecated. Use 'boot_adf' instead.")
-#      out <- boot_df(datad, ...)
     } else {
       stop("Invalid 'method' argument.")
     }
@@ -117,20 +137,22 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
       break
     }
   }
+  diffed_object <- list(order_int = d, diff_data = diff_mult(data, d))
+  class(diffed_object) <- c("bootUR", "order_integration")
   if (plot_orders) {
     if (!requireNamespace("ggplot2", quietly = TRUE)) {
       warning("Cannot plot orders of integration as package ggplot2 not installed.")
     } else {
-      g <- plot_order_integration(d)
+      g <- plot_order_integration(diffed_object)
       print(g)
     }
   }
-  return(list(order_int = d, diff_data = diff_mult(data, d)))
+  return(diffed_object)
 }
 
 #' Plot Orders of Integration
 #' @description Plots a vector with orders of integration of time series.
-#' @param d T\eqn{N}-dimensional vector with time series' orders of integration. Elements should be named after the respective time series to ensure easy interpretation of the plot.
+#' @param orders A \code{"bootUR", "order_integration"} object obtained from the function \code{order_integration}.
 #' @param show_names Show the time series' names on the plot (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param show_legend Logical indicator whether a legend should be displayed. Default is \code{TRUE}.
 #' @param names_size Size of the time series' names if \code{show_names = TRUE}. Default takes \code{ggplot2} defaults.
@@ -139,11 +161,15 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
 #' @export
 #' @details This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 #' @return A \code{ggplot2} object containing the plot of the orders of integration.
-plot_order_integration <- function(d, show_names = TRUE, show_legend = TRUE,
+#' @seealso \code{\link{order_integration}}
+plot_order_integration <- function(orders, show_names = TRUE, show_legend = TRUE,
                                    names_size = NULL, legend_size = NULL, cols = NULL) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Cannot plot orders of integration as package ggplot2 not installed.")
+  } else if (!all(class(orders) ==  c("bootUR", "order_integration"))) {
+    stop("Argument 'orders' not an object of class 'bootUR', 'order_integration'.")
   } else {
+    d <- orders$order_int
     if (is.null(cols)) {
       cols <- c("#1B9E77", "#7570B3", "#D95F02", "#E7298A")
     }

@@ -484,7 +484,7 @@ package. Finally, a function is provided to plot the found orders (not
 run):
 
 ``` r
-plot_order_integration(out_orders$order_int)
+plot_order_integration(out_orders)
 ```
 
 ## References

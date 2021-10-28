@@ -4,11 +4,11 @@
 \alias{plot_order_integration}
 \title{Plot Orders of Integration}
 \usage{
-plot_order_integration(d, show_names = TRUE, show_legend = TRUE,
+plot_order_integration(orders, show_names = TRUE, show_legend = TRUE,
   names_size = NULL, legend_size = NULL, cols = NULL)
 }
 \arguments{
-\item{d}{T\eqn{N}-dimensional vector with time series' orders of integration. Elements should be named after the respective time series to ensure easy interpretation of the plot.}
+\item{orders}{A \code{"bootUR", "order_integration"} object obtained from the function \code{order_integration}.}
 
 \item{show_names}{Show the time series' names on the plot (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
@@ -28,4 +28,7 @@ Plots a vector with orders of integration of time series.
 }
 \details{
 This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
+}
+\seealso{
+\code{\link{order_integration}}
 }
