@@ -21,7 +21,8 @@
 #' @examples
 #' # standard ADF test on GDP_BE
 #' GDP_BE_adf <- adf(MacroTS[, 1], deterministics = "trend")
-adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 0, max_lag = NULL, criterion = "MAIC",
+adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 0,
+                max_lag = NULL, criterion = "MAIC",
                 criterion_scale = TRUE, two_step = TRUE){
 
   if (NCOL(data) > 1) {
@@ -102,7 +103,7 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
 
   p_val <- drop(urca::punitroot(q = tstat, N = TT - max_lag - 1, trend = urtype, statistic = "t"))
   attr(p_val, "names") <- "p-value"
-  
+
   adf_out <- list(method = "ADF test on a single time series", data.name = data_name,
                   null.value = c("gamma" = 0), alternative = "less",
                   estimate = drop(param), statistic = tstat, p.value = p_val)

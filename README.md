@@ -189,9 +189,8 @@ set only 399 bootstrap replications (`B = 399`) to prevent the code from
 running too long. We add an intercept and a trend
 (`deterministics = "trend"`) and OLS detrending. The console gives you
 live updates on the bootstrap progress. To turn these off, set
-`show_progress = FALSE`. The bootstrap loop can also be run in parallel
-by setting `do_parallel = TRUE`.
-<!-- Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually. -->
+`show_progress = FALSE`. The bootstrap loop can be run in parallel by
+setting `do_parallel = TRUE` (the default).
 
 As random number generation is required to draw bootstrap samples, we
 first set the seed of the random number generator to obtain replicable
@@ -200,7 +199,7 @@ results.
 ``` r
 set.seed(155776)
 boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend", 
-                    detrend = "OLS")
+                    detrend = "OLS", do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
@@ -210,7 +209,8 @@ boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend",
 #> tstat = -2.5153, p-value = 0.1454
 #> alternative hypothesis: true gamma is less than 0
 #> sample estimates:
-#> [1] -0.05286343
+#>       gamma 
+#> -0.05286343
 ```
 
 ### Union of Rejections Test
@@ -225,7 +225,7 @@ is not viable. Here we illustrate it with the sieve wild bootstrap as
 proposed by Smeekes and Taylor (2012).
 
 ``` r
-boot_union(GDP_NL, B = 399, bootstrap = "SWB")
+boot_union(GDP_NL, B = 399, bootstrap = "SWB", do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
@@ -235,7 +235,8 @@ boot_union(GDP_NL, B = 399, bootstrap = "SWB")
 #> tstat = -0.71148, p-value = 0.614
 #> alternative hypothesis: true gamma is less than 0
 #> sample estimates:
-#> [1] NA
+#> gamma 
+#>    NA
 ```
 
 ## Panel Unit Root Test
@@ -254,7 +255,7 @@ method cannot handle unbalancedness, and will therefore give an error
 when applied to `MacroTS`:
 
 ``` r
-boot_panel(MacroTS, bootstrap = "MBB", B = 399)
+boot_panel(MacroTS, bootstrap = "MBB", B = 399, do_parallel = FALSE)
 #> Error in check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test = boot_ur_test, : Resampling-based bootstraps MBB and SB cannot handle unbalanced series.
 ```
 
@@ -273,7 +274,7 @@ of dependence across units. The code will give a warning to recommend
 using a different bootstrap method.
 
 ``` r
-boot_panel(MacroTS, bootstrap = "DWB", B = 399)
+boot_panel(MacroTS, bootstrap = "DWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
@@ -301,7 +302,7 @@ case a warning is given to alert the user.
 
 ``` r
 ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALSE, 
-                        deterministics = "trend", detrend = "OLS")
+                        deterministics = "trend", detrend = "OLS", do_parallel = FALSE)
 #> Warning in check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test
 #> = boot_ur_test, : Missing values cause resampling bootstrap to be executed for
 #> each time series individually.
@@ -340,7 +341,9 @@ If the unit root hypothesis cannot be rejected for the first group, the
 algorithm stops; if there is a rejection, the second group is tested,
 and so on.
 
-Most options are the same as for `boot_panel`. The most important new
+Most options are the same as for `boot_panel`. The parameter `SQT_level`
+controls the significance level of the individual tests performed in the
+sequence, with a default value of 0.05. The other important new
 parameter to set here is the group sizes. These can either be set in
 units, or in fractions of the total number of series (i.e. quantiles,
 hence the name) via the parameter `steps`. If we have `N` time series,
@@ -367,7 +370,7 @@ Urbain (2020).
 ``` r
 N <- ncol(MacroTS)
 # Test each unit sequentially
-boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
@@ -381,7 +384,7 @@ boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
 #> Step 1          0          1 -1.661 0.02256
 #> Step 2          1          2 -1.413 0.12281
 # Split in four equally sized groups (motivated by the 4 series per country)
-boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
@@ -410,16 +413,16 @@ dependence between series. Moon and Perron (2012) applied this method to
 unit root testing; it is essentially their method which is implemented
 in `boot_fdr()` though again with the option to change the bootstrap
 used (their suggestion was MBB). The arguments to be set are the same as
-for the other multivariate unit root tests, though the meaning of
-`level` changes from regular significance level to FDR level. As BSQT,
-the method only report those tests until no rejection occurs.
+for the other multivariate unit root tests, with the exception of
+`FDR_level` wihch controls the FDR level. As BSQT, the method only
+report those tests until no rejection occurs.
 
 We illustrate it here with the final available bootstrap method, the
 block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 
 ``` r
 N <- ncol(MacroTS)
-boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
+boot_fdr(MacroTS[, 1:10], FDR_level = 0.1, bootstrap = "BWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
@@ -461,7 +464,8 @@ Here we take `boot_fdr`. We don’t only get the orders out, but also the
 appropriately differenced data.
 
 ``` r
-out_orders <- order_integration(MacroTS[, 11:15], method = "boot_fdr", B = 399)
+out_orders <- order_integration(MacroTS[, 11:15], method = "boot_fdr", B = 399, 
+                                do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> Progress: |------------------| 

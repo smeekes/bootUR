@@ -100,22 +100,21 @@ To perform a bootstrap version of the ADF unit root test on a single time series
 
 **Implementation**
 
-We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`) and OLS detrending. The console gives you live updates on the bootstrap progress. To turn these off, set `show_progress = FALSE`. The bootstrap loop can also be run in parallel by setting `do_parallel = TRUE`. 
-<!-- Note that parallelization requires OpenMP to be available on your system, which is typically not the case on macOS; see https://mac.r-project.org/openmp/ for ways to set it up manually. -->
+We illustrate the bootstrap ADF test here on Dutch GDP, with the sieve bootstrap (`bootstrap = SB`) as in the specification used by Palm, Smeekes and Urbain (2008) and Smeekes (2013). To get the well-known test proposed by Paparoditis and Politis (2003), set `bootstrap = "MBB"`. We set only 399 bootstrap replications (`B = 399`) to prevent the code from running too long. We add an intercept and a trend (`deterministics = "trend"`) and OLS detrending. The console gives you live updates on the bootstrap progress. To turn these off, set `show_progress = FALSE`. The bootstrap loop can be run in parallel by setting `do_parallel = TRUE` (the default). 
 
 As random number generation is required to draw bootstrap samples, we first set the seed of the random number generator to obtain replicable results.
 
 ```{r boot_adf}
 set.seed(155776)
 boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend", 
-                    detrend = "OLS")
+                    detrend = "OLS", do_parallel = FALSE)
 ```
 
 ### Union of Rejections Test
 Use `boot_union()` for a test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Smeekes and Taylor, 2012). The advantage of the union test is that you don't have to specify these (rather influential) specification tests. This makes the union test a safe option for quick or automatic unit root testing where careful manual specification setup is not viable. Here we illustrate it with the sieve wild bootstrap as proposed by Smeekes and Taylor (2012).
 
 ```{r union}
-boot_union(GDP_NL, B = 399, bootstrap = "SWB")
+boot_union(GDP_NL, B = 399, bootstrap = "SWB", do_parallel = FALSE)
 ```
 
 ## Panel Unit Root Test
@@ -124,7 +123,7 @@ The function `boot_panel` performs a test on a multivariate (panel) time series 
 Palm, Smeekes and Urbain (2011) introduced this test with the moving block bootstrap (`bootstrap = "MBB"`). However, this resampling-based method cannot handle unbalancedness, and will therefore give an error when applied to `MacroTS`:
 
 ```{r panel-error, error = TRUE, purl = FALSE}
-boot_panel(MacroTS, bootstrap = "MBB", B = 399)
+boot_panel(MacroTS, bootstrap = "MBB", B = 399, do_parallel = FALSE)
 ```
 
 Therefore, you should switch to one of the wild bootstrap methods. Here we illustrate it with the dependent wild bootstrap (DWB) of Shao (2010) and Rho and Shao (2019).
@@ -134,7 +133,7 @@ By default the union test is used for each series (`union = TRUE`), if this is s
 Although the sieve bootstrap method `"SB"` and `"SWB"` can be used (historically they have been popular among practitioners), Smeekes and Urbain (2014b) show that these are not suited to capture general forms of dependence across units. The code will give a warning to recommend using a different bootstrap method.
 
 ```{r panel}
-boot_panel(MacroTS, bootstrap = "DWB", B = 399)
+boot_panel(MacroTS, bootstrap = "DWB", B = 399, do_parallel = FALSE)
 ```
 
 ## Tests for Multiple Time Series
@@ -143,7 +142,7 @@ To perform individual ADF tests on multiple time series simultaneously, the func
 
 ```{r iADF}
 ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALSE, 
-                        deterministics = "trend", detrend = "OLS")
+                        deterministics = "trend", detrend = "OLS", do_parallel = FALSE)
 print(ADFtests_out)
 ```
 
@@ -152,26 +151,26 @@ Note that `boot_ur` (intentionally) does not provide a correction for multiple t
 ### Bootstrap Sequential Tests
 The function `boot_sqt()` performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015). Here we split the series in groups which are consecutively tested for unit roots, starting with the group most likely to be stationary (having the smallest ADF statistics). If the unit root hypothesis cannot be rejected for the first group, the algorithm stops; if there is a rejection, the second group is tested, and so on.
 
-Most options are the same as for `boot_panel`. The most important new parameter to set here is the group sizes. These can either be set in units, or in fractions of the total number of series (i.e. quantiles, hence the name) via the parameter `steps`. If we have `N` time series, setting `steps = 0:N` means each unit should be tested sequentially. To split the series in four equally sized groups (regardless of many series there are), use `steps = 0:4 / 4`. By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. However, if the initial zero is accidentally omitted, it is automatically added by the function. Similarly, if the final value is not equal to `1` (in case of quantiles) or `N` to end the last group, this is added by the function.
+Most options are the same as for `boot_panel`. The parameter `SQT_level` controls the significance level of the individual tests performed in the sequence, with a default value of 0.05. The other important new parameter to set here is the group sizes. These can either be set in units, or in fractions of the total number of series (i.e. quantiles, hence the name) via the parameter `steps`. If we have `N` time series, setting `steps = 0:N` means each unit should be tested sequentially. To split the series in four equally sized groups (regardless of many series there are), use `steps = 0:4 / 4`. By convention and in accordance with notation in Smeekes (2015), the first entry of the vector should be equal to zero, while the second entry indicates the end of the first group, and so on. However, if the initial zero is accidentally omitted, it is automatically added by the function. Similarly, if the final value is not equal to `1` (in case of quantiles) or `N` to end the last group, this is added by the function.
 
 Testing individual series consecutively is easiest for interpretation, but is only meaningful if `N` is small. In this case the method is equivalent to the bootstrap StepM method of Romano and Wolf (2005), which controls the familywise error rate, that is the probability of making at least one false rejection. This can get very conservative if `N` is large, and you would typically end up not rejecting any null hypothesis. The method is illustrated with the autoregressive wild bootstrap of Smeekes and Urbain (2014a) and Friedrich, Smeekes and Urbain (2020).
 ```{r BSQT}
 N <- ncol(MacroTS)
 # Test each unit sequentially
-boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399, do_parallel = FALSE)
 # Split in four equally sized groups (motivated by the 4 series per country)
-boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399)
+boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399, do_parallel = FALSE)
 ```
 
 ### Bootstrap FDR Controlling Tests
 The function `boot_fdr()` controls for multiple testing by controlling the false discovery rate (FDR), which is defined as the expected proportion of false rejections relative to the total number of rejections. This scales with the total number of tests, making it more suitable for large `N` than the familywise error rate.
 
-The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wolf (2008), who showed that, unlike the classical way to control FDR, the bootstrap is appropriate under general forms of dependence between series. Moon and Perron (2012) applied this method to unit root testing; it is essentially their method which is implemented in `boot_fdr()` though again with the option to change the bootstrap used (their suggestion was MBB). The arguments to be set are the same as for the other multivariate unit root tests, though the meaning of `level` changes from regular significance level to FDR level. As BSQT, the method only report those tests until no rejection occurs. 
+The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wolf (2008), who showed that, unlike the classical way to control FDR, the bootstrap is appropriate under general forms of dependence between series. Moon and Perron (2012) applied this method to unit root testing; it is essentially their method which is implemented in `boot_fdr()` though again with the option to change the bootstrap used (their suggestion was MBB). The arguments to be set are the same as for the other multivariate unit root tests, with the exception of `FDR_level` wihch controls the FDR level. As BSQT, the method only report those tests until no rejection occurs. 
 
 We illustrate it here with the final available bootstrap method, the block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 ```{r bFDR}
 N <- ncol(MacroTS)
-boot_fdr(MacroTS[, 1:10], level = 0.1, bootstrap = "BWB", B = 399)
+boot_fdr(MacroTS[, 1:10], FDR_level = 0.1, bootstrap = "BWB", B = 399, do_parallel = FALSE)
 ```
 
 ## Determining Order of Integration
@@ -183,7 +182,8 @@ Starting from a maximum order \eqn{d} (by default equal to 2), it differences th
 ### Implementation
 The function allows us to choose which unit root test we want to use. Here we take `boot_fdr`. We don't only get the orders out, but also the appropriately differenced data.
 ```{r orders}
-out_orders <- order_integration(MacroTS[, 11:15], method = "boot_fdr", B = 399)
+out_orders <- order_integration(MacroTS[, 11:15], method = "boot_fdr", B = 399, 
+                                do_parallel = FALSE)
 # Orders
 out_orders$order_int
 # Differenced data

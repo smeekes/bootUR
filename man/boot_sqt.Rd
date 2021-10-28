@@ -99,7 +99,8 @@ See \code{\link{boot_ur}} for details on the bootstrap algorithm and lag selecti
 
 \examples{
 # boot_sqt on GDP_BE and GDP_DE
-two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
+two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399,
+do_parallel = FALSE)
 print(two_series_boot_sqt)
 }
 \references{

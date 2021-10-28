@@ -75,12 +75,12 @@
 #' @references Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance principle for modified wild bootstrap methods with an application to unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht University
 #' @examples
 #' # boot_ur on GDP_BE and GDP_DE
-#' two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 399)
+#' two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 399, do_parallel = FALSE)
 #' print(two_series_boot_ur)
 #' @export
 boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_length = NULL,
-                    ar_AWB = NULL, level = NULL, union = TRUE, union_quantile = 0.05, 
-                    deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL, 
+                    ar_AWB = NULL, level = NULL, union = TRUE, union_quantile = 0.05,
+                    deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL,
                     criterion = "MAIC", criterion_scale = TRUE, show_progress = TRUE,
                     do_parallel = TRUE, cores = NULL){
 
@@ -220,11 +220,11 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
 #' @examples
 #' # boot_adf on GDP_BE
 #' GDP_BE_adf <- boot_adf(MacroTS[, 1], B = 399, deterministics = "trend",
-#' detrend = "OLS")
+#' detrend = "OLS", do_parallel = FALSE)
 #' print(GDP_BE_adf)
 boot_adf <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
-                     block_length = NULL, ar_AWB = NULL, deterministics = "intercept", 
-                     min_lag = 0, max_lag = NULL, criterion = "MAIC", 
+                     block_length = NULL, ar_AWB = NULL, deterministics = "intercept",
+                     min_lag = 0, max_lag = NULL, criterion = "MAIC",
                      detrend = "OLS", criterion_scale = TRUE, show_progress = TRUE,
                      do_parallel = TRUE, cores = NULL){
 
@@ -298,7 +298,7 @@ boot_adf <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
 #' @seealso \code{\link{boot_ur}}
 #' @examples
 #' # boot_union on GDP_BE
-#' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399)
+#' GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, do_parallel = FALSE)
 #' print(GDP_BE_df)
 boot_union <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_length = NULL,
                        ar_AWB = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
@@ -374,12 +374,13 @@ boot_union <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, bloc
 #' @seealso \code{\link{boot_ur}}
 #' @examples
 #' # boot_fdr on GDP_BE and GDP_DE
-#' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], bootstrap = "MBB", B = 399)
+#' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], bootstrap = "MBB", B = 399,
+#' do_parallel = FALSE)
 #' print(two_series_boot_fdr)
 #' @export
 boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_length = NULL,
                      ar_AWB = NULL, FDR_level = 0.05, union = TRUE, deterministics = NULL, detrend = NULL,
-                     min_lag = 0, max_lag = NULL, criterion = "MAIC", criterion_scale = TRUE, 
+                     min_lag = 0, max_lag = NULL, criterion = "MAIC", criterion_scale = TRUE,
                      show_progress = TRUE, do_parallel = TRUE, cores = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
@@ -488,12 +489,13 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
 #' @seealso \code{\link{boot_ur}}
 #' @examples
 #' # boot_sqt on GDP_BE and GDP_DE
-#' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
+#' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 399,
+#' do_parallel = FALSE)
 #' print(two_series_boot_sqt)
 #' @export
 boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "AWB",
                      B = 1999, block_length = NULL, ar_AWB = NULL, SQT_level = 0.05, union = TRUE,
-                     deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC", 
+                     deterministics = NULL, detrend = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
                      criterion_scale = TRUE, show_progress = TRUE, do_parallel = TRUE, cores = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = TRUE, boot_ur_test = FALSE,
@@ -539,7 +541,7 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
   colnames(BSQT_seq) <- c("H0: # I(0)", "H1: # I(0)", "tstat", "p-value")
   p_vals <- rep(NA, NCOL(data))
   names(estimates) <- names(tstats) <- names(p_vals) <- var_names
-  
+
   sqt_output <- list(method = method_name, data.name = data_name,
                      null.value =  c("gamma" = 0), alternative = "less",
                      estimate = estimates, statistic = tstats, p.value = p_vals,
@@ -589,7 +591,8 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
 #' @seealso \code{\link{boot_ur}}
 #' @examples
 #' # boot_panel on GDP_BE and GDP_DE
-#' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 399)
+#' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 399,
+#' do_parallel = FALSE)
 #' print(two_series_boot_panel)
 #' @export
 boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
