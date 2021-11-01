@@ -152,7 +152,7 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
 
 #' Plot Orders of Integration
 #' @description Plots a vector with orders of integration of time series.
-#' @param orders A \code{"bootUR", "order_integration"} object obtained from the function \code{order_integration}.
+#' @param orders A \code{"bootUR", "order_integration"} object obtained from the function \code{order_integration}, or a vector with found orders of integration.
 #' @param show_names Show the time series' names on the plot (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.
 #' @param show_legend Logical indicator whether a legend should be displayed. Default is \code{TRUE}.
 #' @param names_size Size of the time series' names if \code{show_names = TRUE}. Default takes \code{ggplot2} defaults.
@@ -166,55 +166,62 @@ plot_order_integration <- function(orders, show_names = TRUE, show_legend = TRUE
                                    names_size = NULL, legend_size = NULL, cols = NULL) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Cannot plot orders of integration as package ggplot2 not installed.")
-  } else if (!all(class(orders) ==  c("bootUR", "order_integration"))) {
-    stop("Argument 'orders' not an object of class 'bootUR', 'order_integration'.")
-  } else {
-    d <- orders$order_int
-    if (is.null(cols)) {
-      cols <- c("#1B9E77", "#7570B3", "#D95F02", "#E7298A")
-    }
-    if (max(d) > length(cols)) {
-      stop("Insufficient number of colours supplied to display all orders of integration.")
-    }
-    cols <- cols[unique(d) + 1]
-    n_g <- floor(max(1, length(d) - 5)^(1/3))
-    group <- rep(paste0("g", 1:n_g), each = ceiling(length(d) / n_g))[1:length(d)]
-    df <- data.frame(names = factor(names(d), levels = rev(names(d))),
-                     order = paste0("I(", d, ")"), group = group)
-    if (show_names) {
-      g <- ggplot2::ggplot(df) +
-        ggplot2::geom_col(ggplot2::aes(x = names, y = order, fill = order),
-                          show.legend = show_legend) +
-        ggplot2::labs(y = "Order of Integration", x = "Variables") +
-        ggplot2::coord_flip() +
-        ggplot2::scale_fill_manual(values = cols) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
-                       panel.grid.minor = ggplot2::element_blank(),
-                       legend.title = ggplot2::element_blank(),
-                       legend.text = ggplot2::element_text(size = legend_size),
-                       axis.text.x = ggplot2::element_text(size = names_size))
-    } else {
-      g <- ggplot2::ggplot(df) +
-        ggplot2::geom_col(ggplot2::aes(x = names, y = order, fill = order),
-                          show.legend = show_legend) +
-        ggplot2::labs(y = "Order of Integration", x = "Variables") +
-        ggplot2::coord_flip() +
-        ggplot2::scale_fill_manual(values = cols) +
-        ggplot2::theme_minimal() +
-        ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
-                       panel.grid.minor = ggplot2::element_blank(),
-                       legend.title = ggplot2::element_blank(),
-                       legend.text = ggplot2::element_text(size = legend_size),
-                       axis.text.x = ggplot2::element_blank())
-    }
-
-    if (n_g > 1) {
-      g <- g + ggplot2::facet_wrap(ggplot2::vars(df$group), nrow = 1, scales = "free_y") +
-        ggplot2::theme(strip.text = ggplot2::element_blank())
-    }
-    return(g)
   }
+  if (all(class(orders) ==  c("bootUR", "order_integration"))) {
+    d <- orders$order_int
+  } else {
+    if (is.vector(orders, mode = "numeric")) {
+      d <- orders
+    } else {
+      stop("Argument 'orders' is not an object of class 'bootUR', 'order_integration', nor a numeric vector.")
+    }
+  }
+  if (is.null(cols)) {
+    cols <- c("#1B9E77", "#7570B3", "#D95F02", "#E7298A")
+  }
+  if (max(d) > length(cols)) {
+    stop("Insufficient number of colours supplied to display all orders of integration.")
+  }
+  if (is.null(names(d))) {
+    names(d) <- paste0("Var", 1:length(d))
+  }
+  cols <- cols[unique(d) + 1]
+  n_g <- floor(max(1, length(d) - 5)^(1/3))
+  group <- rep(paste0("g", 1:n_g), each = ceiling(length(d) / n_g))[1:length(d)]
+  df <- data.frame(names = factor(names(d), levels = rev(names(d))),
+                   order = paste0("I(", d, ")"), group = group)
+  if (show_names) {
+    g <- ggplot2::ggplot(df) +
+      ggplot2::geom_col(ggplot2::aes(x = names, y = order, fill = order),
+                        show.legend = show_legend) +
+      ggplot2::labs(y = "Order of Integration", x = "Variables") +
+      ggplot2::coord_flip() +
+      ggplot2::scale_fill_manual(values = cols) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     legend.title = ggplot2::element_blank(),
+                     legend.text = ggplot2::element_text(size = legend_size),
+                     axis.text.x = ggplot2::element_text(size = names_size))
+  } else {
+    g <- ggplot2::ggplot(df) +
+      ggplot2::geom_col(ggplot2::aes(x = names, y = order, fill = order),
+                        show.legend = show_legend) +
+      ggplot2::labs(y = "Order of Integration", x = "Variables") +
+      ggplot2::coord_flip() +
+      ggplot2::scale_fill_manual(values = cols) +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(panel.grid.major = ggplot2::element_blank(),
+                     panel.grid.minor = ggplot2::element_blank(),
+                     legend.title = ggplot2::element_blank(),
+                     legend.text = ggplot2::element_text(size = legend_size),
+                     axis.text.x = ggplot2::element_blank())
+  }
+  if (n_g > 1) {
+    g <- g + ggplot2::facet_wrap(ggplot2::vars(df$group), nrow = 1, scales = "free_y") +
+      ggplot2::theme(strip.text = ggplot2::element_blank())
+  }
+  return(g)
 }
 
 #' Check Missing Values in Sample
