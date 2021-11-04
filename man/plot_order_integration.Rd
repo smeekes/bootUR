@@ -8,7 +8,7 @@ plot_order_integration(orders, show_names = TRUE, show_legend = TRUE,
   names_size = NULL, legend_size = NULL, cols = NULL)
 }
 \arguments{
-\item{orders}{A \code{"bootUR", "order_integration"} object obtained from the function \code{order_integration}, or an integer vector with found orders of integration.}
+\item{orders}{A \code{"bootUR", "order_integration"} object obtained from the function \code{order_integration}, or a vector with found orders of integration.}
 
 \item{show_names}{Show the time series' names on the plot (\code{TRUE}) or not (\code{FALSE}). Default is \code{TRUE}.}
 
