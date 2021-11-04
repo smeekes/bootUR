@@ -1,3 +1,11 @@
+## Version 0.4.0
+
+### New Functionality
+* Parallel computing via the RcppParallel package replaces OpenMP.
+
+### Bug Fixes
+* Fixed order_integration() to allow for all possible tests.
+
 ## Version 0.3.0
 
 ### New Functionality
