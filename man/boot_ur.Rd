@@ -97,7 +97,8 @@ The function may give the following warnings.
 
 \examples{
 # boot_ur on GDP_BE and GDP_DE
-two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 399, do_parallel = FALSE)
+two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 199,
+do_parallel = FALSE, show_progress = FALSE)
 print(two_series_boot_ur)
 }
 \references{

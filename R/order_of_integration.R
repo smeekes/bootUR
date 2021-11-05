@@ -55,7 +55,7 @@ diff_mult <- function(data, d, keep_NAs = TRUE) {
 #' @examples
 #' # Use "boot_ur" to determine the order of GDP_BE and GDP_DE
 #' orders_tseries <- order_integration(MacroTS[, 1:2], method = "boot_ur", B = 199,
-#' do_parallel = FALSE)
+#' do_parallel = FALSE, show_progress = FALSE)
 order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0.05,
                               plot_orders = FALSE, data_name = NULL, ...) {
   N <- NCOL(data)

@@ -21,7 +21,7 @@ LazyData: true
 Roxygen: list(old_usage = TRUE)
 RoxygenNote: 7.1.2
 Imports: 
-    Rcpp, stats, urca, RcppParallel
+    Rcpp, stats, urca, RcppParallel, parallelly
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel, RcppThread
 URL: https://github.com/smeekes/bootUR
 Suggests: 

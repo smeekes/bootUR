@@ -84,8 +84,8 @@ Lag length selection is done automatically in the ADF regression with the specif
 
 \examples{
 # boot_adf on GDP_BE
-GDP_BE_adf <- boot_adf(MacroTS[, 1], B = 399, deterministics = "trend",
-detrend = "OLS", do_parallel = FALSE)
+GDP_BE_adf <- boot_adf(MacroTS[, 1], B = 199, deterministics = "trend", detrend = "OLS",
+ do_parallel = FALSE, show_progress = FALSE)
 print(GDP_BE_adf)
 }
 \references{

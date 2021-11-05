@@ -73,7 +73,7 @@ Lag length selection is done automatically in the ADF regressions with the speci
 
 \examples{
 # boot_union on GDP_BE
-GDP_BE_df <- boot_union(MacroTS[, 1], B = 399, do_parallel = FALSE)
+GDP_BE_df <- boot_union(MacroTS[, 1], B = 199, do_parallel = FALSE, show_progress = FALSE)
 print(GDP_BE_df)
 }
 \references{

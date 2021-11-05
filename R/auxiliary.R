@@ -148,17 +148,14 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
     stop("Bootstrap iterations B too low to perform test at desired significance level.")
   }
   # Set up parallel computing
-  if (is.null(cores)) {
-    if (do_parallel) {
-      cores <- max(parallel::detectCores() - 2, 1)
-    } else {
-      cores <- 1
+  if (do_parallel) {
+    if (is.null(cores)) {
+      cores <- parallelly::availableCores(omit = 2)
+    } else if ((cores != round(cores)) | (cores < 1)) {
+      stop("Invalid value for argument cores")
     }
+    RcppParallel::setThreadOptions(numThreads = cores)
   }
-  if ((cores != round(cores)) | (cores < 1)) {
-    stop("Invalid value for argument cores")
-  }
-  RcppParallel::setThreadOptions(numThreads = cores)
 
   # Check for missing values or unbalanced panels (MBB, SB)
   check_missing <- check_missing_insample_values(data)
