@@ -76,7 +76,7 @@
 #' @examples
 #' # boot_ur on GDP_BE and GDP_DE
 #' two_series_boot_ur <- boot_ur(MacroTS[, 1:2], bootstrap = "MBB", B = 199,
-#' do_parallel = FALSE, show_progress = FALSE)
+#'                               do_parallel = FALSE, show_progress = FALSE)
 #' print(two_series_boot_ur)
 #' @export
 boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_length = NULL,
@@ -221,7 +221,7 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
 #' @examples
 #' # boot_adf on GDP_BE
 #' GDP_BE_adf <- boot_adf(MacroTS[, 1], B = 199, deterministics = "trend", detrend = "OLS",
-#'  do_parallel = FALSE, show_progress = FALSE)
+#'                        do_parallel = FALSE, show_progress = FALSE)
 #' print(GDP_BE_adf)
 boot_adf <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
                      block_length = NULL, ar_AWB = NULL, deterministics = "intercept",
@@ -376,13 +376,14 @@ boot_union <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, bloc
 #' @examples
 #' # boot_fdr on GDP_BE and GDP_DE
 #' two_series_boot_fdr <- boot_fdr(MacroTS[, 1:2], bootstrap = "MBB", B = 199,
-#' do_parallel = FALSE, show_progress = FALSE)
+#'                                 do_parallel = FALSE, show_progress = FALSE)
 #' print(two_series_boot_fdr)
 #' @export
 boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_length = NULL,
-                     ar_AWB = NULL, FDR_level = 0.05, union = TRUE, deterministics = NULL, detrend = NULL,
-                     min_lag = 0, max_lag = NULL, criterion = "MAIC", criterion_scale = TRUE,
-                     show_progress = TRUE, do_parallel = TRUE, cores = NULL){
+                     ar_AWB = NULL, FDR_level = 0.05, union = TRUE, deterministics = NULL,
+                     detrend = NULL, min_lag = 0, max_lag = NULL, criterion = "MAIC",
+                     criterion_scale = TRUE, show_progress = TRUE, do_parallel = TRUE,
+                     cores = NULL){
 
   inputs <- do_tests_and_bootstrap(data = data, boot_sqt_test = FALSE, boot_ur_test = FALSE,
                                    level = FDR_level, bootstrap = bootstrap, B = B,
@@ -491,7 +492,7 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
 #' @examples
 #' # boot_sqt on GDP_BE and GDP_DE
 #' two_series_boot_sqt <- boot_sqt(MacroTS[, 1:2], bootstrap = "AWB", B = 199,
-#' do_parallel = FALSE, show_progress = FALSE)
+#'                                 do_parallel = FALSE, show_progress = FALSE)
 #' print(two_series_boot_sqt)
 #' @export
 boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "AWB",
@@ -594,7 +595,7 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
 #' @examples
 #' # boot_panel on GDP_BE and GDP_DE
 #' two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 199,
-#' do_parallel = FALSE, show_progress = FALSE)
+#'                                     do_parallel = FALSE, show_progress = FALSE)
 #' print(two_series_boot_panel)
 #' @export
 boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,

@@ -91,7 +91,7 @@ See \code{\link{boot_ur}} for details on the bootstrap algorithm and lag selecti
 \examples{
 # boot_panel on GDP_BE and GDP_DE
 two_series_boot_panel <- boot_panel(MacroTS[, 1:2], bootstrap = "AWB", B = 199,
-do_parallel = FALSE, show_progress = FALSE)
+                                    do_parallel = FALSE, show_progress = FALSE)
 print(two_series_boot_panel)
 }
 \references{

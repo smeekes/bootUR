@@ -627,12 +627,10 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
 
   progress prog(B, show_progress);
   if (do_parallel) {
-    Rcpp::Rcout << "parallel" << std::endl;
     boot_par boot_loops(i, z, u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type,
                         dc, detr, ic_scale, h_rs, range, joint, output, prog);
     RcppParallel::parallelFor(0, B, boot_loops);
   } else {
-    Rcpp::Rcout << "serial" << std::endl;
     if (joint) {
       for (int iB = 0; iB < B; iB++) {
         output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
