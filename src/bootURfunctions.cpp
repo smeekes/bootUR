@@ -1,3 +1,4 @@
+#define ARMA_DONT_USE_OPENMP 1
 #include <RcppArmadillo.h>
 #include <RcppArmadilloExtensions/sample.h>
 #include <RcppParallel.h>
