@@ -1,4 +1,4 @@
-## Version 0.4.0
+## Version 0.4.1
 
 ### New Functionality
 * Parallel computing via the RcppParallel package replaces OpenMP.
