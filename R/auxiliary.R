@@ -318,6 +318,7 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
     e_va <- ev$values
     e_ve <- ev$vectors
     e_va <- diag((e_va > 1e-10) * e_va + (e_va <= 1e-10) * 1e-10)
+    e_ve <- e_ve * (matrix(sign(e_ve[1,]), nrow = n, ncol = n, byrow = TRUE))
     s_DWB <- e_ve %*% sqrt(e_va)
   }
   out <- list(boot = boot, l = block_length, s_DWB = s_DWB, ar_AWB = ar_AWB, dc = dc,
