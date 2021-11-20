@@ -103,8 +103,13 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
 
   p_val <- drop(urca::punitroot(q = tstat, N = TT - max_lag - 1, trend = urtype, statistic = "t"))
   attr(p_val, "names") <- "p-value"
-
-  adf_out <- list(method = "ADF test on a single time series", data.name = data_name,
+  if(two_step){
+    method_name <- "Two-step ADF test on a single time series"
+  }else{
+    method_name <- "One-step ADF test on a single time series"
+  }
+  
+  adf_out <- list(method = method_name, data.name = data_name,
                   null.value = c("gamma" = 0), alternative = "less",
                   estimate = drop(param), statistic = tstat, p.value = p_val)
   class(adf_out) <- c("bootUR", "htest")
