@@ -100,24 +100,20 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
          "trend" = urtype <- "ct",
          "intercept" = urtype <- "c",
          "none"  =  urtype <- "nc")
+  p_val <- drop(urca::punitroot(q = tstat, N = TT - max_lag - 1, trend = urtype, statistic = "t"))
+  attr(p_val, "names") <- "p-value"
   
   spec <- list("deterministics" = deterministics, "min_lag" = min_lag, "max_lag" = max_lag,
                "criterion" = criterion, "criterion_scale" = criterion_scale, "two_step" = two_step)
-  
   switch(deterministics,
          "trend" = deterministics <- "intercept and trend",
          "intercept" = deterministics <- "intercept",
          "none"  =  deterministics <- "no deterministics")
-  
-  p_val <- drop(urca::punitroot(q = tstat, N = TT - max_lag - 1, trend = urtype, statistic = "t"))
-  attr(p_val, "names") <- "p-value"
   if(two_step){
     method_name <- paste("Two-step ADF test ( with" , deterministics,") on a single time series")
   }else{
     method_name <- paste("One-step ADF test ( with" , deterministics,") on a single time series")
   }
-  
-
   
   adf_out <- list(method = method_name, data.name = data_name,
                   null.value = c("gamma" = 0), alternative = "less",
