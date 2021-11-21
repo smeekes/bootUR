@@ -98,7 +98,7 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   }
   out <- list("y" = data, "p_vec" = p_vec, "t_star" = t_star, "test_stats_star" = test_stats_star,
               "tests_i" = tests_i, "param_i" = params_i,"test_stats" = test_stats,
-              "level" = level, "dc" = dc, "detr" = detr)
+              "level" = level, "dc" = dc, "detr" = detr, "inputs" = inputs)
 
   return(out)
 }
