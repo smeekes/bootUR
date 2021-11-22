@@ -55,6 +55,35 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   range_nonmiss <- inputs$range_nonmiss
   joint <- inputs$joint
 
+  list_inputs <- inputs
+  if (!(bootstrap %in% c("MBB", "BWB", "DWB"))) {
+    list_inputs$l <- NULL
+  }
+  if (bootstrap != "AWB") {
+    list_inputs$ar_AWB <- NULL
+  }
+  if (!union) {
+    list_inputs$union_quantile <- NULL
+    dc_vector <- c("no deterministics", "intercept", "intercept and trend")
+    list_inputs$deterministics <- dc_vector[dc + 1]
+    detr_name_vector <- c("ADF", "ADF-QD")
+    detr_vector <- c("OLS", "QD")
+    list_inputs$name <- detr_name_vector[detr_int]
+    list_inputs$detrend <- detr_vector[detr_int]
+  } else {
+    list_inputs$union_quantile <- level
+    list_inputs$deterministics <- NULL
+    list_inputs$name <- "Union"
+    list_inputs$detrend <- NULL
+  }
+  if (min_lag == max_lag) {
+    list_inputs$criterion <- NULL
+    list_inputs$criterion_scale <- NULL
+  } else {
+    list_inputs$criterion <- criterion
+    list_inputs$criterion_scale <- criterion_scale
+  }
+
   # Dimensions
   n <- nrow(data)
   N <- ncol(data)
@@ -68,11 +97,11 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   u_boot[is.nan(u_boot)] <- NA
   res <- panel_est$res
   ar_est <- panel_est$par[-1, , drop = FALSE]
-  t_star <- bootstrap_cpp(B = B, boot = boot, u = u_boot, e = res, l = l, s = s_DWB, ar = ar_AWB,
-                          ar_est = ar_est, y0 = matrix(0, ncol = N), pmin = min_lag,
-                          pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
-                          ic_scale = criterion_scale, h_rs = h_rs,
-                          range = range_nonmiss, joint = joint, show_progress = show_progress,
+  t_star <- bootstrap_cpp(B = B, boot = boot, u = u_boot, e = res, l = l, s = s_DWB,
+                          ar = ar_AWB, ar_est = ar_est, y0 = matrix(0, ncol = N),
+                          pmin = min_lag, pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
+                          ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss,
+                          joint = joint, show_progress = show_progress,
                           do_parallel = do_parallel)
 
   tests_and_params <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic,
@@ -86,7 +115,8 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
     if (N > 1) {
       test_stats_star <- union_tests_cpp(t_star, scaling)
       test_stats <- union_tests_cpp(array(tests_i,
-                                          dim = c(1, length(dc) * length(detr_int), N)), scaling)
+                                          dim = c(1, length(dc) * length(detr_int), N)),
+                                    scaling)
     } else {
       test_stats_star <- union_test_cpp(t_star[, , 1], scaling)
       test_stats <- union_test_cpp(array(tests_i,
@@ -98,7 +128,7 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   }
   out <- list("y" = data, "p_vec" = p_vec, "t_star" = t_star, "test_stats_star" = test_stats_star,
               "tests_i" = tests_i, "param_i" = params_i,"test_stats" = test_stats,
-              "level" = level, "dc" = dc, "detr" = detr, "inputs" = inputs)
+              "level" = level, "dc" = dc, "detr" = detr, "inputs" = list_inputs)
 
   return(out)
 }
@@ -213,9 +243,9 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
       stop("The argument deterministics should be equal to either none, intercept, trend:
            (none: no deterministics, intercept: intercept only, trend: intercept and trend)")
     }
-    dc <- 0*(deterministics=="none") + 1*(deterministics=="intercept") + 2*(deterministics=="trend")
-    dc <- sort(dc)
-    dc_boot <- max(dc)
+    dc <- 0*(deterministics=="none") + 1*(deterministics=="intercept") +
+      2*(deterministics=="trend")
+    dc_boot <- dc
     if (is.null(detrend)) {
       warning("No detrending specification set. Using OLS detrending.")
       detrend <- "OLS"
@@ -223,7 +253,6 @@ check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
       stop("The argument detrend should be equal to either OLS, QD")
     }
     detr_int <- 1*(detrend=="OLS") + 2*(detrend=="QD")
-    detr_int <- sort(detr_int)
   }
 
   if (is.null(block_length)) {

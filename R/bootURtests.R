@@ -112,13 +112,17 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
   }
 
   spec <- list("bootstrap" = bootstrap, "B" = B, "block_length" = inputs$inputs$l,
-               "ar_AWB" = inputs$inputs$ar_AWB, "level" = level, "union" = union, "union_quantile" = union_quantile,
-               "deterministics" = deterministics, "detrend" = detrend, "min_lag" = min_lag, 
-               "max_lag" = inputs$inputs$p_max, "criterion" = criterion, "criterion_scale" = criterion_scale)
-  
+               "ar_AWB" = inputs$inputs$ar_AWB, "level" = level,
+               "union" = union, "union_quantile" = inputs$inputs$union_quantile,
+               "deterministics" = inputs$inputs$deterministics,
+               "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
+               "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
+               "criterion_scale" = inputs$inputs$criterion_scale)
+
   # Results
   if (union) { # Union test
-    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star, level = inputs$level)
+    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
+                        level = inputs$level)
     iADFout <- cbind(rep(NA, nrow(iADFout)), iADFout)
     if (NCOL(data) > 1) {
       rownames(iADFout) <- var_names
@@ -133,13 +137,6 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
       rownames(iADFout) <- var_names
       colnames(iADFout) <- c("gamma", "statistic", "p.value")
     }
-    switch(deterministics,
-           "trend" = deterministics <- "intercept and trend",
-           "intercept" = deterministics <- "intercept",
-           "none"  =  deterministics <- "no deterministics")
-    switch(detrend,
-           "OLS" = detrend <- "ADF",
-           "QD" = detrend <- "ADF-QD")
   }
 
   if (!is.null(level)) {
@@ -148,12 +145,13 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
     rej_H0 <- NULL
   }
 
-
   if (NCOL(data) > 1) {
-    if(union){
+    if (union) {
       method_name <- paste(bootstrap, "Bootstrap Union test on each individual series (no multiple testing correction)")
-    }else{
-      method_name <- paste(bootstrap, "Bootstrap", detrend, " test ( with" , deterministics,") on each individual series (no multiple testing correction)")
+    } else {
+      method_name <- paste(bootstrap, "Bootstrap", inputs$inputs$name,
+                           " test ( with" , inputs$inputs$deterministics,
+                           ") on each individual series (no multiple testing correction)")
     }
     boot_ur_output <- list(method = method_name, data.name = data_name,
                            null.value =  c("gamma" = 0), alternative = "less",
@@ -170,15 +168,18 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
     attr(iADFtstat, "names") <- "tstat"
     p_val <- drop(iADFout[1, 3])
     attr(p_val, "names") <- "p-value"
-    
-    if(union){
+
+    if (union) {
       method_name <- paste(bootstrap, "Bootstrap Union test on a single time series")
-    }else{
-      method_name <- paste(bootstrap, "Bootstrap", detrend, " test ( with" , deterministics,") on a single time series")
+    } else {
+      method_name <- paste(bootstrap, "Bootstrap", inputs$inputs$detrend,
+                           " test ( with" , inputs$inputs$deterministics,
+                           ") on a single time series")
     }
     boot_ur_output <- list(method = method_name, data.name = var_names,
                            null.value = c("gamma" = 0), alternative = "less",
-                           estimate = param, statistic = iADFtstat, p.value = p_val, specifications = spec)
+                           estimate = param, statistic = iADFtstat, p.value = p_val,
+                           specifications = spec)
     class(boot_ur_output) <- c("bootUR", "htest")
   }
 
@@ -421,9 +422,11 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
   }
 
   spec <- list("bootstrap" = bootstrap, "B" = B, "block_length" = inputs$inputs$l,
-               "ar_AWB" = inputs$inputs$ar_AWB, "FDR_level" = FDR_level, "union" = union, "deterministics" = deterministics,
-               "detrend" = detrend, "min_lag" = min_lag, "max_lag" = inputs$inputs$p_max, "criterion" = criterion,
-               "criterion_scale" = criterion_scale)
+               "ar_AWB" = inputs$inputs$ar_AWB, "FDR_level" = FDR_level, "union" = union,
+               "deterministics" = inputs$inputs$deterministics,
+               "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
+               "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
+               "criterion_scale" = inputs$inputs$criterion_scale)
 
   if (union) { # Union Tests
     bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
@@ -436,14 +439,8 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
                          t_star = inputs$t_star[ , 1,], level = inputs$level)
       estimates <- t(inputs$param_i)
       tstats <- drop(inputs$tests_i[1, ])
-      switch(deterministics,
-             "trend" = deterministics <- "intercept and trend",
-             "intercept" = deterministics <- "intercept",
-             "none"  =  deterministics <- "no deterministics")
-      switch(detrend,
-             "OLS" = detrend <- "ADF",
-             "QD" = detrend <- "ADF-QD")
-      method_name <- paste(bootstrap, "Bootstrap", detrend, " tests ( with" , deterministics,") with False Discovery Rate control")
+      method_name <- paste(bootstrap, "Bootstrap", inputs$inputs$name, " tests ( with" ,
+                           inputs$inputs$deterministics, ") with False Discovery Rate control")
   }
   rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
   rownames(rej_H0) <- var_names
@@ -457,7 +454,8 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
   fdr_output <- list(method = method_name, data.name = data_name,
                      null.value =  c("gamma" = 0), alternative = "less",
                      estimate = estimates, statistic = tstats, p.value = p_vals,
-                     rejections = rej_H0, details = FDR_seq, series.names = var_names, specifications = spec)
+                     rejections = rej_H0, details = FDR_seq, series.names = var_names,
+                     specifications = spec)
   class(fdr_output) <- c("bootUR", "mult_htest")
 
   return(fdr_output)
@@ -549,10 +547,12 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
   }
 
   spec <- list("steps" = steps, "bootstrap" = bootstrap, "B" = B, "block_length" = inputs$inputs$l,
-               "ar_AWB" = inputs$inputs$ar_AWB, "SQT_level" = SQT_level, "union" = union, "deterministics" = deterministics,
-               "detrend" = detrend, "min_lag" = min_lag, "max_lag" = inputs$inputs$p_max, "criterion" = criterion,
-               "criterion_scale" = criterion_scale)
-  
+               "ar_AWB" = inputs$inputs$ar_AWB, "SQT_level" = SQT_level, "union" = union,
+               "deterministics" = inputs$inputs$deterministics,
+               "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
+               "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
+               "criterion_scale" = inputs$inputs$criterion_scale)
+
   if (union) { # Union Tests
     BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = inputs$test_stats,
                         t_star = inputs$test_stats_star, level = inputs$level)
@@ -564,15 +564,10 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
                         t_star = inputs$t_star[ , 1,], level = inputs$level)
     estimates <- t(inputs$param_i)
     tstats <- drop(inputs$tests_i[1, ])
-    switch(deterministics,
-           "trend" = deterministics <- "intercept and trend",
-           "intercept" = deterministics <- "intercept",
-           "none"  =  deterministics <- "no deterministics")
-    switch(detrend,
-           "OLS" = detrend <- "ADF",
-           "QD" = detrend <- "ADF-QD")
-    method_name <- paste(bootstrap, "Bootstrap Sequential Quantile", detrend, " test ( with" , deterministics,")")
-    
+    method_name <- paste(bootstrap, "Bootstrap Sequential Quantile",
+                         inputs$inputs$name, " test ( with" ,
+                         inputs$inputs$deterministics,")")
+
   }
   rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
   rownames(rej_H0) <- var_names
@@ -586,7 +581,8 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
   sqt_output <- list(method = method_name, data.name = data_name,
                      null.value =  c("gamma" = 0), alternative = "less",
                      estimate = estimates, statistic = tstats, p.value = p_vals,
-                     rejections = rej_H0, details = BSQT_seq, series.names = var_names, specifications = spec)
+                     rejections = rej_H0, details = BSQT_seq, series.names = var_names,
+                     specifications = spec)
   class(sqt_output) <- c("bootUR", "mult_htest")
   return(sqt_output)
 }
@@ -654,12 +650,15 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
   if (is.null(data_name)) {
     data_name <- deparse(substitute(data))
   }
-  
+
   spec <- list("bootstrap" = bootstrap, "B" = B, "block_length" = inputs$inputs$l,
-               "ar_AWB" = inputs$inputs$ar_AWB,"union" = union, "union_quantile" = union_quantile,
-               "deterministics" = deterministics, "detrend" = detrend, "min_lag" = min_lag, 
-               "max_lag" = inputs$inputs$p_max, "criterion" = criterion, "criterion_scale" = criterion_scale)
-  
+               "ar_AWB" = inputs$inputs$ar_AWB,"union" = union,
+               "union_quantile" = inputs$inputs$union_quantile,
+               "deterministics" = inputs$inputs$deterministics,
+               "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
+               "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
+               "criterion_scale" = inputs$inputs$criterion_scale)
+
   if (union) { # Union Test
     GM_test <- mean(inputs$test_stats)
     t_star <- rowMeans(inputs$test_stats_star)
@@ -669,14 +668,8 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
     GM_test <- rowMeans(inputs$tests_i)
     t_star <- apply(inputs$t_star, 1:2, mean)
     p_val <- sapply(1, function(i){mean(t_star[, i] < GM_test[i])})
-    switch(deterministics,
-           "trend" = deterministics <- "intercept and trend",
-           "intercept" = deterministics <- "intercept",
-           "none"  =  deterministics <- "no deterministics")
-    switch(detrend,
-           "OLS" = detrend <- "ADF",
-           "QD" = detrend <- "ADF-QD")
-    method_name <- paste("Panel", bootstrap, "Bootstrap Group-Mean", detrend, " test ( with" , deterministics,")")
+    method_name <- paste("Panel", bootstrap, "Bootstrap Group-Mean", inputs$inputs$name,
+                         " test ( with" , inputs$inputs$deterministics,")")
   }
 
   attr(GM_test, "names") <- "tstat"
@@ -685,7 +678,8 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
   attr(p_val, "names") <- "p-value"
   panel_output <- list(method = method_name, data.name = data_name,
                        null.value = c("gamma" = 0), alternative = "less",
-                       estimate = gamma_hat, statistic = GM_test, p.value = p_val, specifications = spec)
+                       estimate = gamma_hat, statistic = GM_test, p.value = p_val,
+                       specifications = spec)
   class(panel_output) <- c("bootUR", "htest")
   return(panel_output)
 }
