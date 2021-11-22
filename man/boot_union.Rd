@@ -54,7 +54,8 @@ An object of class \code{"bootUR"}, \code{"htest"} with the following components
 \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
 \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
 \item{\code{statistic}}{The value of the test statistic of the unit root test;}
-\item{\code{p.value}}{The p-value of the unit root test.}
+\item{\code{p.value}}{The p-value of the unit root test;}
+\item{\code{specifications}}{The specifications used in the test.}
 }
 \description{
 Performs bootstrap unit root test based on the union of rejections of 4 tests with different number of deterministic components and different type of detrending (Harvey, Leybourne and Taylor, 2012; Smeekes and Taylor, 2012).

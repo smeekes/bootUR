@@ -70,7 +70,8 @@ An object of class \code{"bootUR"}, \code{"htest"} with the following components
 \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
 \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
 \item{\code{statistic}}{The value of the test statistic of the unit root test;}
-\item{\code{p.value}}{The p-value of the unit root test.}
+\item{\code{p.value}}{The p-value of the unit root test;}
+\item{\code{specifications}}{The specifications used in the test.}
 }
 \description{
 Performs a test on a multivariate (panel) time series by testing the null hypothesis that all series have a unit root. The test is based on averaging the individual test statistics, also called the Group-Mean (GM) test in Palm, Smeekes and Urbain (2011).

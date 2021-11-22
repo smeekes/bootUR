@@ -72,7 +72,8 @@ An object of class \code{"bootUR"}, \code{"mult_htest"} with the following compo
 \item{\code{p.value}}{A vector with \code{NA} values, as p-values are not available for the FDR method;}
 \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 \item{\code{details}}{The details of the performed tests in a matrix containing for each step the test statistics and critical value, up to non-rejection.}
-\item{\code{series.names}}{The names of the series that the tests are performed on.}
+\item{\code{series.names}}{The names of the series that the tests are performed on;}
+\item{\code{specifications}}{The specifications used in the test(s).}
 }
 \description{
 Controls for multiple testing by controlling the false discovery rate (FDR), see Moon and Perron (2012) and Romano, Shaikh and Wolf (2008).

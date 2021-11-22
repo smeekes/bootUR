@@ -73,8 +73,9 @@ An object of class \code{"bootUR"}, \code{"mult_htest"} with the following compo
 \item{\code{statistic}}{The value of the test statistic of the unit root tests;}
 \item{\code{p.value}}{A vector with \code{NA} values, as p-values per inidividual series are not available.The p-value for each test in the sequence can be found in \code{details};}
 \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-\item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value.}
-\item{\code{series.names}}{The names of the series that the tests are performed on.}
+\item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value;}
+\item{\code{series.names}}{The names of the series that the tests are performed on;}
+\item{\code{specifications}}{The specifications used in the tests.}
 }
 \description{
 Performs the Bootstrap Sequential Quantile Test (BSQT) proposed by Smeekes (2015).

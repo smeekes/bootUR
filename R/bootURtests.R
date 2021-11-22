@@ -48,7 +48,8 @@
 #' \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
 #' \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE}). This is only supplied when an optional significance level is given, otherwise \code{NULL} is returned;}
 #' \item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
-#' \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on.}
+#' \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on;}
+#' \item{\code{specifications}}{The specifications used in the test(s).}
 #' @section Warnings:
 #' The function may give the following warnings.
 #' \describe{
@@ -211,7 +212,8 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
 #' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
 #' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
-#' \item{\code{p.value}}{The p-value of the unit root test.}
+#' \item{\code{p.value}}{The p-value of the unit root test;}
+#' \item{\code{specifications}}{The specifications used in the test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function is a simple wrapper around \code{\link{boot_ur}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{boot_ur}} is specifically suited for that.}
@@ -289,7 +291,8 @@ boot_adf <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
 #' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
 #' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
-#' \item{\code{p.value}}{The p-value of the unit root test.}
+#' \item{\code{p.value}}{The p-value of the unit root test;}
+#' \item{\code{specifications}}{The specifications used in the test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function is a simple wrapper around \code{\link{boot_ur}} to facilitate use for single time series. It does not support multiple time series, as \code{\link{boot_ur}} is specifically suited for that.}
@@ -358,7 +361,8 @@ boot_union <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, bloc
 #' \item{\code{p.value}}{A vector with \code{NA} values, as p-values are not available for the FDR method;}
 #' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
 #' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the test statistics and critical value, up to non-rejection.}
-#' \item{\code{series.names}}{The names of the series that the tests are performed on.}
+#' \item{\code{series.names}}{The names of the series that the tests are performed on;}
+#' \item{\code{specifications}}{The specifications used in the test(s).}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
@@ -481,8 +485,9 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
 #' \item{\code{statistic}}{The value of the test statistic of the unit root tests;}
 #' \item{\code{p.value}}{A vector with \code{NA} values, as p-values per inidividual series are not available.The p-value for each test in the sequence can be found in \code{details};}
 #' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value.}
-#' \item{\code{series.names}}{The names of the series that the tests are performed on.}
+#' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value;}
+#' \item{\code{series.names}}{The names of the series that the tests are performed on;}
+#' \item{\code{specifications}}{The specifications used in the tests.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
@@ -599,7 +604,8 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
 #' \item{\code{alternative}}{A character string specifying the direction of the alternative hypothesis relative to the null value. The alternative postulates that the series is stationary;}
 #' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
 #' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
-#' \item{\code{p.value}}{The p-value of the unit root test.}
+#' \item{\code{p.value}}{The p-value of the unit root test;}
+#' \item{\code{specifications}}{The specifications used in the test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Resampling-based bootstraps MBB and SB cannot handle missing values.}}{If the time series in \code{data} have different starting and end points (and thus some series contain \code{NA} values at the beginning and/or end of the sample, the resampling-based moving block bootstrap (MBB) and sieve bootstrap (SB) cannot be used, as they create holes (internal missings) in the bootstrap samples. Switch to another bootstrap method or truncate your sample to eliminate \code{NA} values.}
