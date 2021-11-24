@@ -1,3 +1,14 @@
+## Version 0.4.2
+
+### New Functionality
+* Output slot added that stores te specifications of the tests.
+
+### Bug Fixes
+* Visually differentiated test print output by making the name reflect the most 
+important specifications.
+* Forced normalisation of the signs of the eigenvectors calculated for DWB to
+ensure reproducability of results across OSes.
+
 ## Version 0.4.1
 
 ### New Functionality
