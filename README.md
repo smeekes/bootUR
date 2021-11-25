@@ -153,7 +153,7 @@ specification, including a linear trend in the specification.
 GDP_NL <- MacroTS[, 4]
 adf(GDP_NL, deterministics = "trend")
 #> 
-#>  ADF test on a single time series
+#>  Two-step ADF test ( with intercept and trend ) on a single time series
 #> 
 #> data:  GDP_NL
 #> tstat = -2.5153, p-value = 0.3202
@@ -203,7 +203,8 @@ boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend",
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  Bootstrap ADF test on a single time series
+#>  SB Bootstrap OLS test ( with intercept and trend ) on a single time
+#>  series
 #> 
 #> data:  GDP_NL
 #> tstat = -2.5153, p-value = 0.1454
@@ -229,7 +230,7 @@ boot_union(GDP_NL, B = 399, bootstrap = "SWB", do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  Bootstrap Union test on a single time series
+#>  SWB Bootstrap Union test on a single time series
 #> 
 #> data:  GDP_NL
 #> tstat = -0.71148, p-value = 0.614
@@ -278,10 +279,10 @@ boot_panel(MacroTS, bootstrap = "DWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  Panel Bootstrap Group-Mean Union Test
+#>  Panel DWB Bootstrap Group-Mean Union test
 #> 
 #> data:  MacroTS
-#> tstat = -0.85435, p-value = 0.1303
+#> tstat = -0.86213, p-value = 0.1103
 #> alternative hypothesis: true gamma is less than 0
 #> sample estimates:
 #> gamma 
@@ -310,8 +311,8 @@ ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALS
 #>           ********************
 print(ADFtests_out)
 #> 
-#>  Bootstrap ADF tests on each individual series (no multiple testing
-#>  correction)
+#>  MBB Bootstrap ADF test ( with intercept and trend ) on each individual
+#>  series (no multiple testing correction)
 #> 
 #> data: MacroTS[, 1:5]
 #> alternative hypothesis: true gamma is less than 0
@@ -374,7 +375,7 @@ boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  Bootstrap Sequential Quantile Union Test
+#>  AWB Bootstrap Sequential Quantile Union test
 #> 
 #> data: MacroTS
 #> alternative hypothesis: true gamma is less than 0
@@ -388,7 +389,7 @@ boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399, do_parallel = FAL
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  Bootstrap Sequential Quantile Union Test
+#>  AWB Bootstrap Sequential Quantile Union test
 #> 
 #> data: MacroTS
 #> alternative hypothesis: true gamma is less than 0
@@ -426,7 +427,7 @@ boot_fdr(MacroTS[, 1:10], FDR_level = 0.1, bootstrap = "BWB", B = 399, do_parall
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  Bootstrap Union Tests with False Discovery Rate control
+#>  BWB Bootstrap Union test with False Discovery Rate control
 #> 
 #> data: MacroTS[, 1:10]
 #> alternative hypothesis: true gamma is less than 0
