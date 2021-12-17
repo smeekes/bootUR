@@ -73,7 +73,9 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
     datad <- diff_mult(data_mat[, i_in_datad], rep(d_i, length(i_in_datad)), keep_NAs = FALSE)
     if (method == "boot_ur") {
       out <- boot_ur(datad, level = level, ...)
-      out$rejections <- out$p.value < level
+      if (N == 1) {
+        out$rejections <- out$p.value < level
+      }
     } else if (method == "boot_fdr" & N > 1) {
       user_arguments <- list(...)
       if ("FDR_level" %in% names(user_arguments)) {
