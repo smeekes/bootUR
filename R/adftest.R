@@ -14,6 +14,7 @@
 #' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression;}
 #' \item{\code{statistic}}{The value of the test statistic of the ADF unit root test;}
 #' \item{\code{p.value}}{The p-value of the ADF unit root test.}
+#' \item{\code{specifications}}{The specifications used in the test.}
 #' @section Errors and warnings:
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function provides a standard ADF test with asymptotic p-value. It does not support multiple time series}
