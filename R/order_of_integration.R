@@ -70,7 +70,7 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
   datad <- data_mat
   i_in_datad <- 1:N
   for (d_i in (max_order - 1):0) {
-    datad <- diff_mult(data_mat[, i_in_datad], rep(d_i, length(i_in_datad)), keep_NAs = FALSE)
+    datad <- diff_mult(data_mat[, i_in_datad, drop = FALSE], rep(d_i, length(i_in_datad)), keep_NAs = FALSE)
     if (method == "boot_ur") {
       out <- boot_ur(datad, level = level, ...)
       if (N == 1) {
