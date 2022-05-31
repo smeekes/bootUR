@@ -55,7 +55,7 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
 
   if(is.null(max_lag)){
     # Correction for small samples as formula doesn't work well for micropanels
-    max_lag = round(12*(n/100)^(1/4)) - 7*max(1 - n/50, 0)*(n/100)^(1/4)
+    max_lag = round(12*(n/100)^(1/4) - 7*max(1 - n/50, 0)*(n/100)^(1/4))
   }
 
   if (any(!is.element(criterion, c("AIC", "BIC", "MAIC", "MBIC"))) | length(criterion) > 1) {
@@ -101,7 +101,7 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
          "trend" = urtype <- "ct",
          "intercept" = urtype <- "c",
          "none"  =  urtype <- "nc")
-  p_val <- drop(urca::punitroot(q = tstat, N = TT - max_lag - 1, trend = urtype, statistic = "t"))
+  p_val <- drop(urca::punitroot(q = tstat, N = max(TT - max_lag - 1, 20), trend = urtype, statistic = "t"))
   attr(p_val, "names") <- "p-value"
   
   spec <- list("deterministics" = deterministics, "min_lag" = min_lag, "max_lag" = max_lag,
