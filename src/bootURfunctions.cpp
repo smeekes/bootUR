@@ -51,6 +51,7 @@ struct adfmout {
   arma::mat par;
   arma::mat res;
   arma::mat b_res;
+  arma::mat lags;
 };
 
 struct adfvout {
@@ -58,11 +59,6 @@ struct adfvout {
   arma::vec par;
   arma::vec res;
   arma::vec b_res;
-};
-
-struct adf_param_mout {
-  arma::mat tests;
-  arma::mat par;
 };
 
 arma::mat lag_matrix(const arma::vec& x, const int& p, const bool& trim = true) {
@@ -313,63 +309,72 @@ arma::mat adf_tests_all_units_cpp(const arma::mat& y, const int& pmin, const int
   return adftests;
 }
 
-adf_param_mout adf_tests_and_params_all_units_cpp(const arma::mat& y, const int& pmin, const int& pmax, icFun ic_type,
-                                                  const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range){
+adfmout adf_tests_parest_all_units_cpp(const arma::mat& y, const int& pmin,
+                                       const int& pmax, icFun ic_type, const arma::vec& dc,
+                                       const arma::vec& detr,const bool& ic_scale,
+                                       const double& h_rs, const arma::umat& range){
 
   const int dclength = dc.size();
   const int N = y.n_cols;
   adfvout adf_OLS, adf_QD;
-  arma::mat OLS_p = zeros(N, dclength);
+  arma::mat OLS_p = zeros(dclength, N);
+  arma::mat adflags;
+
   arma::mat tests_OLS = zeros(dclength, N);
   arma::mat tests_QD = zeros(dclength, N);
   arma::mat adftests;
 
-  arma::mat params_OLS = zeros(dclength, N);
-  arma::mat params_QD = zeros(dclength, N);
-  arma::mat adfparams;
+  arma::mat parest_OLS = zeros(dclength, N);
+  arma::mat parest_QD = zeros(dclength, N);
+  arma::mat adfparest;
 
   if (any(detr == 1)) {
     for (int iN = 0; iN < N; iN++) {
       for (int idc = 0; idc < dclength; idc++) {
         adf_OLS = adf_selectlags_cpp(y(span(range(0, iN), range(1, iN)), iN), pmin, pmax, ic_type, dc[idc], false, ic_scale, h_rs, 0, true);
         tests_OLS(idc, iN) = adf_OLS.tests(0);
-        params_OLS(idc, iN) = adf_OLS.par(0);
-        OLS_p(iN, idc) = adf_OLS.par.n_elem - 1;
+        parest_OLS(idc, iN) = adf_OLS.par(0);
+        OLS_p(idc, iN) = adf_OLS.par.n_elem - 1;
       }
     }
     adftests = tests_OLS;
-    adfparams = params_OLS;
+    adfparest = parest_OLS;
+    adflags = OLS_p;
 
     if (any(detr == 2)) {
       for (int iN = 0; iN < N; iN++) {
         for (int idc = 0; idc < dclength; idc++) {
-          adf_QD = adf_cpp(y(span(range(0, iN), range(1, iN)), iN), OLS_p(iN, idc), dc[idc], true, true, 0);
+          adf_QD = adf_cpp(y(span(range(0, iN), range(1, iN)), iN), OLS_p(idc, iN), dc[idc], true, true, 0);
           tests_QD(idc, iN) = adf_QD.tests(0);
-          params_QD(idc, iN) = adf_QD.par(0);
+          parest_QD(idc, iN) = adf_QD.par(0);
         }
       }
       adftests = join_cols(adftests, tests_QD);
-      adfparams = join_cols(adfparams, params_QD);
+      adfparest = join_cols(adfparest, parest_QD);
+      adflags = join_cols(adflags, OLS_p);
     }
   } else {
     if (any(detr == 2)) {
       for (int iN = 0; iN < N; iN++) {
         for (int idc = 0; idc < dclength; idc++) {
           adf_QD = adf_selectlags_cpp(y(span(range(0, iN), range(1, iN)), iN), pmin, pmax, ic_type, dc[idc], true, ic_scale, h_rs, 0, true);
+          OLS_p(idc, iN) = adf_QD.par.n_elem - 1;
           tests_QD(idc, iN) = adf_QD.tests(0);
-          params_QD(idc, iN) = adf_QD.par(0);
+          parest_QD(idc, iN) = adf_QD.par(0);
         }
       }
       adftests = tests_QD;
-      adfparams = params_QD;
+      adfparest = parest_QD;
+      adflags = OLS_p;
     }
   }
 
-  adf_param_mout adf_tests_param;
-  adf_tests_param.tests = adftests;
-  adf_tests_param.par = adfparams;
+  adfmout adf_tests;
+  adf_tests.tests = adftests;
+  adf_tests.par = adfparest;
+  adf_tests.lags = adflags;
 
-  return adf_tests_param;
+  return adf_tests;
 }
 
 // [[Rcpp::export]]
@@ -384,11 +389,13 @@ arma::mat adf_tests_panel_cpp_mat_out(const arma::mat& y, const int& pmin, const
 Rcpp::List adf_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& pmax, const int& ic,
                               const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range){
   icFun ic_type = ic_function(ic);
-  adf_param_mout adf_out = adf_tests_and_params_all_units_cpp(y, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+  adfmout adf_out = adf_tests_parest_all_units_cpp(y, pmin, pmax, ic_type, dc, detr,
+                                                   ic_scale, h_rs, range);
 
   return Rcpp::List::create(
     Rcpp::Named ("tests") = adf_out.tests,
-    Rcpp::Named ("par") = adf_out.par);
+    Rcpp::Named ("par") = adf_out.par,
+    Rcpp::Named ("lags") = adf_out.lags);
 }
 
 // [[Rcpp::export]]
@@ -413,10 +420,10 @@ Rcpp::List adf_panel_bootstrap_dgp_cpp(const arma::mat& y, const int& pmin, cons
 
   return Rcpp::List::create(
     Rcpp::Named ("tests") = tests,
+    Rcpp::Named ("par") = par,
     Rcpp::Named ("res") = e,
     Rcpp::Named ("b_res") = eb,
-    Rcpp::Named ("par") = par,
-    Rcpp::Named ("p") = p);
+    Rcpp::Named ("lags") = p);
 }
 
 arma::vec gen_AR_cpp(const arma::vec& x, const double& ar, const double& init = 0, const bool& include_init = false){
@@ -795,14 +802,13 @@ Rcpp:: List BSQT_cpp(const arma::vec& pvec, const arma::mat& test_i, const arma:
 }
 
 // [[Rcpp::export]]
-arma::mat iADF_cpp(const arma::mat& test_i, const arma::mat& t_star, const double& level){
-  const int N = test_i.n_cols;
+arma::vec iADF_cpp(const arma::vec& test_i, const arma::mat& t_star){
+  const int N = test_i.n_elem;
   arma::vec p_val_i = zeros(N);
   for (int i = 0; i < N; i++) {
     p_val_i(i) = double(sum(t_star.col(i) < test_i(i))) / t_star.n_rows;
   }
-  const arma::mat Ind_Tests = join_rows(test_i.t(), p_val_i);
-  return Ind_Tests;
+  return p_val_i;
 }
 
 // [[Rcpp::export]]
@@ -962,8 +968,10 @@ adfvout adf_onestep_selectlags_cpp(const arma::vec& y, const int& pmin, const in
 
 }
 
-adf_param_mout adf_onestep_tests_and_params_all_units_cpp(const arma::mat& y, const int& pmin, const int& pmax, icFun ic_type,
-                                                          const arma::vec& dc, const bool& ic_scale, const double& h_rs, const arma::umat& range){
+adfmout adf_onestep_tests_parest_all_units_cpp(const arma::mat& y, const int& pmin,
+                                               const int& pmax, icFun ic_type, const arma::vec& dc,
+                                               const bool& ic_scale, const double& h_rs,
+                                               const arma::umat& range){
 
   const int dclength = dc.size();
   const int N = y.n_cols;
@@ -982,7 +990,7 @@ adf_param_mout adf_onestep_tests_and_params_all_units_cpp(const arma::mat& y, co
     }
   }
 
-  adf_param_mout adf_tests_param;
+  adfmout adf_tests_param;
   adf_tests_param.tests = tests_OLS;
   adf_tests_param.par = params_OLS;
 
@@ -993,7 +1001,7 @@ adf_param_mout adf_onestep_tests_and_params_all_units_cpp(const arma::mat& y, co
 Rcpp::List adf_onestep_tests_panel_cpp(const arma::mat& y, const int& pmin, const int& pmax, const int& ic,
                                         const arma::vec& dc, const bool& ic_scale, const double& h_rs, const arma::umat& range){
   icFun ic_type = ic_function(ic);
-  adf_param_mout adf_out = adf_onestep_tests_and_params_all_units_cpp(y, pmin, pmax, ic_type, dc, ic_scale, h_rs, range);
+  adfmout adf_out = adf_onestep_tests_parest_all_units_cpp(y, pmin, pmax, ic_type, dc, ic_scale, h_rs, range);
 
   return Rcpp::List::create(
     Rcpp::Named ("tests") = adf_out.tests,

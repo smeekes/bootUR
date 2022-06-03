@@ -33,8 +33,8 @@ BSQT_cpp <- function(pvec, test_i, t_star, level) {
     .Call(`_bootUR_BSQT_cpp`, pvec, test_i, t_star, level)
 }
 
-iADF_cpp <- function(test_i, t_star, level) {
-    .Call(`_bootUR_iADF_cpp`, test_i, t_star, level)
+iADF_cpp <- function(test_i, t_star) {
+    .Call(`_bootUR_iADF_cpp`, test_i, t_star)
 }
 
 FDR_cpp <- function(test_i, t_star, level) {

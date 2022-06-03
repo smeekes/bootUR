@@ -104,30 +104,37 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
                           joint = joint, show_progress = show_progress,
                           do_parallel = do_parallel)
 
-  tests_and_params <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic,
-                                          dc = dc, detr = detr_int, ic_scale = criterion_scale,
-                                          h_rs = h_rs, range = range_nonmiss)
-  tests_i<- tests_and_params$tests # Test statistics
-  params_i <- tests_and_params$par # Parameter estimates
+  tests <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic,
+                               dc = dc, detr = detr_int, ic_scale = criterion_scale,
+                               h_rs = h_rs, range = range_nonmiss)
+  tests_ind <- tests$tests # Individual test statistics
+  par_est_ind <- tests$par # Parameter estimates
+  lags_ind <- tests$lags   # Selected lag lengths
 
+  pvals <- matrix(iADF_cpp(matrix(tests_ind, nrow = 1),
+                  matrix(t_star, nrow = B)), nrow = N, ncol = 4, byrow = TRUE)
   if (union) {
+    pvals <- matrix(iADF_cpp(matrix(tests_ind, nrow = 1),
+                             matrix(t_star, nrow = B)), nrow = N, ncol = 4, byrow = TRUE)
     scaling <- scaling_factors_cpp(t_star, level)
     if (N > 1) {
       test_stats_star <- union_tests_cpp(t_star, scaling)
-      test_stats <- union_tests_cpp(array(tests_i,
-                                          dim = c(1, length(dc) * length(detr_int), N)),
+      test_stats <- union_tests_cpp(array(tests_ind, dim = c(1, length(dc) * length(detr_int), N)),
                                     scaling)
     } else {
       test_stats_star <- union_test_cpp(t_star[, , 1], scaling)
-      test_stats <- union_test_cpp(array(tests_i,
+      test_stats <- union_test_cpp(array(tests_ind,
                                          dim = c(1, length(dc) * length(detr_int))), scaling)
     }
   } else {
+    pvals <- matrix(iADF_cpp(matrix(tests_ind, nrow = 1),
+                             matrix(t_star, nrow = B)), nrow = N, ncol = 1, byrow = TRUE)
     test_stats_star <- NULL
     test_stats <- NULL
   }
   out <- list("y" = data, "p_vec" = p_vec, "t_star" = t_star, "test_stats_star" = test_stats_star,
-              "tests_i" = tests_i, "param_i" = params_i,"test_stats" = test_stats,
+              "indiv_test_stats" = tests_ind, "indiv_par_est" = par_est_ind,
+              "indiv_pval" = pvals, "indiv_lags_stats" = lags_ind, "test_stats" = test_stats,
               "level" = level, "dc" = dc, "detr" = detr, "inputs" = list_inputs)
 
   return(out)

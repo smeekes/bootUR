@@ -150,15 +150,14 @@ BEGIN_RCPP
 END_RCPP
 }
 // iADF_cpp
-arma::mat iADF_cpp(const arma::mat& test_i, const arma::mat& t_star, const double& level);
-RcppExport SEXP _bootUR_iADF_cpp(SEXP test_iSEXP, SEXP t_starSEXP, SEXP levelSEXP) {
+arma::vec iADF_cpp(const arma::vec& test_i, const arma::mat& t_star);
+RcppExport SEXP _bootUR_iADF_cpp(SEXP test_iSEXP, SEXP t_starSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::mat& >::type test_i(test_iSEXP);
+    Rcpp::traits::input_parameter< const arma::vec& >::type test_i(test_iSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type t_star(t_starSEXP);
-    Rcpp::traits::input_parameter< const double& >::type level(levelSEXP);
-    rcpp_result_gen = Rcpp::wrap(iADF_cpp(test_i, t_star, level));
+    rcpp_result_gen = Rcpp::wrap(iADF_cpp(test_i, t_star));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -203,7 +202,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bootUR_union_tests_cpp", (DL_FUNC) &_bootUR_union_tests_cpp, 2},
     {"_bootUR_union_test_cpp", (DL_FUNC) &_bootUR_union_test_cpp, 2},
     {"_bootUR_BSQT_cpp", (DL_FUNC) &_bootUR_BSQT_cpp, 4},
-    {"_bootUR_iADF_cpp", (DL_FUNC) &_bootUR_iADF_cpp, 3},
+    {"_bootUR_iADF_cpp", (DL_FUNC) &_bootUR_iADF_cpp, 2},
     {"_bootUR_FDR_cpp", (DL_FUNC) &_bootUR_FDR_cpp, 3},
     {"_bootUR_adf_onestep_tests_panel_cpp", (DL_FUNC) &_bootUR_adf_onestep_tests_panel_cpp, 8},
     {NULL, NULL, 0}

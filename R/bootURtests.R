@@ -47,7 +47,7 @@
 #' \item{\code{statistic}}{The value(s) of the test statistic of the unit root test(s);}
 #' \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
 #' \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE}). This is only supplied when an optional significance level is given, otherwise \code{NULL} is returned;}
-#' \item{\code{details}}{For \code{"mult_htest"} only. The details of the performed tests in a matrix containing parameter estimate. test statistic and p-value for each time series.}
+#' \item{\code{details}}{A lost containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values.}
 #' \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on;}
 #' \item{\code{specifications}}{The specifications used in the test(s).}
 #' @section Warnings:
@@ -122,20 +122,60 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
 
   # Results
   if (union) { # Union test
-    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
-                        level = inputs$level)
-    iADFout <- cbind(rep(NA, nrow(iADFout)), iADFout)
+    iADFout <- iADF_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star)
+    iADFout <- cbind(rep(NA, nrow(iADFout)), t(inputs$test_stats), iADFout)
     if (NCOL(data) > 1) {
       rownames(iADFout) <- var_names
       colnames(iADFout) <- c("gamma", "tstat", "p-value")
     }
     # Parameter estimates, tstats and p-values. Note: Parameter Estimates not defined for union test
+
+    details <- list(indiv_param_est = t(inputs$indiv_par_est),
+                    indiv_test_stats = t(inputs$indiv_test_stats),
+                    indiv_pval = inputs$indiv_pval,
+                    indiv_lags = t(inputs$indiv_lags))
+    rownames(details$indiv_param_est) <- var_names
+    colnames(details$indiv_param_est) <- c(t(outer(c("OLS", "QD"),
+                                                   c("intercept", "intercept and trend"),
+                                                   function(x,y){paste0(x, "/", y)})))
+    rownames(details$indiv_test_stats) <- var_names
+    colnames(details$indiv_test_stats) <- c(t(outer(c("OLS", "QD"),
+                                                    c("intercept", "intercept and trend"),
+                                                    function(x,y){paste0(x, "/", y)})))
+    rownames(details$indiv_pval) <- var_names
+    colnames(details$indiv_pval) <- c(t(outer(c("OLS", "QD"),
+                                              c("intercept", "intercept and trend"),
+                                              function(x,y){paste0(x, "/", y)})))
+    rownames(details$indiv_lags) <- var_names
+    colnames(details$indiv_lags) <- c(t(outer(c("OLS", "QD"),
+                                              c("intercept", "intercept and trend"),
+                                              function(x,y){paste0(x, "/", y)})))
   } else { # No union test
-    iADFout <- iADF_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1),
-                        t_star = matrix(inputs$t_star[ , 1, ], nrow = B), level = inputs$level)
-    iADFout <- cbind(t(inputs$param_i), iADFout) # Parameter estimates, tstats and p-values
+    iADFout <- iADF_cpp(test_i = matrix(inputs$indiv_test_stats[1, ], nrow = 1),
+                        t_star = matrix(inputs$t_star[ , 1, ], nrow = B))
+    iADFout <- cbind(t(inputs$indiv_par_est), t(inputs$indiv_test_stats), iADFout)
+    # Parameter estimates, tstats and p-values
+
+    details <- list(indiv_param_est = t(inputs$indiv_par_est),
+                    indiv_test_stats = t(inputs$indiv_test_stats),
+                    indiv_pval = inputs$indiv_pval,
+                    indiv_lags = t(inputs$indiv_lags))
+    rownames(details$indiv_param_est) <- var_names
+    colnames(details$indiv_param_est) <- paste0(inputs$inputs$detrend, "/",
+                                                inputs$inputs$deterministics)
+    rownames(details$indiv_test_stats) <- var_names
+    colnames(details$indiv_test_stats) <- paste0(inputs$inputs$detrend, "/",
+                                                 inputs$inputs$deterministics)
+    rownames(details$indiv_pval) <- var_names
+    colnames(details$indiv_pval) <- paste0(inputs$inputs$detrend, "/",
+                                           inputs$inputs$deterministics)
+    rownames(details$indiv_lags) <- var_names
+    colnames(details$indiv_lags) <- paste0(inputs$inputs$detrend, "/",
+                                           inputs$inputs$deterministics)
+
     if (NCOL(data) > 1) {
       rownames(iADFout) <- var_names
+      colnames(iADFout) <- c("gamma", "statistic", "p.value")
       colnames(iADFout) <- c("gamma", "statistic", "p.value")
     }
   }
@@ -148,7 +188,8 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
 
   if (NCOL(data) > 1) {
     if (union) {
-      method_name <- paste(bootstrap, "Bootstrap Union test on each individual series (no multiple testing correction)")
+      method_name <- paste(bootstrap,
+                           "Bootstrap Union test on each individual series (no multiple testing correction)")
     } else {
       method_name <- paste(bootstrap, "Bootstrap", inputs$inputs$name,
                            " test ( with" , inputs$inputs$deterministics,
@@ -158,7 +199,7 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
                            null.value =  c("gamma" = 0), alternative = "less",
                            estimate = iADFout[, 1], statistic = iADFout[, 2],
                            p.value = iADFout[, 3], rejections = rej_H0,
-                           details = NULL, series.names = var_names , specifications = spec)
+                           details = details, series.names = var_names , specifications = spec)
     class(boot_ur_output) <- c("bootUR", "mult_htest")
 
 
@@ -180,7 +221,7 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
     boot_ur_output <- list(method = method_name, data.name = var_names,
                            null.value = c("gamma" = 0), alternative = "less",
                            estimate = param, statistic = iADFtstat, p.value = p_val,
-                           specifications = spec)
+                           details = details, specifications = spec)
     class(boot_ur_output) <- c("bootUR", "htest")
   }
 
