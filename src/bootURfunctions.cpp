@@ -965,7 +965,6 @@ adfvout adf_onestep_selectlags_cpp(const arma::vec& y, const int& pmin, const in
   const int p_opt = icvalue.index_min() + pmin;
   adfvout ADFp = adf_onestep_cpp(y, p_opt, dc, trim, 0);
   return ADFp;
-
 }
 
 adfmout adf_onestep_tests_parest_all_units_cpp(const arma::mat& y, const int& pmin,
@@ -976,7 +975,7 @@ adfmout adf_onestep_tests_parest_all_units_cpp(const arma::mat& y, const int& pm
   const int dclength = dc.size();
   const int N = y.n_cols;
   adfvout adf_OLS;
-  arma::mat OLS_p = zeros(N, dclength);
+  arma::mat OLS_p = zeros(dclength, N);
   arma::mat tests_OLS = zeros(dclength, N);
 
   arma::mat params_OLS = zeros(dclength, N);
@@ -986,13 +985,14 @@ adfmout adf_onestep_tests_parest_all_units_cpp(const arma::mat& y, const int& pm
       adf_OLS = adf_onestep_selectlags_cpp(y(span(range(0, iN), range(1, iN)), iN), pmin, pmax, ic_type, dc[idc], ic_scale, h_rs, 0, true);
       tests_OLS(idc, iN) = adf_OLS.tests(0);
       params_OLS(idc, iN) = adf_OLS.par(0);
-      OLS_p(iN, idc) = adf_OLS.par.n_elem - 1;
+      OLS_p(idc, iN) = adf_OLS.par.n_elem - 1;
     }
   }
 
   adfmout adf_tests_param;
   adf_tests_param.tests = tests_OLS;
   adf_tests_param.par = params_OLS;
+  adf_tests_param.lags = OLS_p;
 
   return adf_tests_param;
 }
@@ -1005,5 +1005,6 @@ Rcpp::List adf_onestep_tests_panel_cpp(const arma::mat& y, const int& pmin, cons
 
   return Rcpp::List::create(
     Rcpp::Named ("tests") = adf_out.tests,
-    Rcpp::Named ("par") = adf_out.par);
+    Rcpp::Named ("par") = adf_out.par,
+    Rcpp::Named ("lags") = adf_out.lags);
 }

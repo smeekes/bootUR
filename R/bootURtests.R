@@ -47,7 +47,7 @@
 #' \item{\code{statistic}}{The value(s) of the test statistic of the unit root test(s);}
 #' \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
 #' \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE}). This is only supplied when an optional significance level is given, otherwise \code{NULL} is returned;}
-#' \item{\code{details}}{A lost containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values.}
+#' \item{\code{details}}{A list containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values.}
 #' \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on;}
 #' \item{\code{specifications}}{The specifications used in the test(s).}
 #' @section Warnings:
@@ -118,7 +118,7 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
                "deterministics" = inputs$inputs$deterministics,
                "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
                "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
-               "criterion_scale" = inputs$inputs$criterion_scale)
+               "criterion_scale" = inputs$inputs$criterion_scale, "mult_test_ctrl" = "none")
 
   # Results
   if (union) { # Union test
@@ -130,48 +130,48 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
     }
     # Parameter estimates, tstats and p-values. Note: Parameter Estimates not defined for union test
 
-    details <- list(indiv_param_est = t(inputs$indiv_par_est),
-                    indiv_test_stats = t(inputs$indiv_test_stats),
-                    indiv_pval = inputs$indiv_pval,
-                    indiv_lags = t(inputs$indiv_lags))
-    rownames(details$indiv_param_est) <- var_names
-    colnames(details$indiv_param_est) <- c(t(outer(c("OLS", "QD"),
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
+                                                  c("intercept", "intercept and trend"),
+                                                  function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- c(t(outer(c("OLS", "QD"),
                                                    c("intercept", "intercept and trend"),
                                                    function(x,y){paste0(x, "/", y)})))
-    rownames(details$indiv_test_stats) <- var_names
-    colnames(details$indiv_test_stats) <- c(t(outer(c("OLS", "QD"),
-                                                    c("intercept", "intercept and trend"),
-                                                    function(x,y){paste0(x, "/", y)})))
-    rownames(details$indiv_pval) <- var_names
-    colnames(details$indiv_pval) <- c(t(outer(c("OLS", "QD"),
-                                              c("intercept", "intercept and trend"),
-                                              function(x,y){paste0(x, "/", y)})))
-    rownames(details$indiv_lags) <- var_names
-    colnames(details$indiv_lags) <- c(t(outer(c("OLS", "QD"),
-                                              c("intercept", "intercept and trend"),
-                                              function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- c(t(outer(c("OLS", "QD"),
+                                                 c("intercept", "intercept and trend"),
+                                                 function(x,y){paste0(x, "/", y)})))
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- c(t(outer(c("OLS", "QD"),
+                                           c("intercept", "intercept and trend"),
+                                           function(x,y){paste0(x, "/", y)})))
   } else { # No union test
     iADFout <- iADF_cpp(test_i = matrix(inputs$indiv_test_stats[1, ], nrow = 1),
                         t_star = matrix(inputs$t_star[ , 1, ], nrow = B))
     iADFout <- cbind(t(inputs$indiv_par_est), t(inputs$indiv_test_stats), iADFout)
     # Parameter estimates, tstats and p-values
 
-    details <- list(indiv_param_est = t(inputs$indiv_par_est),
-                    indiv_test_stats = t(inputs$indiv_test_stats),
-                    indiv_pval = inputs$indiv_pval,
-                    indiv_lags = t(inputs$indiv_lags))
-    rownames(details$indiv_param_est) <- var_names
-    colnames(details$indiv_param_est) <- paste0(inputs$inputs$detrend, "/",
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
+                                                       inputs$inputs$deterministics)
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- paste0(inputs$inputs$detrend, "/",
+                                                        inputs$inputs$deterministics)
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- paste0(inputs$inputs$detrend, "/",
+                                                      inputs$inputs$deterministics)
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- paste0(inputs$inputs$detrend, "/",
                                                 inputs$inputs$deterministics)
-    rownames(details$indiv_test_stats) <- var_names
-    colnames(details$indiv_test_stats) <- paste0(inputs$inputs$detrend, "/",
-                                                 inputs$inputs$deterministics)
-    rownames(details$indiv_pval) <- var_names
-    colnames(details$indiv_pval) <- paste0(inputs$inputs$detrend, "/",
-                                           inputs$inputs$deterministics)
-    rownames(details$indiv_lags) <- var_names
-    colnames(details$indiv_lags) <- paste0(inputs$inputs$detrend, "/",
-                                           inputs$inputs$deterministics)
 
     if (NCOL(data) > 1) {
       rownames(iADFout) <- var_names
@@ -188,12 +188,12 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
 
   if (NCOL(data) > 1) {
     if (union) {
-      method_name <- paste(bootstrap,
-                           "Bootstrap Union test on each individual series (no multiple testing correction)")
+      method_name <- paste0(bootstrap,
+                           " Bootstrap Union test on each individual series (no multiple testing correction)")
     } else {
-      method_name <- paste(bootstrap, "Bootstrap", inputs$inputs$name,
-                           " test ( with" , inputs$inputs$deterministics,
-                           ") on each individual series (no multiple testing correction)")
+      method_name <- paste0(bootstrap, "Bootstrap ", inputs$inputs$name,
+                            " test (with " , inputs$inputs$deterministics,
+                            ") on each individual series (no multiple testing correction)")
     }
     boot_ur_output <- list(method = method_name, data.name = data_name,
                            null.value =  c("gamma" = 0), alternative = "less",
@@ -254,6 +254,7 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
 #' \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
 #' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
 #' \item{\code{p.value}}{The p-value of the unit root test;}
+#' \item{\code{details}}{A list containing the detailed outcomes of the performed test, such as selected lags, individual estimates and p-values.}
 #' \item{\code{specifications}}{The specifications used in the test.}
 #' @section Errors and warnings:
 #' \describe{
@@ -333,6 +334,7 @@ boot_adf <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
 #' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
 #' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
 #' \item{\code{p.value}}{The p-value of the unit root test;}
+#' \item{\code{details}}{A list containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values.}
 #' \item{\code{specifications}}{The specifications used in the test.}
 #' @section Errors and warnings:
 #' \describe{
@@ -401,7 +403,7 @@ boot_union <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, bloc
 #' \item{\code{statistic}}{The value of the test statistic of the unit root tests;}
 #' \item{\code{p.value}}{A vector with \code{NA} values, as p-values are not available for the FDR method;}
 #' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the test statistics and critical value, up to non-rejection.}
+#' \item{\code{details}}{A list containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values. In addtion, the slot \code{FDR} contains a matrix with for each step the test statistics and critical value, up to non-rejection.}
 #' \item{\code{series.names}}{The names of the series that the tests are performed on;}
 #' \item{\code{specifications}}{The specifications used in the test(s).}
 #' @section Errors and warnings:
@@ -471,21 +473,57 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
                "deterministics" = inputs$inputs$deterministics,
                "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
                "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
-               "criterion_scale" = inputs$inputs$criterion_scale)
+               "criterion_scale" = inputs$inputs$criterion_scale, "mult_test_ctrl" = "FDR")
 
   if (union) { # Union Tests
     bFDRout <- FDR_cpp(test_i = inputs$test_stats, t_star = inputs$test_stats_star,
                        level = inputs$level)
     estimates <- rep(NA, NCOL(data))
     tstats <- drop(inputs$test_stats)
-    method_name <- paste(bootstrap, "Bootstrap Union test with False Discovery Rate control")
+    method_name <- paste0(bootstrap, " Bootstrap Union test with False Discovery Rate control")
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
+                                                  c("intercept", "intercept and trend"),
+                                                  function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- c(t(outer(c("OLS", "QD"),
+                                                   c("intercept", "intercept and trend"),
+                                                   function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- c(t(outer(c("OLS", "QD"),
+                                                 c("intercept", "intercept and trend"),
+                                                 function(x,y){paste0(x, "/", y)})))
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- c(t(outer(c("OLS", "QD"),
+                                           c("intercept", "intercept and trend"),
+                                           function(x,y){paste0(x, "/", y)})))
   } else { # No Union Tests
-      bFDRout <- FDR_cpp(test_i = matrix(inputs$tests_i[1, ], nrow = 1),
-                         t_star = inputs$t_star[ , 1,], level = inputs$level)
-      estimates <- t(inputs$param_i)
-      tstats <- drop(inputs$tests_i[1, ])
-      method_name <- paste(bootstrap, "Bootstrap", inputs$inputs$name, " tests ( with" ,
-                           inputs$inputs$deterministics, ") with False Discovery Rate control")
+    bFDRout <- FDR_cpp(test_i = matrix(inputs$indiv_test_stats[1, ], nrow = 1),
+                       t_star = inputs$t_star[ , 1,], level = inputs$level)
+    estimates <- t(inputs$indiv_par_est)
+    tstats <- drop(inputs$tests_i[1, ])
+    method_name <- paste0(bootstrap, "Bootstrap ", inputs$inputs$name, " tests (with " ,
+                          inputs$inputs$deterministics, ") with False Discovery Rate control")
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
+                                                       inputs$inputs$deterministics)
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- paste0(inputs$inputs$detrend, "/",
+                                                        inputs$inputs$deterministics)
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- paste0(inputs$inputs$detrend, "/",
+                                                      inputs$inputs$deterministics)
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- paste0(inputs$inputs$detrend, "/",
+                                                inputs$inputs$deterministics)
   }
   rej_H0 <- matrix(bFDRout$rej_H0 == 1, nrow = NCOL(data))
   rownames(rej_H0) <- var_names
@@ -495,11 +533,12 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
   colnames(FDR_seq) <- c("tstat", "critical value")
   p_vals <- rep(NA, NCOL(data))
   names(estimates) <- names(tstats) <- names(p_vals) <- var_names
+  details$FDR <- FDR_seq
 
   fdr_output <- list(method = method_name, data.name = data_name,
                      null.value =  c("gamma" = 0), alternative = "less",
                      estimate = estimates, statistic = tstats, p.value = p_vals,
-                     rejections = rej_H0, details = FDR_seq, series.names = var_names,
+                     rejections = rej_H0, details = details, series.names = var_names,
                      specifications = spec)
   class(fdr_output) <- c("bootUR", "mult_htest")
 
@@ -526,7 +565,7 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
 #' \item{\code{statistic}}{The value of the test statistic of the unit root tests;}
 #' \item{\code{p.value}}{A vector with \code{NA} values, as p-values per inidividual series are not available.The p-value for each test in the sequence can be found in \code{details};}
 #' \item{\code{rejections}}{A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE});}
-#' \item{\code{details}}{The details of the performed tests in a matrix containing for each step the stationary units undr the null and alternative hypothesis, the test statistic and the p-value;}
+#' \item{\code{details}}{A list containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values. In addtion, the slot \code{FDR} contains a matrix with for each step the stationary units under the null and alternative hypothesis, the test statistic and the p-value;}
 #' \item{\code{series.names}}{The names of the series that the tests are performed on;}
 #' \item{\code{specifications}}{The specifications used in the tests.}
 #' @section Errors and warnings:
@@ -597,23 +636,61 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
                "deterministics" = inputs$inputs$deterministics,
                "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
                "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
-               "criterion_scale" = inputs$inputs$criterion_scale)
+               "criterion_scale" = inputs$inputs$criterion_scale, "mult_test_ctrl" = "SQT")
 
   if (union) { # Union Tests
     BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = inputs$test_stats,
                         t_star = inputs$test_stats_star, level = inputs$level)
     estimates <- rep(NA, NCOL(data))
     tstats <- drop(inputs$test_stats)
-    method_name <- paste(bootstrap, "Bootstrap Sequential Quantile Union test")
-  } else { # No Union Tests
-    BSQTout <- BSQT_cpp(pvec = inputs$p_vec, test_i = matrix(inputs$tests_i[1, ], nrow = 1),
-                        t_star = inputs$t_star[ , 1,], level = inputs$level)
-    estimates <- t(inputs$param_i)
-    tstats <- drop(inputs$tests_i[1, ])
-    method_name <- paste(bootstrap, "Bootstrap Sequential Quantile",
-                         inputs$inputs$name, " test ( with" ,
-                         inputs$inputs$deterministics,")")
+    method_name <- paste0(bootstrap, " Bootstrap Sequential Quantile Union test")
 
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
+                                                  c("intercept", "intercept and trend"),
+                                                  function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- c(t(outer(c("OLS", "QD"),
+                                                   c("intercept", "intercept and trend"),
+                                                   function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- c(t(outer(c("OLS", "QD"),
+                                                 c("intercept", "intercept and trend"),
+                                                 function(x,y){paste0(x, "/", y)})))
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- c(t(outer(c("OLS", "QD"),
+                                           c("intercept", "intercept and trend"),
+                                           function(x,y){paste0(x, "/", y)})))
+  } else { # No Union Tests
+    BSQTout <- BSQT_cpp(pvec = inputs$p_vec,
+                        test_i = matrix(inputs$indiv_test_stats[1, ], nrow = 1),
+                        t_star = inputs$t_star[ , 1,], level = inputs$level)
+    estimates <- t(inputs$indiv_par_est)
+    tstats <- drop(inputs$indiv_test_stats)
+    method_name <- paste0(bootstrap, "Bootstrap Sequential Quantile ",
+                          inputs$inputs$name, " test (with " ,
+                          inputs$inputs$deterministics,")")
+
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
+                                                       inputs$inputs$deterministics)
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- paste0(inputs$inputs$detrend, "/",
+                                                        inputs$inputs$deterministics)
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- paste0(inputs$inputs$detrend, "/",
+                                                      inputs$inputs$deterministics)
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- paste0(inputs$inputs$detrend, "/",
+                                                inputs$inputs$deterministics)
   }
   rej_H0 <- matrix(BSQTout$rej_H0 == 1, nrow = NCOL(data))
   rownames(rej_H0) <- var_names
@@ -623,11 +700,12 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
   colnames(BSQT_seq) <- c("H0: # I(0)", "H1: # I(0)", "tstat", "p-value")
   p_vals <- rep(NA, NCOL(data))
   names(estimates) <- names(tstats) <- names(p_vals) <- var_names
+  details$SQT <- BSQT_seq
 
   sqt_output <- list(method = method_name, data.name = data_name,
                      null.value =  c("gamma" = 0), alternative = "less",
                      estimate = estimates, statistic = tstats, p.value = p_vals,
-                     rejections = rej_H0, details = BSQT_seq, series.names = var_names,
+                     rejections = rej_H0, details = details, series.names = var_names,
                      specifications = spec)
   class(sqt_output) <- c("bootUR", "mult_htest")
   return(sqt_output)
@@ -646,6 +724,7 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
 #' \item{\code{estimate}}{For the union test, the estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression is not defined, hence NA is given;}
 #' \item{\code{statistic}}{The value of the test statistic of the unit root test;}
 #' \item{\code{p.value}}{The p-value of the unit root test;}
+#' \item{\code{details}}{A list containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values.}
 #' \item{\code{specifications}}{The specifications used in the test.}
 #' @section Errors and warnings:
 #' \describe{
@@ -697,26 +776,73 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
   if (is.null(data_name)) {
     data_name <- deparse(substitute(data))
   }
+  if (!is.null(colnames(data))) {
+    var_names <- colnames(data)
+  } else {
+    if (NCOL(data) > 1) {
+      var_names <- paste0(data_name, " var", 1:NCOL(data))
+    } else {
+      var_names <- data_name
+    }
+  }
 
   spec <- list("bootstrap" = bootstrap, "B" = B, "block_length" = inputs$inputs$l,
-               "ar_AWB" = inputs$inputs$ar_AWB,"union" = union,
+               "ar_AWB" = inputs$inputs$ar_AWB, "union" = union,
                "union_quantile" = inputs$inputs$union_quantile,
                "deterministics" = inputs$inputs$deterministics,
                "detrend" = inputs$inputs$detrend, "min_lag" = min_lag,
                "max_lag" = inputs$inputs$p_max, "criterion" = inputs$inputs$criterion,
-               "criterion_scale" = inputs$inputs$criterion_scale)
+               "criterion_scale" = inputs$inputs$criterion_scale, "mult_test_ctrl" = "none")
 
   if (union) { # Union Test
     GM_test <- mean(inputs$test_stats)
     t_star <- rowMeans(inputs$test_stats_star)
     p_val <- mean(t_star < GM_test)
-    method_name <- paste("Panel", bootstrap, "Bootstrap Group-Mean Union test")
+    method_name <- paste0("Panel ", bootstrap, " Bootstrap Group-Mean Union test")
+
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
+                                                  c("intercept", "intercept and trend"),
+                                                  function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- c(t(outer(c("OLS", "QD"),
+                                                   c("intercept", "intercept and trend"),
+                                                   function(x,y){paste0(x, "/", y)})))
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- c(t(outer(c("OLS", "QD"),
+                                                 c("intercept", "intercept and trend"),
+                                                 function(x,y){paste0(x, "/", y)})))
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- c(t(outer(c("OLS", "QD"),
+                                           c("intercept", "intercept and trend"),
+                                           function(x,y){paste0(x, "/", y)})))
   } else { # No Union Test
     GM_test <- rowMeans(inputs$tests_i)
     t_star <- apply(inputs$t_star, 1:2, mean)
     p_val <- sapply(1, function(i){mean(t_star[, i] < GM_test[i])})
-    method_name <- paste("Panel", bootstrap, "Bootstrap Group-Mean", inputs$inputs$name,
-                         " test ( with" , inputs$inputs$deterministics,")")
+    method_name <- paste0("Panel" , bootstrap, " Bootstrap Group-Mean ", inputs$inputs$name,
+                          " test (with " , inputs$inputs$deterministics,")")
+
+    details <- list("individual estimates" = t(inputs$indiv_par_est),
+                    "individual statistics" = t(inputs$indiv_test_stats),
+                    "individual p-values" = inputs$indiv_pval,
+                    "selected lags" = t(inputs$indiv_lags))
+    rownames(details$"individual estimates") <- var_names
+    colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
+                                                inputs$inputs$deterministics)
+    rownames(details$"individual statistics") <- var_names
+    colnames(details$"individual statistics") <- paste0(inputs$inputs$detrend, "/",
+                                                 inputs$inputs$deterministics)
+    rownames(details$"individual p-values") <- var_names
+    colnames(details$"individual p-values") <- paste0(inputs$inputs$detrend, "/",
+                                           inputs$inputs$deterministics)
+    rownames(details$"selected lags") <- var_names
+    colnames(details$"selected lags") <- paste0(inputs$inputs$detrend, "/",
+                                           inputs$inputs$deterministics)
   }
 
   attr(GM_test, "names") <- "tstat"
@@ -726,7 +852,7 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
   panel_output <- list(method = method_name, data.name = data_name,
                        null.value = c("gamma" = 0), alternative = "less",
                        estimate = gamma_hat, statistic = GM_test, p.value = p_val,
-                       specifications = spec)
+                       details = details, specifications = spec)
   class(panel_output) <- c("bootUR", "htest")
   return(panel_output)
 }

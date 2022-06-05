@@ -165,7 +165,6 @@ The bootstrap method for controlling FDR was introduced by Romano, Shaikh and Wo
 
 We illustrate it here with the final available bootstrap method, the block wild bootstrap of Shao (2011) and Smeekes and Urbain (2014a).
 ```{r bFDR}
-N <- ncol(MacroTS)
 boot_fdr(MacroTS[, 1:10], FDR_level = 0.1, bootstrap = "BWB", B = 399, do_parallel = FALSE)
 ```
 

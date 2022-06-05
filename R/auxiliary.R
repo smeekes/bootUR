@@ -387,7 +387,7 @@ print.mult_htest <- function(x, digits = max(3, getOption("digits") - 3), ...){
     }
   }
   cat("\n")
-  if (is.null(x$details)) {
+  if (x$specifications$mult_test_ctrl == "none") {
     N <- NROW(x$statistic)
     out_matrix <- matrix(nrow = N, ncol = 3)
     colnames(out_matrix) <- c("estimate", "statistic", "p-value")
@@ -411,7 +411,7 @@ print.mult_htest <- function(x, digits = max(3, getOption("digits") - 3), ...){
     print(out_matrix, digits = digits, ...)
   } else {
     cat("Sequence of tests:", "\n")
-    print(x$details, digits = digits, ...)
+    print(x$details[[x$specifications$mult_test_ctrl]], digits = digits, ...)
   }
   cat("\n")
   invisible(x)
