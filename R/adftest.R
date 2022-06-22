@@ -96,9 +96,7 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
   attr(tstat, "names") <- "tstat"
   param <- c(tests_and_params$par) # Parameter estimates
   attr(param, "names") <- "gamma"
-
-  details <- list("selected lags" = drop(tests_and_params$lags))
-
+  
   switch(deterministics,
          "trend" = urtype <- "ct",
          "intercept" = urtype <- "c",
@@ -119,6 +117,12 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
     method_name <- paste0("One-step ADF test (with " , deterministics,") on a single time series")
   }
 
+  
+  details <- list("individual estimates" = drop(param),
+                  "individual statistics" = tstat,
+                  "individual p-values" = p_val,
+                  "selected lags" = drop(tests_and_params$lags))
+  
   adf_out <- list(method = method_name, data.name = data_name,
                   null.value = c("gamma" = 0), alternative = "less",
                   estimate = drop(param), statistic = tstat, p.value = p_val,
