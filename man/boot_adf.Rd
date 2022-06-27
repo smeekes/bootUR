@@ -66,6 +66,7 @@ An object of class \code{"bootUR"}, \code{"htest"} with the following components
 \item{\code{estimate}}{The estimated value of the (gamma) parameter of the lagged dependent variable in the ADF regression.;}
 \item{\code{statistic}}{The value of the test statistic of the unit root test;}
 \item{\code{p.value}}{The p-value of the unit root test;}
+\item{\code{details}}{A list containing the detailed outcomes of the performed test, such as selected lags, individual estimates and p-values.}
 \item{\code{specifications}}{The specifications used in the test.}
 }
 \description{

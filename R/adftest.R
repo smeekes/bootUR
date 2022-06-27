@@ -97,8 +97,6 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
   param <- c(tests_and_params$par) # Parameter estimates
   attr(param, "names") <- "gamma"
 
-  details <- list("selected lags" = drop(tests_and_params$lags))
-
   switch(deterministics,
          "trend" = urtype <- "ct",
          "intercept" = urtype <- "c",
@@ -106,6 +104,13 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
   p_val <- drop(urca::punitroot(q = tstat, N = max(TT - max_lag - 1, 20),
                                 trend = urtype, statistic = "t"))
   attr(p_val, "names") <- "p-value"
+
+  details <- list("individual estimates" = param,
+                  "individual statistics" = tstat,
+                  "individual p-values" = p_val,
+                  "selected lags" = drop(tests_and_params$lags),
+                  "txt_null" = "Series has a unit root",
+                  "txt_alternative" = "Series is stationary")
 
   spec <- list("deterministics" = deterministics, "min_lag" = min_lag, "max_lag" = max_lag,
                "criterion" = criterion, "criterion_scale" = criterion_scale, "two_step" = two_step)
@@ -122,7 +127,7 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
   adf_out <- list(method = method_name, data.name = data_name,
                   null.value = c("gamma" = 0), alternative = "less",
                   estimate = drop(param), statistic = tstat, p.value = p_val,
-                  details = details, specifications = spec)
+                  details = details, series.names = data_name, specifications = spec)
   class(adf_out) <- c("bootUR", "htest")
 
   return(adf_out)

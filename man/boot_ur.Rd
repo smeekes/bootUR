@@ -74,7 +74,7 @@ An object of class \code{"bootUR"}, \code{"\*"}, where \code{"\*"} is \code{"mul
 \item{\code{statistic}}{The value(s) of the test statistic of the unit root test(s);}
 \item{\code{p.value}}{The p-value(s) of the unit root test(s);}
 \item{\code{rejections}}{For \code{"mult_htest"} only. A vector with logical indicators for each time series whether the null hypothesis of a unit root is rejected (\code{TRUE}) or not (\code{FALSE}). This is only supplied when an optional significance level is given, otherwise \code{NULL} is returned;}
-\item{\code{details}}{A lost containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values.}
+\item{\code{details}}{A list containing the detailed outcomes of the performed tests, such as selected lags, individual estimates and p-values.}
 \item{\code{series.names}}{For \code{"mult_htest"} only. The names of the series that the tests are performed on;}
 \item{\code{specifications}}{The specifications used in the test(s).}
 }

@@ -416,3 +416,87 @@ print.mult_htest <- function(x, digits = max(3, getOption("digits") - 3), ...){
   cat("\n")
   invisible(x)
 }
+
+#' Printing Summary Output for Objects of class bootUR
+#' @description This function prints summary output for objects of class bootUR (for unit root testing)
+#' @export
+#' @keywords internal
+print.bootUR <- function(x, digits = max(3, getOption("digits") - 3), ...){
+  cat("\n")
+  cat(strwrap(x$method, prefix = "\t"), sep = "\n")
+  cat("\n")
+  cat("data: ", x$data.name, "\n", sep = "")
+  N <- NROW(x$statistic)
+
+  if (!is.null(x$details$txt_null)) {
+    cat("null hypothesis: ")
+    cat(x$details$txt_null, "\n", sep = "")
+  }
+  if (!is.null(x$details$txt_alternative)) {
+    cat("alternative hypothesis: ")
+    cat(x$details$txt_alternative, "\n", sep = "")
+  } else if (!is.null(x$alternative)) {
+    cat("alternative hypothesis: ")
+    if (!is.null(x$null.value)) {
+      alt.char <- switch(x$alternative,
+                         two.sided = "not equal to",
+                         less = "less than",
+                         greater = "greater than")
+      cat("true ", names(x$null.value), " is ", alt.char, " ", x$null.value, "\n", sep = "")
+    } else {
+      cat(x$alternative, "\n", sep = "")
+    }
+  }
+  cat("\n")
+  if ("mult_test_ctrl" %in% names(x$specifications)) {
+    if (x$specifications$mult_test_ctrl == "none") {
+      out_matrix <- matrix(nrow = N, ncol = 3)
+      colnames(out_matrix) <- c("estimate largest root", "statistic", "p-value")
+      rownames(out_matrix) <- x$series.names
+      if (!is.null(x$estimate)) {
+        out_matrix[, 1] <- x$estimate + 1
+      } else{
+        out_matrix[, 1] <- NA
+      }
+      if (!is.null(x$statistic)) {
+        out_matrix[, 2] <- x$statistic
+      } else{
+        out_matrix[, 2] <- NA
+      }
+      if (!is.null(x$p.value)) {
+        out_matrix[, 3] <- x$p.value
+      } else{
+        out_matrix[, 3] <- NA
+      }
+      if (N > 1) {
+        cat("Tests performed on each series:", "\n")
+      }
+      print(out_matrix, digits = digits, ...)
+    } else {
+      cat("Sequence of tests:", "\n")
+      print(x$details[[x$specifications$mult_test_ctrl]], digits = digits, ...)
+    }
+  } else {
+    out_matrix <- matrix(nrow = N, ncol = 3)
+    colnames(out_matrix) <- c("estimate largest root", "statistic", "p-value")
+    rownames(out_matrix) <- x$series.names
+    if (!is.null(x$estimate)) {
+      out_matrix[, 1] <- x$estimate + 1
+    } else{
+      out_matrix[, 1] <- NA
+    }
+    if (!is.null(x$statistic)) {
+      out_matrix[, 2] <- x$statistic
+    } else{
+      out_matrix[, 2] <- NA
+    }
+    if (!is.null(x$p.value)) {
+      out_matrix[, 3] <- x$p.value
+    } else{
+      out_matrix[, 3] <- NA
+    }
+    print(out_matrix, digits = digits, ...)
+  }
+  cat("\n")
+  invisible(x)
+}

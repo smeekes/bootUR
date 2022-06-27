@@ -133,7 +133,9 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "Series has a unit root",
+                    "txt_alternative" = "Series is stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
                                                   c("intercept", "intercept and trend"),
@@ -159,7 +161,9 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "Series has a unit root",
+                    "txt_alternative" = "Series is stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
                                                        inputs$inputs$deterministics)
@@ -189,9 +193,9 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
   if (NCOL(data) > 1) {
     if (union) {
       method_name <- paste0(bootstrap,
-                           " Bootstrap Union test on each individual series (no multiple testing correction)")
+                           " bootstrap union test on each individual series (no multiple testing correction)")
     } else {
-      method_name <- paste0(bootstrap, "Bootstrap ", inputs$inputs$name,
+      method_name <- paste0(bootstrap, " bootstrap ", inputs$inputs$name,
                             " test (with " , inputs$inputs$deterministics,
                             ") on each individual series (no multiple testing correction)")
     }
@@ -199,7 +203,7 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
                            null.value =  c("gamma" = 0), alternative = "less",
                            estimate = iADFout[, 1], statistic = iADFout[, 2],
                            p.value = iADFout[, 3], rejections = rej_H0,
-                           details = details, series.names = var_names , specifications = spec)
+                           details = details, series.names = var_names, specifications = spec)
     class(boot_ur_output) <- c("bootUR", "mult_htest")
 
 
@@ -212,16 +216,16 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
     attr(p_val, "names") <- "p-value"
 
     if (union) {
-      method_name <- paste(bootstrap, "Bootstrap Union test on a single time series")
+      method_name <- paste0(bootstrap, " bootstrap union test on a single time series")
     } else {
-      method_name <- paste(bootstrap, "Bootstrap", inputs$inputs$detrend,
-                           " test ( with" , inputs$inputs$deterministics,
+      method_name <- paste0(bootstrap, " bootstrap ", inputs$inputs$detrend,
+                           " test (with " , inputs$inputs$deterministics,
                            ") on a single time series")
     }
     boot_ur_output <- list(method = method_name, data.name = var_names,
                            null.value = c("gamma" = 0), alternative = "less",
                            estimate = param, statistic = iADFtstat, p.value = p_val,
-                           details = details, specifications = spec)
+                           details = details, series.names = var_names, specifications = spec)
     class(boot_ur_output) <- c("bootUR", "htest")
   }
 
@@ -480,11 +484,13 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
                        level = inputs$level)
     estimates <- rep(NA, NCOL(data))
     tstats <- drop(inputs$test_stats)
-    method_name <- paste0(bootstrap, " Bootstrap Union test with False Discovery Rate control")
+    method_name <- paste0(bootstrap, " bootstrap union test with false discovery rate control")
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "Series has a unit root",
+                    "txt_alternative" = "Series is stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
                                                   c("intercept", "intercept and trend"),
@@ -506,12 +512,14 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
                        t_star = inputs$t_star[ , 1,], level = inputs$level)
     estimates <- t(inputs$indiv_par_est)
     tstats <- drop(inputs$tests_i[1, ])
-    method_name <- paste0(bootstrap, "Bootstrap ", inputs$inputs$name, " tests (with " ,
-                          inputs$inputs$deterministics, ") with False Discovery Rate control")
+    method_name <- paste0(bootstrap, " bootstrap ", inputs$inputs$name, " tests (with " ,
+                          inputs$inputs$deterministics, ") with false discovery rate control")
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "Series has a unit root",
+                    "txt_alternative" = "Series is stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
                                                        inputs$inputs$deterministics)
@@ -643,12 +651,14 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
                         t_star = inputs$test_stats_star, level = inputs$level)
     estimates <- rep(NA, NCOL(data))
     tstats <- drop(inputs$test_stats)
-    method_name <- paste0(bootstrap, " Bootstrap Sequential Quantile Union test")
+    method_name <- paste0(bootstrap, " bootstrap sequential quantile union test")
 
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "Series has a unit root",
+                    "txt_alternative" = "Series is stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
                                                   c("intercept", "intercept and trend"),
@@ -671,14 +681,16 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
                         t_star = inputs$t_star[ , 1,], level = inputs$level)
     estimates <- t(inputs$indiv_par_est)
     tstats <- drop(inputs$indiv_test_stats)
-    method_name <- paste0(bootstrap, "Bootstrap Sequential Quantile ",
+    method_name <- paste0(bootstrap, " bootstrap sequential quantile ",
                           inputs$inputs$name, " test (with " ,
                           inputs$inputs$deterministics,")")
 
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "Series has a unit root",
+                    "txt_alternative" = "Series is stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
                                                        inputs$inputs$deterministics)
@@ -798,12 +810,14 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
     GM_test <- mean(inputs$test_stats)
     t_star <- rowMeans(inputs$test_stats_star)
     p_val <- mean(t_star < GM_test)
-    method_name <- paste0("Panel ", bootstrap, " Bootstrap Group-Mean Union test")
+    method_name <- paste0("Panel ", bootstrap, " bootstrap group-mean union test")
 
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "All series have a unit root",
+                    "txt_alternative" = "Some series are stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- c(t(outer(c("OLS", "QD"),
                                                   c("intercept", "intercept and trend"),
@@ -824,13 +838,15 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
     GM_test <- rowMeans(inputs$tests_i)
     t_star <- apply(inputs$t_star, 1:2, mean)
     p_val <- sapply(1, function(i){mean(t_star[, i] < GM_test[i])})
-    method_name <- paste0("Panel" , bootstrap, " Bootstrap Group-Mean ", inputs$inputs$name,
+    method_name <- paste0("Panel" , bootstrap, " bootstrap group-mean ", inputs$inputs$name,
                           " test (with " , inputs$inputs$deterministics,")")
 
     details <- list("individual estimates" = t(inputs$indiv_par_est),
                     "individual statistics" = t(inputs$indiv_test_stats),
                     "individual p-values" = inputs$indiv_pval,
-                    "selected lags" = t(inputs$indiv_lags))
+                    "selected lags" = t(inputs$indiv_lags),
+                    "txt_null" = "All series have a unit root",
+                    "txt_alternative" = "Some series are stationary")
     rownames(details$"individual estimates") <- var_names
     colnames(details$"individual estimates") <- paste0(inputs$inputs$detrend, "/",
                                                 inputs$inputs$deterministics)
@@ -852,7 +868,7 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
   panel_output <- list(method = method_name, data.name = data_name,
                        null.value = c("gamma" = 0), alternative = "less",
                        estimate = gamma_hat, statistic = GM_test, p.value = p_val,
-                       details = details, specifications = spec)
+                       details = details, series.names = data_name, specifications = spec)
   class(panel_output) <- c("bootUR", "htest")
   return(panel_output)
 }

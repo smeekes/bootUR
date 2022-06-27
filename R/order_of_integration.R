@@ -118,14 +118,6 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
           return(adf(x, ...)$p.value < level)
         })
         out <- list("rejections" = rejections)
-      } else if (method == "iADFtest") {
-      stop("'iADFtest' is deprecated. Use 'boot_ur' instead.")
-    } else if (method == "bFDRtest" & N > 1) {
-      stop("'bFDRtest' is deprecated. Use 'boot_fdr' instead.")
-    } else if (method == "BSQTtest" & N > 1) {
-      stop("'BSQTtest' is deprecated. Use 'boot_sqt' instead.")
-    } else if (method == "boot_df" & N == 1) {
-      stop("'boot_df' is deprecated. Use 'boot_adf' instead.")
     } else {
       stop("Invalid 'method' argument.")
     }
@@ -269,7 +261,7 @@ find_nonmissing_subsample <- function(X) {
 #' @param legend_size Size of the text in the legend if \code{show_legend = TRUE}. Default takes \code{ggplot2} defaults.
 #' @param cols Vector with colours for displaying the different types of data. If the default is overwritten, four colours must be supplied.
 #' @export
-#' @details The function distinguish four types of data: observed data (non-missing) and three missing types. Type \code{"Balanced NA"} indicates where entire rows are missing (\code{NA}). These do not cause unbalancedness as the missing rows can simply be deleted.  Type \code{"Unalanced NA"} are missing values on the beginning or end of the sample, which cause unbalancedness. These affect some (but not all) bootstrap methods, see e.g.~\code{\link{bFDRtest}}. Type \code{"Internal NA"} are missing values inside the sample, which need to be removed before the bootstrap unit root tests can be used.
+#' @details The function distinguish four types of data: observed data (non-missing) and three missing types. Type \code{"Balanced NA"} indicates where entire rows are missing (\code{NA}). These do not cause unbalancedness as the missing rows can simply be deleted.  Type \code{"Unbalanced NA"} are missing values on the beginning or end of the sample, which cause unbalancedness. These affect some (but not all) bootstrap methods, see e.g.~\code{\link{boot_fdr}}. Type \code{"Internal NA"} are missing values inside the sample, which need to be removed before the bootstrap unit root tests can be used.
 #'
 #' This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 #' @return A \code{ggplot2} object containing the missing values plot.
