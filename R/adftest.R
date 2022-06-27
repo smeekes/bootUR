@@ -114,6 +114,13 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
   spec <- list("deterministics" = deterministics, "min_lag" = min_lag, "max_lag" = max_lag,
                "criterion" = criterion, "criterion_scale" = criterion_scale, "two_step" = two_step)
 
+  if(two_step){
+    method_name <- paste0("Two-step ADF test (with " , deterministics,") on a single time series")
+  }else{
+    method_name <- paste0("One-step ADF test (with " , deterministics,") on a single time series")
+  }
+  
+  
   adf_out <- list(method = method_name, data.name = data_name,
                   null.value = c("gamma" = 0), alternative = "less",
                   estimate = drop(param), statistic = tstat, p.value = p_val,
