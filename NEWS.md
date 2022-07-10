@@ -1,3 +1,13 @@
+## Version 0.5.0
+
+### New Functionality
+* Output slots added that store the details of the tests such as individual test 
+statistics and selected lag lengths.
+* Removed the deprecated test names.
+
+### Bug Fixes
+* Fixed th error in order_of_integration() with boot_ur() test applied to single time series.
+
 ## Version 0.4.2
 
 ### New Functionality
