@@ -835,7 +835,7 @@ boot_panel <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999,
                                            c("intercept", "intercept and trend"),
                                            function(x,y){paste0(x, "/", y)})))
   } else { # No Union Test
-    GM_test <- rowMeans(inputs$tests_i)
+    GM_test <- rowMeans(inputs$indiv_test_stats)
     t_star <- apply(inputs$t_star, 1:2, mean)
     p_val <- sapply(1, function(i){mean(t_star[, i] < GM_test[i])})
     method_name <- paste0("Panel" , bootstrap, " bootstrap group-mean ", inputs$inputs$name,

@@ -1,3 +1,8 @@
+## Version 0.5.0.999
+
+### Bug Fixes
+* Fixed the error in boot_panel() when not performing union.
+
 ## Version 0.5.0
 
 ### New Functionality
@@ -6,7 +11,7 @@ statistics and selected lag lengths.
 * Removed the deprecated test names.
 
 ### Bug Fixes
-* Fixed th error in order_of_integration() with boot_ur() test applied to single time series.
+* Fixed the error in order_of_integration() with boot_ur() test applied to single time series.
 
 ## Version 0.4.2
 
