@@ -19,3 +19,6 @@ The appropriately differenced data in the same format as the original data.
 \description{
 Performs differencing of multiple time series, with possibly different orders for each time series.
 }
+\references{
+Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
+}

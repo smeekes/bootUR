@@ -31,3 +31,6 @@ The function distinguish four types of data: observed data (non-missing) and thr
 
 This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 }
+\references{
+Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
+}

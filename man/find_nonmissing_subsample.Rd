@@ -17,3 +17,6 @@ A list with the following components
 \description{
 Find Non-Missing Subsamples
 }
+\references{
+Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
+}

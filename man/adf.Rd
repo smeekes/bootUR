@@ -63,3 +63,6 @@ Lag length selection is done automatically in the ADF regression with the specif
 # standard ADF test on GDP_BE
 GDP_BE_adf <- adf(MacroTS[, 1], deterministics = "trend")
 }
+\references{
+Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
+}

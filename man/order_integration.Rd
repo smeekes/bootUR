@@ -43,5 +43,7 @@ orders_tseries <- order_integration(MacroTS[, 1:2], method = "boot_ur", B = 199,
 do_parallel = FALSE, show_progress = FALSE)
 }
 \references{
+Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
+
 Smeekes, S. and Wijler, E. (2020). Unit roots and cointegration. In P. Fuleky (Ed.) \emph{Macroeconomic Forecasting in the Era of Big Data}, Chapter 17, pp. 541-584. \emph{Advanced Studies in Theoretical and Applied Econometrics}, vol. 52. Springer.
 }

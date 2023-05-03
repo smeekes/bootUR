@@ -1,4 +1,7 @@
-## Version 0.5.0.999
+## Version 1.0.0
+
+### New Functionality
+* Updated citation and references to incorporate Journal of Statistical Software publication.
 
 ### Bug Fixes
 * Fixed the error in boot_panel() when not performing union.

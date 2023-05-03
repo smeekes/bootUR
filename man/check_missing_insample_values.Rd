@@ -15,3 +15,6 @@ check_missing_insample_values(X)
 \description{
 Check Missing Values in Sample
 }
+\references{
+Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
+}

@@ -29,6 +29,9 @@ Plots a vector with orders of integration of time series.
 \details{
 This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 }
+\references{
+Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
+}
 \seealso{
 \code{\link{order_integration}}
 }

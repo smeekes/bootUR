@@ -19,6 +19,7 @@
 #' \describe{
 #' \item{\code{Error: Multiple time series not allowed. Switch to a multivariate method such as boot_ur, or change argument data to a univariate time series.}}{The function provides a standard ADF test with asymptotic p-value. It does not support multiple time series}
 #' }
+#' @references Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
 #' @examples
 #' # standard ADF test on GDP_BE
 #' GDP_BE_adf <- adf(MacroTS[, 1], deterministics = "trend")
@@ -119,8 +120,8 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
   }else{
     method_name <- paste0("One-step ADF test (with " , deterministics,") on a single time series")
   }
-  
-  
+
+
   adf_out <- list(method = method_name, data.name = data_name,
                   null.value = c("gamma" = 0), alternative = "less",
                   estimate = drop(param), statistic = tstat, p.value = p_val,

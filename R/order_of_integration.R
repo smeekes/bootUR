@@ -5,6 +5,7 @@
 #' @param keep_NAs Logical indicator whether or not to keep the \code{NA} values resulting from differencing at the beginning of the sample. Default is \code{TRUE}. If \code{FALSE}, the entire row containing the \code{NA} values is removed.
 #' @export
 #' @return The appropriately differenced data in the same format as the original data.
+#' @references Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
 diff_mult <- function(data, d, keep_NAs = TRUE) {
   x <- as.matrix(data)
   diffed_x <- matrix(NA, nrow = nrow(x), ncol = ncol(x))
@@ -51,6 +52,7 @@ diff_mult <- function(data, d, keep_NAs = TRUE) {
 #' @return An object of class \code{"bootUR", "order_integration"} with the following components
 #' \item{\code{order_int}}{A vector with the found orders of integration of each time series.}
 #' \item{\code{diff_data}}{The appropriately differenced data according to \code{order_int} in the same format as the original data.}
+#' @references Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
 #' @references Smeekes, S. and Wijler, E. (2020). Unit roots and cointegration. In P. Fuleky (Ed.) \emph{Macroeconomic Forecasting in the Era of Big Data}, Chapter 17, pp. 541-584. \emph{Advanced Studies in Theoretical and Applied Econometrics}, vol. 52. Springer.
 #' @examples
 #' # Use "boot_ur" to determine the order of GDP_BE and GDP_DE
@@ -156,6 +158,7 @@ order_integration <- function(data, max_order = 2, method = "boot_ur", level = 0
 #' @export
 #' @details This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 #' @return A \code{ggplot2} object containing the plot of the orders of integration.
+#' @references Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
 #' @seealso \code{\link{order_integration}}
 plot_order_integration <- function(orders, show_names = TRUE, show_legend = TRUE,
                                    names_size = NULL, legend_size = NULL, cols = NULL) {
@@ -223,6 +226,7 @@ plot_order_integration <- function(orders, show_names = TRUE, show_legend = TRUE
 #' @param X A (\eqn{T}x\eqn{N})-matrix of \eqn{N} time series with \eqn{T} observations. Data may also be in a time series format (e.g. \code{ts}, \code{zoo} or \code{xts}) or data frame.
 #' @export
 #' @return \eqn{N}-dimensional vector, for each series whether missing values are present (\code{TRUE}) or not (\code{FALSE})
+#' @references Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
 check_missing_insample_values <- function(X) {
   X <- as.matrix(X)
   n <- nrow(X)
@@ -236,6 +240,7 @@ check_missing_insample_values <- function(X) {
 #' @return A list with the following components
 #' \item{\code{range}}{(2x\eqn{N})-dimensional matrix containing the first and last non-missing observation in each column of X.}
 #' \item{\code{all_equal}}{Logical value indicating whether all series have the same non-missing indices.}
+#' @references Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
 find_nonmissing_subsample <- function(X) {
   names <- colnames(X)
   X <- as.matrix(X)
@@ -265,6 +270,7 @@ find_nonmissing_subsample <- function(X) {
 #'
 #' This function requires the package \code{ggplot2} to be installed. If the package is not found, plotting is aborted.
 #' @return A \code{ggplot2} object containing the missing values plot.
+#' @references Smeekes, S. and Wilms, I. (2023). bootUR: An R Package for Bootstrap Unit Root Tests. \emph{Journal of Statistical Software}, 106(12), 1-39.
 plot_missing_values <- function(y, show_names = FALSE, show_legend = TRUE,
                                 axis_text_size = NULL, legend_size = NULL,
                                 cols = NULL) {

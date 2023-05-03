@@ -1,0 +1,13 @@
+bibentry(bibtype = "Article",
+  title        = "{bootUR}: An {R} Package for Bootstrap Unit Root Tests",
+  author       = c(person(given = "Stephan", family = "Smeekes", email = "s.smeekes@maastrichtuniversity.nl"),
+                   person(given = "Ines", family = "Wilms", email = "i.wilms@maastrichtuniversity.nl")),
+  journal      = "Journal of Statistical Software",
+  year         = "2023",
+  volume       = "106",
+  number       = "12",
+  pages        = "1--39",
+  doi          = "10.18637/jss.v106.i12",
+  header       = "To cite bootUR in publications use:"
+)
+
