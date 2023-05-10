@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 [![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
 [![License_GPLv2_Badge](https://img.shields.io/badge/License-GPLv2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![License_GPLv3_Badge](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![R-CMD-check](https://github.com/smeekes/bootUR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/smeekes/bootUR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The R package `bootUR` implements several bootstrap tests for unit roots, both for single time series and for (potentially) large systems of time series.
