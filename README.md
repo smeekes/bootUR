@@ -5,10 +5,11 @@
 
 <!-- badges: start -->
 
-[![CRAN\_Version\_Badge](http://www.r-pkg.org/badges/version/bootUR)](https://cran.r-project.org/package=bootUR)
-[![CRAN\_Downloads\_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
-[![License\_GPLv2\_Badge](https://img.shields.io/badge/License-GPLv2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
-[![License\_GPLv3\_Badge](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![CRAN_Version_Badge](http://www.r-pkg.org/badges/version/bootUR)](https://cran.r-project.org/package=bootUR)
+[![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
+[![License_GPLv2_Badge](https://img.shields.io/badge/License-GPLv2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![License_GPLv3_Badge](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![R-CMD-check](https://github.com/smeekes/bootUR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/smeekes/bootUR/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The R package `bootUR` implements several bootstrap tests for unit
@@ -153,14 +154,14 @@ specification, including a linear trend in the specification.
 GDP_NL <- MacroTS[, 4]
 adf(GDP_NL, deterministics = "trend")
 #> 
-#>  Two-step ADF test ( with intercept and trend ) on a single time series
+#>  Two-step ADF test (with trend) on a single time series
 #> 
-#> data:  GDP_NL
-#> tstat = -2.5153, p-value = 0.3202
-#> alternative hypothesis: true gamma is less than 0
-#> sample estimates:
-#>       gamma 
-#> -0.05286343
+#> data: GDP_NL
+#> null hypothesis: Series has a unit root
+#> alternative hypothesis: Series is stationary
+#> 
+#>        estimate largest root statistic p-value
+#> GDP_NL                0.9471    -2.515  0.3202
 ```
 
 ## Univariate Bootstrap Unit Root Tests
@@ -203,15 +204,15 @@ boot_adf(GDP_NL, B = 399, bootstrap = "SB", deterministics = "trend",
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  SB Bootstrap OLS test ( with intercept and trend ) on a single time
+#>  SB bootstrap OLS test (with intercept and trend) on a single time
 #>  series
 #> 
-#> data:  GDP_NL
-#> tstat = -2.5153, p-value = 0.1454
-#> alternative hypothesis: true gamma is less than 0
-#> sample estimates:
-#>       gamma 
-#> -0.05286343
+#> data: GDP_NL
+#> null hypothesis: Series has a unit root
+#> alternative hypothesis: Series is stationary
+#> 
+#>        estimate largest root statistic p-value
+#> GDP_NL                0.9471    -2.515  0.1454
 ```
 
 ### Union of Rejections Test
@@ -230,14 +231,14 @@ boot_union(GDP_NL, B = 399, bootstrap = "SWB", do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  SWB Bootstrap Union test on a single time series
+#>  SWB bootstrap union test on a single time series
 #> 
-#> data:  GDP_NL
-#> tstat = -0.71148, p-value = 0.614
-#> alternative hypothesis: true gamma is less than 0
-#> sample estimates:
-#> gamma 
-#>    NA
+#> data: GDP_NL
+#> null hypothesis: Series has a unit root
+#> alternative hypothesis: Series is stationary
+#> 
+#>        estimate largest root statistic p-value
+#> GDP_NL                    NA   -0.7115   0.614
 ```
 
 ## Panel Unit Root Test
@@ -279,14 +280,14 @@ boot_panel(MacroTS, bootstrap = "DWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  Panel DWB Bootstrap Group-Mean Union test
+#>  Panel DWB bootstrap group-mean union test
 #> 
-#> data:  MacroTS
-#> tstat = -0.86213, p-value = 0.1103
-#> alternative hypothesis: true gamma is less than 0
-#> sample estimates:
-#> gamma 
-#>    NA
+#> data: MacroTS
+#> null hypothesis: All series have a unit root
+#> alternative hypothesis: Some series are stationary
+#> 
+#>         estimate largest root statistic p-value
+#> MacroTS                    NA   -0.8621  0.1103
 ```
 
 ## Tests for Multiple Time Series
@@ -304,26 +305,27 @@ case a warning is given to alert the user.
 ``` r
 ADFtests_out <- boot_ur(MacroTS[, 1:5], bootstrap = "MBB", B = 399, union = FALSE, 
                         deterministics = "trend", detrend = "OLS", do_parallel = FALSE)
-#> Warning in check_inputs(data = data, boot_sqt_test = boot_sqt_test, boot_ur_test
-#> = boot_ur_test, : Missing values cause resampling bootstrap to be executed for
-#> each time series individually.
+#> Warning in check_inputs(data = data, boot_sqt_test = boot_sqt_test,
+#> boot_ur_test = boot_ur_test, : Missing values cause resampling bootstrap to be
+#> executed for each time series individually.
 #> Progress: |------------------| 
 #>           ********************
 print(ADFtests_out)
 #> 
-#>  MBB Bootstrap ADF test ( with intercept and trend ) on each individual
+#>  MBB bootstrap ADF test (with intercept and trend) on each individual
 #>  series (no multiple testing correction)
 #> 
 #> data: MacroTS[, 1:5]
-#> alternative hypothesis: true gamma is less than 0
+#> null hypothesis: Series has a unit root
+#> alternative hypothesis: Series is stationary
 #> 
 #> Tests performed on each series: 
-#>        estimate statistic p-value
-#> GDP_BE -0.06958    -2.792  0.1955
-#> GDP_DE -0.10895    -2.774  0.1003
-#> GDP_FR -0.03451    -2.049  0.5113
-#> GDP_NL -0.05286    -2.515  0.1930
-#> GDP_UK -0.03996    -2.449  0.2882
+#>        estimate largest root statistic p-value
+#> GDP_BE                0.9304    -2.792  0.1955
+#> GDP_DE                0.8911    -2.774  0.1003
+#> GDP_FR                0.9655    -2.049  0.5113
+#> GDP_NL                0.9471    -2.515  0.1930
+#> GDP_UK                0.9600    -2.449  0.2882
 ```
 
 Note that `boot_ur` (intentionally) does not provide a correction for
@@ -375,10 +377,11 @@ boot_sqt(MacroTS, steps = 0:N, bootstrap = "AWB", B = 399, do_parallel = FALSE)
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  AWB Bootstrap Sequential Quantile Union test
+#>  AWB bootstrap sequential quantile union test
 #> 
 #> data: MacroTS
-#> alternative hypothesis: true gamma is less than 0
+#> null hypothesis: Series has a unit root
+#> alternative hypothesis: Series is stationary
 #> 
 #> Sequence of tests: 
 #>        H0: # I(0) H1: # I(0)  tstat p-value
@@ -389,10 +392,11 @@ boot_sqt(MacroTS, steps = 0:4 / 4, bootstrap = "AWB", B = 399, do_parallel = FAL
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  AWB Bootstrap Sequential Quantile Union test
+#>  AWB bootstrap sequential quantile union test
 #> 
 #> data: MacroTS
-#> alternative hypothesis: true gamma is less than 0
+#> null hypothesis: Series has a unit root
+#> alternative hypothesis: Series is stationary
 #> 
 #> Sequence of tests: 
 #>        H0: # I(0) H1: # I(0)  tstat p-value
@@ -427,10 +431,11 @@ boot_fdr(MacroTS[, 1:10], FDR_level = 0.1, bootstrap = "BWB", B = 399, do_parall
 #> Progress: |------------------| 
 #>           ********************
 #> 
-#>  BWB Bootstrap Union test with False Discovery Rate control
+#>  BWB bootstrap union test with false discovery rate control
 #> 
 #> data: MacroTS[, 1:10]
-#> alternative hypothesis: true gamma is less than 0
+#> null hypothesis: Series has a unit root
+#> alternative hypothesis: Series is stationary
 #> 
 #> Sequence of tests: 
 #>         tstat critical value
@@ -490,57 +495,56 @@ plot_order_integration(out_orders)
 
 ## References
 
--   Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
-    (2015). Lag length selection for unit root tests in the presence of
-    nonstationary volatility. *Econometric Reviews*, 34(4), 512-536.
--   Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient
-    tests for an autoregressive unit root. *Econometrica*, 64(4),
-    813-836.
--   Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive
-    wild bootstrap inference for nonparametric trends. *Journal of
-    Econometrics*, 214(1), 81-109.
--   Moon, H.R. and Perron, B. (2012). Beyond panel unit root tests:
-    Using multiple testing to determine the non stationarity properties
-    of individual series in a panel. *Journal of Econometrics*, 169(1),
-    29-33.
--   Ng, S. and Perron, P. (2001). Lag Length Selection and the
-    Construction of Unit Root Tests with Good Size and Power.
-    *Econometrica*, 69(6), 1519-1554,
--   Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008). Bootstrap unit
-    root tests: Comparison and extensions. *Journal of Time Series
-    Analysis*, 29(1), 371-401.
--   Palm, F. C., Smeekes, S., and Urbain, J.-.P. (2011). Cross-sectional
-    dependence robust block bootstrap panel unit root tests. *Journal of
-    Econometrics*, 163(1), 85-104.
--   Paparoditis, E. and Politis, D.N. (2003). Residual‐based block
-    bootstrap for unit root testing. *Econometrica*, 71(3), 813-855.
--   Perron, P. and Qu, Z. (2008). A simple modification to improve the
-    finite sample properties of Ng and Perron’s unit root tests.
-    *Economic Letters*, 94(1), 12-19.
--   Rho, Y. and Shao, X. (2019). Bootstrap-assisted unit root testing
-    with piecewise locally stationary errors. *Econometric Theory*,
-    35(1), 142-166.
--   Romano, J.P., Shaikh, A.M., and Wolf, M. (2008). Control of the
-    false discovery rate under dependence using the bootstrap and
-    subsampling. *Test*, 17(3), 417.
--   Romano, J. P. and Wolf, M. (2005). Stepwise multiple testing as
-    formalized data snooping. *Econometrica*, 73(4), 1237-1282.
--   Shao, X. (2010). The dependent wild bootstrap. *Journal of the
-    American Statistical Association*, 105(489), 218-235.
--   Shao, X. (2011). A bootstrap-assisted spectral test of white noise
-    under unknown dependence. *Journal of Econometrics*, 162, 213-224.
--   Smeekes (2013). Detrending bootstrap unit root tests. *Econometric
-    Reviews*, 32(8), 869-891.
--   Smeekes, S. (2015). Bootstrap sequential tests to determine the
-    order of integration of individual units in a time series panel.
-    *Journal of Time Series Analysis*, 36(3), 398-415.
--   Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for
-    unit roots in the presence of nonstationary volatility. *Econometric
-    Theory*, 28(2), 422-456.
--   Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance
-    principle for modified wild bootstrap methods with an application to
-    unit root testing. GSBE Research Memorandum No. RM/14/008,
-    Maastricht University.
--   Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the
-    sieve bootstrap in time series panels. *Oxford Bulletin of Economics
-    and Statistics*, 76(1), 139-151.
+- Cavaliere, G., Phillips, P.C.B., Smeekes, S., and Taylor, A.M.R.
+  (2015). Lag length selection for unit root tests in the presence of
+  nonstationary volatility. *Econometric Reviews*, 34(4), 512-536.
+- Elliott, G., Rothenberg, T.J., and Stock, J.H. (1996). Efficient tests
+  for an autoregressive unit root. *Econometrica*, 64(4), 813-836.
+- Friedrich, M., Smeekes, S. and Urbain, J.-P. (2020). Autoregressive
+  wild bootstrap inference for nonparametric trends. *Journal of
+  Econometrics*, 214(1), 81-109.
+- Moon, H.R. and Perron, B. (2012). Beyond panel unit root tests: Using
+  multiple testing to determine the non stationarity properties of
+  individual series in a panel. *Journal of Econometrics*, 169(1),
+  29-33.
+- Ng, S. and Perron, P. (2001). Lag Length Selection and the
+  Construction of Unit Root Tests with Good Size and Power.
+  *Econometrica*, 69(6), 1519-1554,
+- Palm, F.C., Smeekes, S. and Urbain, J.-P. (2008). Bootstrap unit root
+  tests: Comparison and extensions. *Journal of Time Series Analysis*,
+  29(1), 371-401.
+- Palm, F. C., Smeekes, S., and Urbain, J.-.P. (2011). Cross-sectional
+  dependence robust block bootstrap panel unit root tests. *Journal of
+  Econometrics*, 163(1), 85-104.
+- Paparoditis, E. and Politis, D.N. (2003). Residual‐based block
+  bootstrap for unit root testing. *Econometrica*, 71(3), 813-855.
+- Perron, P. and Qu, Z. (2008). A simple modification to improve the
+  finite sample properties of Ng and Perron’s unit root tests. *Economic
+  Letters*, 94(1), 12-19.
+- Rho, Y. and Shao, X. (2019). Bootstrap-assisted unit root testing with
+  piecewise locally stationary errors. *Econometric Theory*, 35(1),
+  142-166.
+- Romano, J.P., Shaikh, A.M., and Wolf, M. (2008). Control of the false
+  discovery rate under dependence using the bootstrap and subsampling.
+  *Test*, 17(3), 417.
+- Romano, J. P. and Wolf, M. (2005). Stepwise multiple testing as
+  formalized data snooping. *Econometrica*, 73(4), 1237-1282.
+- Shao, X. (2010). The dependent wild bootstrap. *Journal of the
+  American Statistical Association*, 105(489), 218-235.
+- Shao, X. (2011). A bootstrap-assisted spectral test of white noise
+  under unknown dependence. *Journal of Econometrics*, 162, 213-224.
+- Smeekes (2013). Detrending bootstrap unit root tests. *Econometric
+  Reviews*, 32(8), 869-891.
+- Smeekes, S. (2015). Bootstrap sequential tests to determine the order
+  of integration of individual units in a time series panel. *Journal of
+  Time Series Analysis*, 36(3), 398-415.
+- Smeekes, S. and Taylor, A.M.R. (2012). Bootstrap union tests for unit
+  roots in the presence of nonstationary volatility. *Econometric
+  Theory*, 28(2), 422-456.
+- Smeekes, S. and Urbain, J.-P. (2014a). A multivariate invariance
+  principle for modified wild bootstrap methods with an application to
+  unit root testing. GSBE Research Memorandum No. RM/14/008, Maastricht
+  University.
+- Smeekes, S. and Urbain, J.-P. (2014b). On the applicability of the
+  sieve bootstrap in time series panels. *Oxford Bulletin of Economics
+  and Statistics*, 76(1), 139-151.
