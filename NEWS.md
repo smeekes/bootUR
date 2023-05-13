@@ -1,3 +1,8 @@
+## Version 1.0.1
+
+### Bug Fixes
+* Fixed the CRAN check Additional Issues.
+
 ## Version 1.0.0
 
 ### New Functionality

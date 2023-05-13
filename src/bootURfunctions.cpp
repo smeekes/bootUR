@@ -558,50 +558,52 @@ arma::mat bootstrap_tests_cpp(const arma::mat& u, const arma::mat& e, bFun boot_
   return adf_btests;
 }
 
-struct boot_par : public RcppParallel::Worker
-{
-  // inputs
-  const arma::umat& i; const arma::mat& z; const arma::mat& u0; const arma::mat& e0;
-  const bFun& boot_f; const int& l; const arma::mat& s; const double& ar;
-  const arma::mat& ar_est; const arma::mat& y0; const int& pmin; const int& pmax;
-  const icFun& ic_type; const arma::vec& dc; const arma::vec& detr; const bool& ic_scale;
-  const double& h_rs; const arma::umat& range; const bool& joint;
-  const int N = u0.n_cols;
-  const int detrlength = detr.size();
-  const int dclength = dc.size();
+namespace bootur {
+  struct boot_par : public RcppParallel::Worker
+  {
+    // inputs
+    const arma::umat& i; const arma::mat& z; const arma::mat& u0; const arma::mat& e0;
+    const bFun& boot_f; const int& l; const arma::mat& s; const double& ar;
+    const arma::mat& ar_est; const arma::mat& y0; const int& pmin; const int& pmax;
+    const icFun& ic_type; const arma::vec& dc; const arma::vec& detr; const bool& ic_scale;
+    const double& h_rs; const arma::umat& range; const bool& joint;
+    const int N = u0.n_cols;
+    const int detrlength = detr.size();
+    const int dclength = dc.size();
 
-  // Output
-  arma::cube& output;
-  bootur::progress& prog;
+    // Output
+    arma::cube output;
+    bootur::progress& prog;
 
-  // initialize with source and destination
-  boot_par(const arma::umat& i, const arma::mat& z, const arma::mat& u0,
-           const arma::mat& e0, const bFun& boot_f, const int& l,
-           const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0,
-           const int& pmin, const int& pmax, const icFun& ic_type, const arma::vec& dc,
-           const arma::vec& detr, const bool& ic_scale, const double& h_rs,
-           const arma::umat& range, const bool& joint, arma::cube& output, bootur::progress& prog)
-    : i(i), z(z), u0(u0), e0(e0), boot_f(boot_f), l(l), s(s), ar(ar), ar_est(ar_est), y0(y0),
-      pmin(pmin), pmax(pmax), ic_type(ic_type), dc(dc), detr(detr), ic_scale(ic_scale),
-      h_rs(h_rs), range(range), joint(joint), output(output), prog(prog) {}
+    // initialize with source and destination
+    boot_par(const arma::umat& i, const arma::mat& z, const arma::mat& u0,
+             const arma::mat& e0, const bFun& boot_f, const int& l,
+             const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0,
+             const int& pmin, const int& pmax, const icFun& ic_type, const arma::vec& dc,
+             const arma::vec& detr, const bool& ic_scale, const double& h_rs,
+             const arma::umat& range, const bool& joint, arma::cube output, bootur::progress& prog)
+      : i(i), z(z), u0(u0), e0(e0), boot_f(boot_f), l(l), s(s), ar(ar), ar_est(ar_est), y0(y0),
+        pmin(pmin), pmax(pmax), ic_type(ic_type), dc(dc), detr(detr), ic_scale(ic_scale),
+        h_rs(h_rs), range(range), joint(joint), output(output), prog(prog) {}
 
-  // Bootstrap
-  void operator()(std::size_t begin, std::size_t end) {
-    if (joint) {
-      for (std::size_t iB = begin; iB < end; iB++) {
-        output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
-        prog.increment();
-      }
-    } else {
-      for (std::size_t iB = begin; iB < end; iB++) {
-        for (int iN = 0; iN < N; iN++) {
-          output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
+    // Bootstrap
+    void operator()(std::size_t begin, std::size_t end) {
+      if (joint) {
+        for (std::size_t iB = begin; iB < end; iB++) {
+          output.subcube(iB, 0, 0, iB, dclength * detrlength - 1, N - 1) = bootstrap_tests_cpp(u0, e0, boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est, y0, pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range);
+          prog.increment();
         }
-        prog.increment();
+      } else {
+        for (std::size_t iB = begin; iB < end; iB++) {
+          for (int iN = 0; iN < N; iN++) {
+            output.subcube(iB, 0, iN, iB, dclength * detrlength - 1, iN) = bootstrap_tests_cpp(u0.col(iN), e0.col(iN), boot_f, z.col(iB), i.col(iB), l, s, ar, ar_est.col(iN), y0.col(iN), pmin, pmax, ic_type, dc, detr, ic_scale, h_rs, range.col(iN));
+          }
+          prog.increment();
+        }
       }
     }
-  }
-};
+  };
+}
 
 // [[Rcpp::export]]
 arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, const int& boot,
@@ -637,7 +639,7 @@ arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, c
 
   bootur::progress prog(B, show_progress);
   if (do_parallel) {
-    boot_par boot_loops(i, z, u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type,
+    bootur::boot_par boot_loops(i, z, u0, e0, boot_f, l, s, ar, ar_est, y0, pmin, pmax, ic_type,
                         dc, detr, ic_scale, h_rs, range, joint, output, prog);
     RcppParallel::parallelFor(0, B, boot_loops);
   } else {
