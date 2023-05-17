@@ -71,7 +71,7 @@ BEGIN_RCPP
 END_RCPP
 }
 // bootstrap_cpp
-arma::cube bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint, const bool& do_parallel, const bool& show_progress);
+arma::mat bootstrap_cpp(const int& B, const arma::mat& u, const arma::mat& e, const int& boot, const int& l, const arma::mat& s, const double& ar, const arma::mat& ar_est, const arma::mat& y0, const int& pmin, const int& pmax, const int& ic, const arma::vec& dc, const arma::vec& detr, const bool& ic_scale, const double& h_rs, const arma::umat& range, const bool& joint, const bool& do_parallel, const bool& show_progress);
 RcppExport SEXP _bootUR_bootstrap_cpp(SEXP BSEXP, SEXP uSEXP, SEXP eSEXP, SEXP bootSEXP, SEXP lSEXP, SEXP sSEXP, SEXP arSEXP, SEXP ar_estSEXP, SEXP y0SEXP, SEXP pminSEXP, SEXP pmaxSEXP, SEXP icSEXP, SEXP dcSEXP, SEXP detrSEXP, SEXP ic_scaleSEXP, SEXP h_rsSEXP, SEXP rangeSEXP, SEXP jointSEXP, SEXP do_parallelSEXP, SEXP show_progressSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
@@ -101,26 +101,28 @@ BEGIN_RCPP
 END_RCPP
 }
 // scaling_factors_cpp
-arma::mat scaling_factors_cpp(const arma::cube& u, const double& prob);
-RcppExport SEXP _bootUR_scaling_factors_cpp(SEXP uSEXP, SEXP probSEXP) {
+arma::mat scaling_factors_cpp(const arma::mat& u, const int& D, const double& prob);
+RcppExport SEXP _bootUR_scaling_factors_cpp(SEXP uSEXP, SEXP DSEXP, SEXP probSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::cube& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type u(uSEXP);
+    Rcpp::traits::input_parameter< const int& >::type D(DSEXP);
     Rcpp::traits::input_parameter< const double& >::type prob(probSEXP);
-    rcpp_result_gen = Rcpp::wrap(scaling_factors_cpp(u, prob));
+    rcpp_result_gen = Rcpp::wrap(scaling_factors_cpp(u, D, prob));
     return rcpp_result_gen;
 END_RCPP
 }
 // union_tests_cpp
-arma::mat union_tests_cpp(const arma::cube& t, arma::mat& s);
-RcppExport SEXP _bootUR_union_tests_cpp(SEXP tSEXP, SEXP sSEXP) {
+arma::mat union_tests_cpp(const arma::mat& t, const int& D, arma::mat& s);
+RcppExport SEXP _bootUR_union_tests_cpp(SEXP tSEXP, SEXP DSEXP, SEXP sSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const arma::cube& >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const arma::mat& >::type t(tSEXP);
+    Rcpp::traits::input_parameter< const int& >::type D(DSEXP);
     Rcpp::traits::input_parameter< arma::mat& >::type s(sSEXP);
-    rcpp_result_gen = Rcpp::wrap(union_tests_cpp(t, s));
+    rcpp_result_gen = Rcpp::wrap(union_tests_cpp(t, D, s));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -199,8 +201,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bootUR_adf_tests_panel_cpp", (DL_FUNC) &_bootUR_adf_tests_panel_cpp, 9},
     {"_bootUR_adf_panel_bootstrap_dgp_cpp", (DL_FUNC) &_bootUR_adf_panel_bootstrap_dgp_cpp, 10},
     {"_bootUR_bootstrap_cpp", (DL_FUNC) &_bootUR_bootstrap_cpp, 20},
-    {"_bootUR_scaling_factors_cpp", (DL_FUNC) &_bootUR_scaling_factors_cpp, 2},
-    {"_bootUR_union_tests_cpp", (DL_FUNC) &_bootUR_union_tests_cpp, 2},
+    {"_bootUR_scaling_factors_cpp", (DL_FUNC) &_bootUR_scaling_factors_cpp, 3},
+    {"_bootUR_union_tests_cpp", (DL_FUNC) &_bootUR_union_tests_cpp, 3},
     {"_bootUR_union_test_cpp", (DL_FUNC) &_bootUR_union_test_cpp, 2},
     {"_bootUR_BSQT_cpp", (DL_FUNC) &_bootUR_BSQT_cpp, 4},
     {"_bootUR_iADF_cpp", (DL_FUNC) &_bootUR_iADF_cpp, 2},

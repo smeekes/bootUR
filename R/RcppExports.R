@@ -17,12 +17,12 @@ bootstrap_cpp <- function(B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, d
     .Call(`_bootUR_bootstrap_cpp`, B, u, e, boot, l, s, ar, ar_est, y0, pmin, pmax, ic, dc, detr, ic_scale, h_rs, range, joint, do_parallel, show_progress)
 }
 
-scaling_factors_cpp <- function(u, prob) {
-    .Call(`_bootUR_scaling_factors_cpp`, u, prob)
+scaling_factors_cpp <- function(u, D, prob) {
+    .Call(`_bootUR_scaling_factors_cpp`, u, D, prob)
 }
 
-union_tests_cpp <- function(t, s) {
-    .Call(`_bootUR_union_tests_cpp`, t, s)
+union_tests_cpp <- function(t, D, s) {
+    .Call(`_bootUR_union_tests_cpp`, t, D, s)
 }
 
 union_test_cpp <- function(t, s) {

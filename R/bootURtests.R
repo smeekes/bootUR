@@ -155,7 +155,7 @@ boot_ur <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_l
                                            function(x,y){paste0(x, "/", y)})))
   } else { # No union test
     iADFout <- iADF_cpp(test_i = matrix(inputs$indiv_test_stats[1, ], nrow = 1),
-                        t_star = matrix(inputs$t_star[ , 1, ], nrow = B))
+                        t_star = matrix(inputs$t_star, nrow = B))
     iADFout <- cbind(t(inputs$indiv_par_est), t(inputs$indiv_test_stats), iADFout)
     # Parameter estimates, tstats and p-values
 
@@ -513,7 +513,7 @@ boot_fdr <- function(data, data_name = NULL, bootstrap = "AWB", B = 1999, block_
                                            function(x,y){paste0(x, "/", y)})))
   } else { # No Union Tests
     bFDRout <- FDR_cpp(test_i = matrix(inputs$indiv_test_stats[1, ], nrow = 1),
-                       t_star = inputs$t_star[ , 1,], level = inputs$level)
+                       t_star = inputs$t_star, level = inputs$level)
     estimates <- t(inputs$indiv_par_est)
     tstats <- drop(inputs$tests_i[1, ])
     method_name <- paste0(bootstrap, " bootstrap ", inputs$inputs$name, " tests (with " ,
@@ -683,7 +683,7 @@ boot_sqt <- function(data, data_name = NULL, steps = 0:NCOL(data), bootstrap = "
   } else { # No Union Tests
     BSQTout <- BSQT_cpp(pvec = inputs$p_vec,
                         test_i = matrix(inputs$indiv_test_stats[1, ], nrow = 1),
-                        t_star = inputs$t_star[ , 1,], level = inputs$level)
+                        t_star = inputs$t_star, level = inputs$level)
     estimates <- t(inputs$indiv_par_est)
     tstats <- drop(inputs$indiv_test_stats)
     method_name <- paste0(bootstrap, " bootstrap sequential quantile ",

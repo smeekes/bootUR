@@ -97,12 +97,15 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   u_boot[is.nan(u_boot)] <- NA
   res <- panel_est$res
   ar_est <- panel_est$par[-1, , drop = FALSE]
-  t_star <- bootstrap_cpp(B = B, boot = boot, u = u_boot, e = res, l = l, s = s_DWB,
+  t_star_mat <- bootstrap_cpp(B = B, boot = boot, u = u_boot, e = res, l = l, s = s_DWB,
                           ar = ar_AWB, ar_est = ar_est, y0 = matrix(0, ncol = N),
                           pmin = min_lag, pmax = max_lag, ic = ic, dc = dc, detr = detr_int,
                           ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss,
                           joint = joint, show_progress = show_progress,
                           do_parallel = do_parallel)
+  
+  D <- length(dc) * length(detr_int)
+  t_star <- array(t_star_mat, dim = c(B, D * N))
 
   tests <- adf_tests_panel_cpp(data, pmin = min_lag, pmax = max_lag, ic = ic,
                                dc = dc, detr = detr_int, ic_scale = criterion_scale,
@@ -112,19 +115,16 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
   lags_ind <- tests$lags   # Selected lag lengths
 
   pvals <- matrix(iADF_cpp(matrix(tests_ind, nrow = 1),
-                  matrix(t_star, nrow = B)), nrow = N, ncol = 4, byrow = TRUE)
+                           matrix(t_star, nrow = B)), nrow = N, ncol = D, byrow = TRUE)
   if (union) {
-    pvals <- matrix(iADF_cpp(matrix(tests_ind, nrow = 1),
-                             matrix(t_star, nrow = B)), nrow = N, ncol = 4, byrow = TRUE)
-    scaling <- scaling_factors_cpp(t_star, level)
+    scaling <- scaling_factors_cpp(t_star, D, level)
     if (N > 1) {
-      test_stats_star <- union_tests_cpp(t_star, scaling)
-      test_stats <- union_tests_cpp(array(tests_ind, dim = c(1, length(dc) * length(detr_int), N)),
+      test_stats_star <- union_tests_cpp(t_star, D, scaling)
+      test_stats <- union_tests_cpp(array(tests_ind, dim = c(1, D * N)), D,
                                     scaling)
     } else {
-      test_stats_star <- union_test_cpp(t_star[, , 1], scaling)
-      test_stats <- union_test_cpp(array(tests_ind,
-                                         dim = c(1, length(dc) * length(detr_int))), scaling)
+      test_stats_star <- union_test_cpp(t_star, scaling)
+      test_stats <- union_test_cpp(array(tests_ind, dim = c(1, D)), scaling)
     }
   } else {
     pvals <- matrix(iADF_cpp(matrix(tests_ind, nrow = 1),
