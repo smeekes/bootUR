@@ -103,7 +103,7 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
                           ic_scale = criterion_scale, h_rs = h_rs, range = range_nonmiss,
                           joint = joint, show_progress = show_progress,
                           do_parallel = do_parallel)
-  
+
   D <- length(dc) * length(detr_int)
   t_star <- array(t_star_mat, dim = c(B, D * N))
 
@@ -164,7 +164,6 @@ do_tests_and_bootstrap <- function(data, boot_sqt_test, boot_ur_test, level, boo
 #' @param deterministics Numeric vector indicating the deterministic specification. Only relevant if \code{union = FALSE}. Options are (combinations of): \code{0} - no deterministics; \code{1} - intercept only; \code{2} - intercept and trend. If \code{union = FALSE} and \code{deterministics = NULL}, an intercept is added.
 #' @param detrend String vector indicating the type of detrending to be performed. Only relevant if \verb{union = FALSE}. Options are: \verb{"OLS"} and/or \verb{"QD"} (typically also called GLS). If NULL, set to \verb{"OLS"}.
 #' @param steps Numeric vector of quantiles to be tested. Default is to test each unit sequentially.
-#' @param h_rs Bandwidth used in rescaled information criteria.
 #' @seealso \code{\link{boot_ur}}, \code{\link{boot_sqt}}, \code{\link{boot_fdr}}
 #' @keywords internal
 check_inputs <- function(data, boot_sqt_test, boot_ur_test, level, bootstrap, B, block_length,

@@ -1,3 +1,8 @@
+## Version 1.0.3
+
+### Bug Fixes
+* Removed the unused argument 'h_rs' from the documentation of the function chech_inputs() (CRAN note).
+
 ## Version 1.0.2
 
 ### Bug Fixes

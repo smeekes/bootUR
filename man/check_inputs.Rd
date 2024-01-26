@@ -52,8 +52,6 @@ check_inputs(data, boot_sqt_test, boot_ur_test, level, bootstrap, B,
 \item{cores}{The number of cores to be used in the parallel loops. Default is to use all but one.}
 
 \item{data_name}{Optional name for the data, to be used in the output. The default uses the name of the 'data' argument.}
-
-\item{h_rs}{Bandwidth used in rescaled information criteria.}
 }
 \description{
 Auxiliary Function (not accessible to users) to check if all arguments put in by the user are correct, and to perform some preliminary calculations.
