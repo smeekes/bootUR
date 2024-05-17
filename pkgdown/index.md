@@ -1,0 +1,64 @@
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# bootUR: Bootstrap Unit Root Tests
+
+<!-- badges: start -->
+
+[![CRAN_Version_Badge](http://www.r-pkg.org/badges/version/bootUR)](https://cran.r-project.org/package=bootUR)
+[![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
+[![License_GPLv2_Badge](https://img.shields.io/badge/License-GPLv2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![License_GPLv3_Badge](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+[![R-CMD-check](https://github.com/smeekes/bootUR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/smeekes/bootUR/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+The R package `bootUR` implements several bootstrap tests for unit
+roots, both for single time series and for (potentially) large systems
+of time series.
+
+## Installation and Loading
+
+The package can be installed from CRAN using
+
+``` r
+install.packages("bootUR")
+```
+
+The development version of the `bootUR` package can be installed from
+GitHub using
+
+``` r
+# install.packages("devtools")
+devtools::install_github("smeekes/bootUR")
+```
+
+When installing from GitHub, in order to build the package from source,
+you need to have the appropriate R development tools installed
+([Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows, or
+[these tools](https://mac.r-project.org/tools/) on Mac).
+
+If you want the vignette to appear in your package when installing from
+GitHub, use
+
+``` r
+# install.packages("devtools")
+devtools::install_github("smeekes/bootUR", build_vignettes = TRUE, dependencies = TRUE)
+```
+
+instead. As building the vignette may take a bit of time (all bootstrap
+code below is run), package installation will be slower this way.
+
+After installation, the package can be loaded in the standard way:
+
+``` r
+library(bootUR)
+```
+
+## Functionality
+
+A quick overview of the package functionality is provided in the
+vignette `vignette("bootUR")`.
+
+A further investigation of the functionalities is provided in the
+*Journal of Statistical Software* article [bootUR: An R Package for
+Bootstrap Unit Root Tests](https://doi.org/10.18637/jss.v106.i12).

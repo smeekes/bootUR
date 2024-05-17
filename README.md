@@ -35,8 +35,9 @@ devtools::install_github("smeekes/bootUR")
 ```
 
 When installing from GitHub, in order to build the package from source,
-you need to have the appropriate R development tools installed (such as
-[Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows.)
+you need to have the appropriate R development tools installed
+([Rtools](https://cran.r-project.org/bin/windows/Rtools/) on Windows, or
+[these tools](https://mac.r-project.org/tools/) on Mac).
 
 If you want the vignette to appear in your package when installing from
 GitHub, use
