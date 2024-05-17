@@ -1,7 +1,8 @@
 ## Version 1.0.4
 
-### Compatibility
+### Miscellaneous
 * Added RcppParallel cxxflags to makevars, needed for compatibility with Windows ARM64
+* GitHub Actions added
 
 ## Version 1.0.3
 
