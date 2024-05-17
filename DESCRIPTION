@@ -24,7 +24,8 @@ RoxygenNote: 7.2.3
 Imports: 
     Rcpp, stats, urca, RcppParallel, parallelly
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel, RcppThread
-URL: https://github.com/smeekes/bootUR
+URL: https://github.com/smeekes/bootUR,
+    https://smeekes.github.io/bootUR/
 BugReports: https://github.com/smeekes/bootUR/issues
 Suggests: 
     knitr, rmarkdown, testthat, ggplot2

@@ -7,3 +7,4 @@ src/*.so
 src/*.dll
 bootUR.Rproj
 .DS_Store
+docs
