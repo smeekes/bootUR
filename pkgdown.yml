@@ -3,7 +3,7 @@ pkgdown: 2.0.9
 pkgdown_sha: ~
 articles:
   bootUR: bootUR.html
-last_built: 2024-05-20T09:26Z
+last_built: 2024-05-20T10:56Z
 urls:
   reference: https://smeekes.github.io/bootUR/reference
   article: https://smeekes.github.io/bootUR/articles
