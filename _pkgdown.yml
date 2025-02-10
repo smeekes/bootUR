@@ -1,4 +1,4 @@
 url: https://smeekes.github.io/bootUR/
 template:
   bootstrap: 5
-  bootswatch: spacelab
+  bootswatch: flatly

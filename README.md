@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![CRAN_Version_Badge](http://www.r-pkg.org/badges/version/bootUR)](https://cran.r-project.org/package=bootUR)
+[![CRAN_Version_Badge](https://www.r-pkg.org/badges/version/bootUR)](https://cran.r-project.org/package=bootUR)
 [![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bootUR)](https://cran.r-project.org/package=bootUR)
 [![License_GPLv2_Badge](https://img.shields.io/badge/License-GPLv2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
 [![License_GPLv3_Badge](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
