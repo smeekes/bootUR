@@ -1,81 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://smeekes.github.io/bootUR/404.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/LICENSE-text.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/articles/bootUR.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/index.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/MacroTS.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/adf.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/boot_adf.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/boot_fdr.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/boot_panel.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/boot_sqt.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/boot_union.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/boot_ur.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/check_inputs.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/check_missing_insample_values.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/diff_mult.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/do_tests_and_bootstrap.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/find_nonmissing_subsample.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/order_integration.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/plot_missing_values.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/plot_order_integration.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/print.bootUR.html</loc>
-  </url>
-  <url>
-    <loc>https://smeekes.github.io/bootUR/reference/print.mult_htest.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://smeekes.github.io/bootUR/404.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/LICENSE-text.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/articles/bootUR.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/articles/index.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/authors.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/index.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/news/index.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/MacroTS.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/adf.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/boot_adf.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/boot_fdr.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/boot_panel.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/boot_sqt.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/boot_union.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/boot_ur.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/check_inputs.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/check_missing_insample_values.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/diff_mult.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/do_tests_and_bootstrap.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/find_nonmissing_subsample.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/index.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/order_integration.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/plot_missing_values.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/plot_order_integration.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/print.bootUR.html</loc></url>
+<url><loc>https://smeekes.github.io/bootUR/reference/print.mult_htest.html</loc></url>
 </urlset>
+
