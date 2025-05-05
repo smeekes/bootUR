@@ -1,9 +1,9 @@
 pandoc: 3.1.11
-pkgdown: 2.1.1
+pkgdown: 2.1.2
 pkgdown_sha: ~
 articles:
   bootUR: bootUR.html
-last_built: 2025-04-07T11:54Z
+last_built: 2025-05-05T16:54Z
 urls:
   reference: https://smeekes.github.io/bootUR/reference
   article: https://smeekes.github.io/bootUR/articles
