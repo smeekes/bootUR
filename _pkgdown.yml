@@ -11,10 +11,10 @@ navbar:
     right: [search, github, lightswitch, home, software]
   components:
     home:
-      icon: house-door-fill
+      icon: fa-house
       href: https://stephansmeekes.com
       aria-label: Stephan Smeekes
     software:
-      icon: code
+      icon: fa-code
       href: https://stephansmeekes.com.software
       aria-label: Software
