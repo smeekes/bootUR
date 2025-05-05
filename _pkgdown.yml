@@ -1,4 +1,20 @@
 url: https://smeekes.github.io/bootUR/
 template:
   bootstrap: 5
-  bootswatch: spacelab
+  bootswatch: cosmo
+  light-switch: true
+  bslib:
+   primary: "#00A2DB"
+   navbar-bg: "#001C3D"
+navbar:
+  structure:
+    right: [search, github, lightswitch, home, software]
+  components:
+    home:
+      icon: house-door-fill
+      href: https://stephansmeekes.com
+      aria-label: Stephan Smeekes
+    software:
+      icon: code
+      href: https://stephansmeekes.com.software
+      aria-label: Software
