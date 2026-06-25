@@ -1,3 +1,11 @@
+## Version 1.0.5
+
+### Miscellaneous
+* Updated the package website address
+
+### Bug Fixes
+* Fixed the bug in adf() with argument 'MBIC' (issue #7).
+
 ## Version 1.0.4
 
 ### Miscellaneous

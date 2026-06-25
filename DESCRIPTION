@@ -24,7 +24,7 @@ Imports:
     Rcpp, stats, urca, RcppParallel, parallelly
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel, RcppThread
 URL: https://github.com/smeekes/bootUR,
-    https://smeekes.github.io/bootUR/
+    https://stephansmeekes.com/bootUR/
 BugReports: https://github.com/smeekes/bootUR/issues
 Suggests: 
     knitr, rmarkdown, testthat, ggplot2
