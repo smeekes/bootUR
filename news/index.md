@@ -1,5 +1,16 @@
 # Changelog
 
+## Version 1.0.5
+
+### Miscellaneous
+
+- Updated the package website address
+
+### Bug Fixes
+
+- Fixed the bug in adf() with argument ‘MBIC’ (issue
+  [\#7](https://github.com/smeekes/bootUR/issues/7)).
+
 ## Version 1.0.4
 
 CRAN release: 2024-05-20
