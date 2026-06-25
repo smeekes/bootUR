@@ -1,7 +1,7 @@
 Package: bootUR
 Type: Package
 Title: Bootstrap Unit Root Tests
-Version: 1.0.4
+Version: 1.0.5
 Authors@R: c(
    person("Stephan", "Smeekes", email = "s.smeekes@maastrichtuniversity.nl", role = c("cre", "aut"), 
    comment = c(ORCID = "0000-0002-0157-639X")),
@@ -20,7 +20,6 @@ License: GPL (>=2)
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(old_usage = TRUE)
-RoxygenNote: 7.3.1
 Imports: 
     Rcpp, stats, urca, RcppParallel, parallelly
 LinkingTo: Rcpp, RcppArmadillo, RcppParallel, RcppThread
@@ -31,3 +30,4 @@ Suggests:
     knitr, rmarkdown, testthat, ggplot2
 VignetteBuilder: knitr
 SystemRequirements: GNU make
+Config/roxygen2/version: 8.0.0

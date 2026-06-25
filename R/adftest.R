@@ -62,8 +62,7 @@ adf <- function(data, data_name = NULL, deterministics = "intercept", min_lag = 
   if (any(!is.element(criterion, c("AIC", "BIC", "MAIC", "MBIC"))) | length(criterion) > 1) {
     stop("The argument criterion should be equal to either AIC, BIC, MAIC, MBIC)")
   }
-  ic <- 1*(criterion == "AIC") + 2*(criterion == "BIC") + 3*(criterion == "MAIC")
-        + 4*(criterion == "MBIC")
+  ic <- 1*(criterion == "AIC") + 2*(criterion == "BIC") + 3*(criterion == "MAIC") + 4*(criterion == "MBIC")
 
   if (is.null(deterministics)) {
     stop("No deterministic specification set.
