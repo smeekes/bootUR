@@ -10,7 +10,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/smeekes/bootUR/blob/master/inst/CITATION)
+[`inst/CITATION`](https://github.com/smeekes/bootUR/blob/v1.0.5/inst/CITATION)
 
 Smeekes S, Wilms I (2023). “bootUR: An R Package for Bootstrap Unit Root
 Tests.” *Journal of Statistical Software*, **106**(12), 1–39.

@@ -2,6 +2,8 @@
 
 ## Version 1.0.5
 
+CRAN release: 2026-06-25
+
 ### Miscellaneous
 
 - Updated the package website address
